@@ -1,0 +1,668 @@
+<script>
+function cargarPedidosAdmin() {
+  cargarDashboardAdmin();
+}
+
+function renderizarPedidosAdmin_() {
+  const contenedor = document.getElementById("lista-pedidos-admin");
+  if (!contenedor) return;
+
+  if (!pedidosAdminActuales.length) {
+    contenedor.innerHTML = "<div class=\"empty-state\">Sin pedidos pendientes. / Keine offenen Anfragen.</div>";
+    return;
+  }
+
+  const pedidosFiltrados = pedidosAdminActuales.filter(filtrarPedidoAdmin_);
+  if (!pedidosFiltrados.length) {
+    contenedor.innerHTML = "<div class=\"empty-state\">No hay pedidos que coincidan con el filtro actual.</div>";
+    return;
+  }
+
+  contenedor.innerHTML = pedidosFiltrados.map(renderizarPedidoAdmin_).join("");
+}
+
+function actualizarFiltroPedidosAdmin() {
+  filtroPedidosAdmin.termino = String((document.getElementById("filtro-pedidos-admin") || {}).value || "").trim().toLocaleLowerCase("es");
+  filtroPedidosAdmin.soloFaltantes = !!((document.getElementById("filtro-pedidos-faltantes") || {}).checked);
+  renderizarPedidosAdmin_();
+}
+
+function filtrarPedidoAdmin_(pedido) {
+  const termino = filtroPedidosAdmin.termino || "";
+  const soloFaltantes = !!filtroPedidosAdmin.soloFaltantes;
+  const coincideFaltantes = !soloFaltantes || pedido.items.some(function(item) {
+    return item.faltante > 0;
+  });
+
+  if (!termino) return coincideFaltantes;
+
+  const base = [
+    pedido.id,
+    pedido.usuario,
+    pedido.solicitanteMail,
+    pedido.fecha
+  ].join(" ").toLocaleLowerCase("es");
+  const coincidePedido = base.includes(termino);
+  const coincideItem = pedido.items.some(function(item) {
+    return [item.producto, item.estado].join(" ").toLocaleLowerCase("es").includes(termino);
+  });
+  return coincideFaltantes && (coincidePedido || coincideItem);
+}
+
+function renderizarPedidoAdmin_(pedido) {
+  if (rolActual && rolActual.isOperadorEntrega) {
+    return renderizarPedidoEntregaSimple_(pedido);
+  }
+
+  const itemsConRiesgo = pedido.items.filter(item => item.faltante > 0).length;
+  const itemsConRevision = pedido.items.filter(item => item.requiereRevision).length;
+  const alerta = itemsConRiesgo
+    ? `<span class="status-pill status-danger">${itemsConRiesgo} con faltante</span>`
+    : `<span class="status-pill status-ok">Sin faltantes</span>`;
+  const revision = itemsConRevision
+    ? `<span class="status-pill status-warning">${itemsConRevision} revisar cierre</span>`
+    : "";
+  const clavePedido = crearClaveDomSegura_(pedido.id);
+  const expandido = !!pedidosExpandido[clavePedido];
+  const lineasPendientes = pedido.items.reduce((total, item) => total + (item.cantidadPendiente > 0 ? 1 : 0), 0);
+
+  return `
+    <section class="admin-block admin-block-pedidos">
+      <button class="admin-block-toggle" type="button" onclick="togglePedidoAdmin('${clavePedido}')">
+        <div class="admin-block-header">
+          <div>
+            <div class="admin-title-row">
+              <strong>Pedido: ${escapeHtml_(pedido.id)}</strong>
+              ${alerta}
+              ${revision}
+              <span class="status-pill status-neutral">${lineasPendientes} linea(s)</span>
+            </div>
+            <div class="admin-meta">
+              <span>${escapeHtml_(pedido.usuario || "-")}</span>
+              <span>${escapeHtml_(pedido.solicitanteMail || "-")}</span>
+              <span>${escapeHtml_(pedido.fecha || "-")}</span>
+            </div>
+          </div>
+          <span class="section-note">${expandido ? "Ocultar" : "Ver detalle"}</span>
+        </div>
+      </button>
+      <div class="${expandido ? "" : "hidden"}">
+        <div class="batch-toolbar">
+          <span class="batch-toolbar-copy">Usa las acciones rapidas para cargar cantidades y revisa antes de procesar.</span>
+          <div class="batch-toolbar-actions">
+            <button class="btn btn-outline btn-small" type="button" onclick="cargarDisponiblePedidoAdmin('${escapeHtml_(pedido.id)}')">Cargar disponible</button>
+            <button class="btn btn-primary btn-small" onclick="procesarPedidoAdmin('${escapeHtml_(pedido.id)}')">Procesar cambios</button>
+          </div>
+        </div>
+        <div class="pedido-lineas-shell">
+          ${pedido.items.map(item => renderizarLineaPedidoAdmin_(pedido, item)).join("")}
+        </div>
+      </div>
+    </section>`;
+}
+
+function pedidoPuedeEntregarseCompleto_(pedido) {
+  return (pedido.items || []).every(function(item) {
+    const pendienteTotal = Number(item.cantidadPendiente || 0) + Number(item.cantidadLista || 0);
+    return pendienteTotal > 0 && Number(item.stockActual || 0) >= pendienteTotal;
+  });
+}
+
+function pedidoTieneEntregaParcialDisponible_(pedido) {
+  return (pedido.items || []).some(function(item) {
+    const pendienteTotal = Number(item.cantidadPendiente || 0) + Number(item.cantidadLista || 0);
+    return pendienteTotal > 0 && Number(item.stockActual || 0) > 0;
+  });
+}
+
+function renderizarPedidoEntregaSimple_(pedido) {
+  const clavePedido = crearClaveDomSegura_(pedido.id);
+  const expandido = !!pedidosExpandido[clavePedido];
+  const puedeEntregar = pedidoPuedeEntregarseCompleto_(pedido);
+  const puedeEntregarParcial = !puedeEntregar && pedidoTieneEntregaParcialDisponible_(pedido);
+  const faltantes = (pedido.items || []).filter(function(item) {
+    const pendienteTotal = Number(item.cantidadPendiente || 0) + Number(item.cantidadLista || 0);
+    return Number(item.stockActual || 0) < pendienteTotal;
+  }).length;
+  const parciales = (pedido.items || []).filter(function(item) {
+    return Number(item.cantidadRetirada || 0) > 0;
+  }).length;
+  const estado = puedeEntregar
+    ? '<span class="status-pill status-ok">Disponible completo</span>'
+    : `<span class="status-pill status-danger">${faltantes || parciales} revisar</span>`;
+
+  return `
+    <section class="admin-block admin-block-pedidos">
+      <button class="admin-block-toggle" type="button" onclick="togglePedidoAdmin('${clavePedido}')">
+        <div class="admin-block-header">
+          <div>
+            <div class="admin-title-row">
+              <strong>Pedido: ${escapeHtml_(pedido.id)}</strong>
+              ${estado}
+              <span class="status-pill status-neutral">${pedido.items.length} linea(s)</span>
+            </div>
+            <div class="admin-meta">
+              <span>${escapeHtml_(pedido.usuario || "-")}</span>
+              <span>${escapeHtml_(pedido.solicitanteMail || "-")}</span>
+              <span>${escapeHtml_(pedido.fecha || "-")}</span>
+            </div>
+          </div>
+          <span class="section-note">${expandido ? "Ocultar" : "Ver detalle"}</span>
+        </div>
+      </button>
+      <div class="${expandido ? "" : "hidden"}">
+        <div class="batch-toolbar batch-toolbar-success">
+          <span class="batch-toolbar-copy">${puedeEntregar ? "El saldo completo tiene stock disponible." : (puedeEntregarParcial ? "Hay stock para entregar parte del pedido. El saldo queda pendiente." : "No hay stock disponible para entregar este pedido.")}</span>
+          <div class="batch-toolbar-actions">
+            <button class="btn btn-outline btn-small" type="button" ${puedeEntregarParcial ? "" : "disabled"} onclick="entregarPedidoParcialAdmin('${escapeHtml_(pedido.id)}')">Registrar entrega parcial</button>
+            <button class="btn btn-primary btn-small" type="button" ${puedeEntregar ? "" : "disabled"} onclick="entregarPedidoCompletoAdmin('${escapeHtml_(pedido.id)}')">Registrar entrega</button>
+          </div>
+        </div>
+        <div class="pedido-lineas-shell">
+          ${pedido.items.map(renderizarLineaEntregaSimple_).join("")}
+        </div>
+      </div>
+    </section>`;
+}
+
+function renderizarLineaEntregaSimple_(item) {
+  const pendienteTotal = Number(item.cantidadPendiente || 0) + Number(item.cantidadLista || 0);
+  const suficiente = Number(item.stockActual || 0) >= pendienteTotal && Number(item.cantidadRetirada || 0) === 0;
+  return `
+    <article class="linea-operativa ${suficiente ? "" : "linea-operativa-riesgo"}">
+      <div class="linea-operativa-main linea-operativa-main-simple">
+        <div class="linea-producto">
+          <strong>${escapeHtml_(item.producto)}</strong>
+          <span class="producto-subcopy">Pedido: ${pendienteTotal} | Stock fisico: ${item.stockActual}</span>
+          ${item.cantidadRetirada > 0 ? '<span class="faltante-copy">Ya tuvo entrega parcial. Este es el saldo pendiente.</span>' : ""}
+        </div>
+        <div class="linea-metricas">
+          <span class="linea-metrica"><strong>${item.cantidadSolicitada}</strong><small>Solic.</small></span>
+          <span class="linea-metrica"><strong>${pendienteTotal}</strong><small>A entregar</small></span>
+        </div>
+        <div class="linea-stock">
+          <span class="${suficiente ? "status-pill status-ok" : "status-pill status-danger"}">${suficiente ? "Stock suficiente" : `Faltan ${Math.max(pendienteTotal - Number(item.stockActual || 0), 0)}`}</span>
+        </div>
+      </div>
+    </article>`;
+}
+
+function renderizarLineaPedidoAdmin_(pedido, item) {
+  const clave = crearClaveDomSegura_(pedido.id, item.productoId || item.producto);
+  const stockClase = item.faltante > 0 ? "status-pill status-danger" : "status-pill status-ok";
+
+  return `
+    <article class="linea-operativa ${item.faltante > 0 ? "linea-operativa-riesgo" : ""}">
+      <div class="linea-operativa-main">
+        <div class="linea-producto">
+          <strong>${escapeHtml_(item.producto)}</strong>
+          <span class="producto-subcopy">Estado: ${escapeHtml_(item.estado)}${item.faltante > 0 ? ` | Faltan ${item.faltante}` : ""}${item.requiereRevision ? " | Revisar cierre" : ""}</span>
+          ${item.observaciones ? `<span class="producto-subcopy">Obs.: ${escapeHtml_(item.observaciones)}</span>` : ""}
+        </div>
+        <div class="linea-metricas">
+          <span class="linea-metrica"><strong>${item.cantidadSolicitada}</strong><small>Solic.</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadLista}</strong><small>Lista</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadRetirada}</strong><small>Retir.</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadPendiente}</strong><small>Pend.</small></span>
+        </div>
+        <div class="linea-stock">
+          <span class="${stockClase}">Disp. ${item.stockDisponible}</span>
+          <span class="status-pill status-neutral">Fisico ${item.stockActual}</span>
+          <button class="btn btn-chip" type="button" onclick="abrirAjusteStockPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}')">Ajustar stock</button>
+        </div>
+      </div>
+      <div class="linea-operativa-actions">
+        <div class="batch-input-grid batch-input-grid-pedido">
+          <label class="batch-field">
+            <span>Listo</span>
+            <input type="number" min="0" class="cantidad-admin" id="lista-${clave}" placeholder="0">
+          </label>
+          <label class="batch-field">
+            <span>Retiro</span>
+            <input type="number" min="0" class="cantidad-admin" id="retira-${clave}" placeholder="0">
+          </label>
+          <label class="batch-field batch-field-check">
+            <input type="checkbox" id="cancelar-${clave}">
+            <span>Cancelar saldo</span>
+          </label>
+          <label class="batch-field batch-field-wide">
+            <span>Motivo cancelacion</span>
+            <input type="text" id="motivo-cancelar-${clave}" placeholder="Obligatorio si cancela">
+          </label>
+        </div>
+        <div class="quick-action-row">
+          <button class="btn btn-chip" type="button" onclick="aplicarAccionRapidaPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}', 'listo')">Todo listo</button>
+          <button class="btn btn-chip" type="button" onclick="aplicarAccionRapidaPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}', 'retirar')">Retirar listo</button>
+          <button class="btn btn-chip" type="button" onclick="aplicarAccionRapidaPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}', 'listo-retirar')">Listo y retirar</button>
+          ${item.cantidadLista > 0 && item.cantidadRetirada <= 0 ? `<button class="btn btn-chip btn-chip-danger" type="button" onclick="deshacerPreparacionPedidoAdmin('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}')">Deshacer preparado</button>` : ""}
+        </div>
+      </div>
+    </article>`;
+}
+
+function obtenerPedidoAdminActual_(idPedido) {
+  return pedidosAdminActuales.find(function(item) {
+    return item.id === idPedido;
+  }) || null;
+}
+
+function obtenerLineaPedidoAdmin_(idPedido, productoId) {
+  const pedido = obtenerPedidoAdminActual_(idPedido);
+  if (!pedido) return null;
+
+  return (pedido.items || []).find(function(item) {
+    return String(item.productoId || "") === String(productoId || "");
+  }) || null;
+}
+
+function obtenerInputLineaPedido_(idPedido, item, prefijo) {
+  const clave = crearClaveDomSegura_(idPedido, item.productoId || item.producto);
+  return document.getElementById(`${prefijo}-${clave}`);
+}
+
+function setCantidadLineaPedido_(idPedido, item, prefijo, cantidad) {
+  const input = obtenerInputLineaPedido_(idPedido, item, prefijo);
+  if (input) input.value = cantidad > 0 ? String(cantidad) : "";
+}
+
+function obtenerDisponibleParaLinea_(item) {
+  const disponibleLote = Number.isFinite(Number(item.stockDisponibleLote))
+    ? Number(item.stockDisponibleLote)
+    : Number(item.stockDisponible || 0);
+  const yaLista = Number(item.cantidadLista || 0);
+  return Math.max(disponibleLote - yaLista, 0);
+}
+
+function aplicarAccionRapidaPedido(idPedido, productoId, accion, silencioso) {
+  const item = obtenerLineaPedidoAdmin_(idPedido, productoId);
+  if (!item) return 0;
+
+  const pendiente = Number(item.cantidadPendiente || 0);
+  const lista = Number(item.cantidadLista || 0);
+  const stockFisico = Number(item.stockActual || 0);
+  const disponibleParaLinea = obtenerDisponibleParaLinea_(item);
+
+  if (accion === "listo") {
+    const cantidad = Math.min(pendiente, disponibleParaLinea);
+    setCantidadLineaPedido_(idPedido, item, "lista", cantidad);
+    if (!silencioso) {
+      mostrarAviso(cantidad > 0 ? "success" : "info", cantidad > 0 ? `Listo cargado: ${cantidad}.` : "No hay saldo disponible para marcar listo.");
+    }
+    return cantidad;
+  }
+
+  if (accion === "retirar") {
+    const cantidad = Math.min(lista, stockFisico);
+    setCantidadLineaPedido_(idPedido, item, "retira", cantidad);
+    if (!silencioso) {
+      mostrarAviso(cantidad > 0 ? "success" : "info", cantidad > 0 ? `Retiro cargado: ${cantidad}.` : "No hay cantidad lista para retirar.");
+    }
+    return cantidad;
+  }
+
+  if (accion === "listo-retirar") {
+    const cantidadLista = Math.min(pendiente, disponibleParaLinea);
+    const cantidadRetirar = Math.min(lista + cantidadLista, stockFisico);
+    setCantidadLineaPedido_(idPedido, item, "lista", cantidadLista);
+    setCantidadLineaPedido_(idPedido, item, "retira", cantidadRetirar);
+    if (!silencioso) {
+      mostrarAviso(cantidadRetirar > 0 ? "success" : "info", cantidadRetirar > 0 ? `Listo y retiro cargados: ${cantidadRetirar}.` : "No hay stock disponible para retirar.");
+    }
+    return cantidadRetirar;
+  }
+
+  return 0;
+}
+
+function cargarDisponiblePedidoAdmin(idPedido) {
+  const pedido = obtenerPedidoAdminActual_(idPedido);
+  if (!pedido) return;
+
+  let lineasCargadas = 0;
+  (pedido.items || []).forEach(function(item) {
+    const cantidad = aplicarAccionRapidaPedido(idPedido, item.productoId || "", "listo-retirar", true);
+    if (cantidad > 0) lineasCargadas += 1;
+  });
+
+  mostrarAviso(lineasCargadas > 0 ? "success" : "info", lineasCargadas > 0
+    ? `Se cargaron cantidades disponibles en ${lineasCargadas} linea(s). Revisa y procesa cambios.`
+    : "No hay cantidades disponibles para cargar.");
+}
+
+function togglePedidoAdmin(clavePedido) {
+  pedidosExpandido[clavePedido] = !pedidosExpandido[clavePedido];
+  renderizarPedidosAdmin_();
+}
+
+function procesarPedidoAdmin(idPedido) {
+  const pedido = pedidosAdminActuales.find(item => item.id === idPedido);
+  if (!pedido) return;
+
+  const cambios = pedido.items.map(function(item) {
+    const clave = crearClaveDomSegura_(idPedido, item.productoId || item.producto);
+    const cancelarSaldo = !!((document.getElementById(`cancelar-${clave}`) || {}).checked);
+    return {
+      productoId: item.productoId || "",
+      cantidadLista: normalizarCantidadInput((document.getElementById(`lista-${clave}`) || {}).value),
+      cantidadRetirada: normalizarCantidadInput((document.getElementById(`retira-${clave}`) || {}).value),
+      cancelarSaldo: cancelarSaldo,
+      motivoCancelacion: String((document.getElementById(`motivo-cancelar-${clave}`) || {}).value || "").trim()
+    };
+  });
+
+  const cancelacionSinMotivo = cambios.find(function(cambio) {
+    return cambio.cancelarSaldo && !cambio.motivoCancelacion;
+  });
+  if (cancelacionSinMotivo) {
+    mostrarAviso("error", "Ingresa un motivo para cancelar saldo.");
+    return;
+  }
+
+  const cambiosAplicables = cambios.filter(function(cambio) {
+    return cambio.cantidadLista > 0 || cambio.cantidadRetirada > 0 || cambio.cancelarSaldo;
+  });
+
+  if (!cambiosAplicables.length) {
+    mostrarAviso("info", "No hay cambios para procesar en este pedido.");
+    return;
+  }
+
+  mostrarLoading("Procesando pedido...");
+
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || respuesta);
+      if (respuesta && "pedido" in respuesta) {
+        if (respuesta.pedido) {
+          const index = pedidosAdminActuales.findIndex(function(item) { return item.id === idPedido; });
+          if (index >= 0) {
+            pedidosAdminActuales[index] = respuesta.pedido;
+          } else {
+            pedidosAdminActuales.unshift(respuesta.pedido);
+          }
+        } else {
+          pedidosAdminActuales = pedidosAdminActuales.filter(function(item) { return item.id !== idPedido; });
+        }
+        renderizarPedidosAdmin_();
+        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+      } else {
+        cargarDashboardAdmin();
+      }
+      actualizarStockGlobal();
+    })
+    .withFailureHandler(manejarError)
+    .procesarCambiosPedido(idPedido, cambiosAplicables);
+}
+
+function entregarPedidoCompletoAdmin(idPedido) {
+  mostrarLoading("Registrando entrega...");
+
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || respuesta);
+      if (respuesta && "pedido" in respuesta) {
+        if (respuesta.pedido) {
+          const index = pedidosAdminActuales.findIndex(function(item) { return item.id === idPedido; });
+          if (index >= 0) pedidosAdminActuales[index] = respuesta.pedido;
+        } else {
+          pedidosAdminActuales = pedidosAdminActuales.filter(function(item) { return item.id !== idPedido; });
+        }
+        renderizarPedidosAdmin_();
+        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+      } else {
+        cargarDashboardAdmin();
+      }
+      actualizarStockGlobal();
+    })
+    .withFailureHandler(manejarError)
+    .entregarPedidoCompleto(idPedido);
+}
+
+function entregarPedidoParcialAdmin(idPedido) {
+  mostrarLoading("Registrando entrega parcial...");
+
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || respuesta);
+      if (respuesta && "pedido" in respuesta) {
+        if (respuesta.pedido) {
+          const index = pedidosAdminActuales.findIndex(function(item) { return item.id === idPedido; });
+          if (index >= 0) pedidosAdminActuales[index] = respuesta.pedido;
+        } else {
+          pedidosAdminActuales = pedidosAdminActuales.filter(function(item) { return item.id !== idPedido; });
+        }
+        renderizarPedidosAdmin_();
+        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+      } else {
+        cargarDashboardAdmin();
+      }
+      actualizarStockGlobal();
+    })
+    .withFailureHandler(manejarError)
+    .entregarPedidoParcialDisponible(idPedido);
+}
+
+function deshacerPreparacionPedidoAdmin(idPedido, productoId) {
+  const motivo = window.prompt("Motivo para deshacer la preparacion:");
+  if (!motivo) return;
+
+  mostrarLoading("Deshaciendo preparacion...");
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || "Preparacion deshecha.");
+      if (respuesta && "pedido" in respuesta) {
+        const index = pedidosAdminActuales.findIndex(function(item) { return item.id === idPedido; });
+        if (respuesta.pedido && index >= 0) {
+          pedidosAdminActuales[index] = respuesta.pedido;
+        } else if (respuesta.pedido) {
+          pedidosAdminActuales.unshift(respuesta.pedido);
+        }
+        renderizarPedidosAdmin_();
+        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+      } else {
+        cargarDashboardAdmin();
+      }
+    })
+    .withFailureHandler(manejarError)
+    .deshacerPreparacionItemPedido(idPedido, productoId, motivo);
+}
+
+function abrirAjusteStockPedido(idPedido, productoId) {
+  const pedido = pedidosAdminActuales.find(function(item) {
+    return item.id === idPedido;
+  });
+  if (!pedido) return;
+
+  const linea = (pedido.items || []).find(function(item) {
+    return String(item.productoId || "") === String(productoId || "");
+  });
+  if (!linea) return;
+
+  ajusteStockContexto = {
+    pedidoId: idPedido,
+    productoId: String(productoId || ""),
+    producto: linea.producto,
+    stockActual: linea.stockActual
+  };
+
+  const modal = document.getElementById("ajuste-stock-modal");
+  const backdrop = document.getElementById("ajuste-stock-backdrop");
+  const productoNode = document.getElementById("ajuste-stock-producto");
+  const actualNode = document.getElementById("ajuste-stock-actual");
+  const inputNode = document.getElementById("ajuste-stock-real");
+  const motivoNode = document.getElementById("ajuste-stock-motivo");
+  const diferenciaNode = document.getElementById("ajuste-stock-diferencia");
+
+  if (!modal || !backdrop || !productoNode || !actualNode || !inputNode || !motivoNode || !diferenciaNode) return;
+
+  productoNode.innerText = linea.producto || "-";
+  actualNode.innerText = String(linea.stockActual || 0);
+  inputNode.value = String(linea.stockActual || 0);
+  motivoNode.value = "";
+  diferenciaNode.innerText = "0";
+  modal.classList.remove("hidden");
+  backdrop.classList.remove("hidden");
+  window.setTimeout(function() {
+    inputNode.focus();
+    inputNode.select();
+  }, 30);
+}
+
+function actualizarPreviewAjusteStock_() {
+  const actualNode = document.getElementById("ajuste-stock-actual");
+  const inputNode = document.getElementById("ajuste-stock-real");
+  const diferenciaNode = document.getElementById("ajuste-stock-diferencia");
+  if (!actualNode || !inputNode || !diferenciaNode) return;
+
+  const actual = normalizarCantidadInput(actualNode.innerText);
+  const nuevo = normalizarCantidadInput(inputNode.value);
+  const diferencia = nuevo - actual;
+  diferenciaNode.innerText = `${diferencia >= 0 ? "+" : ""}${diferencia}`;
+}
+
+function cerrarAjusteStockPedido() {
+  const modal = document.getElementById("ajuste-stock-modal");
+  const backdrop = document.getElementById("ajuste-stock-backdrop");
+  if (modal) modal.classList.add("hidden");
+  if (backdrop) backdrop.classList.add("hidden");
+  ajusteStockContexto = null;
+}
+
+function guardarAjusteStockPedido() {
+  if (!ajusteStockContexto) return;
+
+  const contexto = {
+    pedidoId: ajusteStockContexto.pedidoId,
+    productoId: ajusteStockContexto.productoId
+  };
+  const inputNode = document.getElementById("ajuste-stock-real");
+  const motivoNode = document.getElementById("ajuste-stock-motivo");
+  const nuevoStock = Number((inputNode || {}).value);
+  const motivo = String((motivoNode || {}).value || "").trim();
+
+  if (!Number.isFinite(nuevoStock) || nuevoStock < 0) {
+    mostrarAviso("error", "Ingresa un stock real valido.");
+    return;
+  }
+
+  mostrarLoading("Guardando ajuste de stock...");
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      cerrarAjusteStockPedido();
+      mostrarAviso("success", respuesta.mensaje || respuesta);
+      if (respuesta && "pedido" in respuesta) {
+        const index = pedidosAdminActuales.findIndex(function(item) {
+          return item.id === contexto.pedidoId;
+        });
+        if (respuesta.pedido && index >= 0) {
+          pedidosAdminActuales[index] = respuesta.pedido;
+        } else if (respuesta.pedido) {
+          pedidosAdminActuales.unshift(respuesta.pedido);
+        }
+        renderizarPedidosAdmin_();
+        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+      } else {
+        cargarDashboardAdmin();
+      }
+      actualizarStockGlobal();
+    })
+    .withFailureHandler(manejarError)
+    .ajustarStockDesdePedido(
+      contexto.pedidoId,
+      contexto.productoId,
+      nuevoStock,
+      motivo
+    );
+}
+
+function cargarActividadAdmin() {
+  cargarDashboardAdmin();
+}
+
+function leerProductoAdminForm_() {
+  return {
+    categoria: String((document.getElementById("producto-categoria") || {}).value || "").trim(),
+    unidadMedida: String((document.getElementById("producto-unidad") || {}).value || "").trim(),
+    nombreEs: String((document.getElementById("producto-nombre-es") || {}).value || "").trim(),
+    nombreDe: String((document.getElementById("producto-nombre-de") || {}).value || "").trim(),
+    stockMinimo: normalizarCantidadInput((document.getElementById("producto-stock-minimo") || {}).value),
+    stockInicial: normalizarCantidadInput((document.getElementById("producto-stock-inicial") || {}).value)
+  };
+}
+
+function limpiarProductoAdminForm_() {
+  ["producto-categoria", "producto-nombre-es", "producto-nombre-de"].forEach(function(id) {
+    const input = document.getElementById(id);
+    if (input) input.value = "";
+  });
+  const unidad = document.getElementById("producto-unidad");
+  const minimo = document.getElementById("producto-stock-minimo");
+  const inicial = document.getElementById("producto-stock-inicial");
+  if (unidad) unidad.value = "unidad";
+  if (minimo) minimo.value = "0";
+  if (inicial) inicial.value = "0";
+}
+
+function crearProductoDesdeAdmin() {
+  if (creandoProducto) return;
+
+  const payload = leerProductoAdminForm_();
+  if (!payload.categoria) {
+    mostrarAviso("error", "Ingresa una categoria.");
+    return;
+  }
+  if (!payload.nombreEs && !payload.nombreDe) {
+    mostrarAviso("error", "Ingresa al menos un nombre.");
+    return;
+  }
+
+  creandoProducto = true;
+  mostrarLoading("Creando producto...");
+
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      creandoProducto = false;
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || "Producto creado.");
+      limpiarProductoAdminForm_();
+      actualizarStockGlobal();
+      cargarDashboardAdmin();
+    })
+    .withFailureHandler(function(error) {
+      creandoProducto = false;
+      manejarError(error);
+    })
+    .altaProductoDesdeApp(payload);
+}
+
+function renderizarActividadAdminLista_() {
+  const contenedor = document.getElementById("lista-actividad-admin");
+  if (!contenedor) return;
+
+  if (!actividadAdminActual.length) {
+    contenedor.innerHTML = '<div class="empty-state">Sin actividad reciente registrada.</div>';
+    return;
+  }
+
+  contenedor.innerHTML = `<div class="activity-list">${actividadAdminActual.map(renderizarActividadAdmin_).join("")}</div>`;
+}
+
+function renderizarActividadAdmin_(item) {
+  return `
+    <article class="activity-item">
+      <div class="activity-item-header">
+        <strong>${escapeHtml_(item.descripcion || item.accion || "Actividad")}</strong>
+        <span class="status-pill status-info">${escapeHtml_(item.accion || "-")}</span>
+      </div>
+      <div class="activity-meta">
+        <span>${escapeHtml_(item.usuario || "-")}</span>
+        <span>${escapeHtml_(item.fecha || "-")}</span>
+      </div>
+    </article>`;
+}
+</script>

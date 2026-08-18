@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= include('Estilos'); ?>
+  </head>
+  <body>
+    <div id="loading"><h3 style="color: var(--primary)">Iniciando sistema... / System wird gestartet...</h3></div>
+    <nav class="navbar">
+      <strong>INVENTARIO GOETHE / GOETHE INVENTAR</strong>
+      <div class="nav-tools">
+        <span id="app-version-info" class="app-version-pill">Version GAS: cargando...</span>
+        <button class="btn btn-light btn-small" type="button" onclick="toggleInstructivo(true)">Instructivo</button>
+        <span id="user-info" style="font-size: 0.8rem;"></span>
+      </div>
+    </nav>
+
+    <? if (String(CONFIG.ENVIRONMENT || "").toUpperCase() !== "PRODUCCION") { ?>
+    <div class="dev-warning-banner" role="alert">
+      <strong>ENTORNO DE PRUEBAS</strong>
+      <span>Stock ficticio. No usar para pedidos reales ni para control de inventario productivo.</span>
+    </div>
+    <? } ?>
+
+    <div class="container">
+      <div id="view-user" class="hidden">
+        <section class="card card-grid collapsible-card" data-section="user-pedido">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('user-pedido')">
+            <span>
+              <strong>Nuevo pedido / Neue Anfrage</strong>
+              <span class="collapsible-copy">Busca productos y carga cantidades directamente en la grilla.</span>
+            </span>
+            <span class="collapsible-indicator" data-indicator-for="user-pedido">Ocultar</span>
+          </button>
+          <div class="collapsible-body" data-body-for="user-pedido">
+            <div class="section-header">
+              <div>
+                <h2>Nuevo pedido / Neue Anfrage</h2>
+                <p class="section-copy">Busca productos y carga cantidades directamente en la grilla.</p>
+              </div>
+              <div class="section-sidecopy">
+                <span id="rol-usuario" class="section-note"></span>
+                <span id="estado-usuario" class="section-note section-note-warning hidden"></span>
+              </div>
+            </div>
+
+            <div class="toolbar">
+              <input id="buscador-productos" type="search" placeholder="Buscar producto / Produkt suchen" oninput="actualizarVistaProductos()">
+              <label class="toggle">
+                <input id="filtro-seleccionados" type="checkbox" onchange="actualizarVistaProductos()">
+                <span>Solo seleccionados / Nur ausgewaehlte</span>
+              </label>
+            </div>
+
+            <div class="helper-banner">
+              Los articulos estan agrupados en categorias; podras expandir la categoria o usar el buscador.
+            </div>
+
+            <div id="general-requester-wrap" class="hidden inline-field-grid">
+              <div class="inline-field">
+                <label for="solicitante-nombre">Nombre</label>
+                <input id="solicitante-nombre" type="text" placeholder="Nombre">
+              </div>
+              <div class="inline-field">
+                <label for="solicitante-apellido">Apellido</label>
+                <input id="solicitante-apellido" type="text" placeholder="Apellido">
+              </div>
+              <div class="inline-field">
+                <label for="solicitante-mail">Mail del solicitante</label>
+                <input id="solicitante-mail" type="email" placeholder="usuario@goethe.edu.ar">
+              </div>
+            </div>
+
+            <div class="grid-shell">
+              <table id="tabla-pedido-grid" class="grid-table">
+                <thead>
+                  <tr>
+                    <th>Producto / Produkt</th>
+                    <th id="pedido-stock-header" class="col-stock">Disponible</th>
+                    <th class="col-cantidad">Cantidad</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpo-pedido-grid"></tbody>
+              </table>
+            </div>
+
+            <div id="pedido-vacio" class="empty-state hidden">No hay productos para mostrar con el filtro actual.</div>
+
+            <div class="pedido-footer">
+              <div class="pedido-resumen">
+                <div><strong id="resumen-items">0</strong><span> articulos seleccionados</span></div>
+                <div><strong id="resumen-unidades">0</strong><span> unidades totales</span></div>
+              </div>
+              <button class="btn btn-primary" onclick="enviarPedidoMasivo()">Enviar pedido / Anfrage senden</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card collapsible-card" data-section="user-mis-pedidos">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('user-mis-pedidos')">
+            <span>
+              <strong>Mis pedidos / Meine Anfragen</strong>
+              <span class="collapsible-copy">Edita o elimina items propios mientras no hayan sido preparados.</span>
+            </span>
+            <span class="collapsible-indicator" data-indicator-for="user-mis-pedidos">Expandir</span>
+          </button>
+          <div class="collapsible-body" data-body-for="user-mis-pedidos">
+            <div class="section-tools section-tools-single">
+              <button class="btn btn-outline btn-small" type="button" onclick="cargarMisPedidos()">Actualizar mis pedidos</button>
+            </div>
+            <div id="lista-mis-pedidos" class="pedido-lineas-shell"></div>
+          </div>
+        </section>
+
+        <section class="card collapsible-card copies-section" data-section="user-copias">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('user-copias')">
+            <span>
+              <strong>Solicitud de copias / Fotokopierantrag</strong>
+              <span class="collapsible-copy">Envia un unico archivo y consulta el estado del trabajo.</span>
+            </span>
+            <span class="collapsible-indicator" data-indicator-for="user-copias">Expandir</span>
+          </button>
+          <div class="collapsible-body" data-body-for="user-copias">
+            <form id="copias-form" onsubmit="enviarSolicitudCopias(this, event)">
+              <div class="section-header">
+                <div>
+                  <h2>Solicitud de copias</h2>
+                  <p class="section-copy">Completa los datos del trabajo. Maximo 80 MB.</p>
+                </div>
+                <span class="section-note">PDF, DOC, DOCX, JPG, PNG, TXT o ZIP</span>
+              </div>
+
+              <div class="copies-form-grid">
+                <div class="inline-field copies-field-wide">
+                  <label for="copias-archivo">Archivo</label>
+                  <input id="copias-archivo" name="archivo" type="file" accept=".pdf,.doc,.docx,.jpg,.png,.txt,.zip" required onchange="validarArchivoCopiasCliente_(this)">
+                  <span id="copias-archivo-info" class="field-help">Selecciona un archivo de hasta 80 MB.</span>
+                </div>
+                <div class="inline-field">
+                  <label for="copias-nivel">Nivel</label>
+                  <select id="copias-nivel" name="nivel" required>
+                    <option value="">Seleccionar</option>
+                    <option value="KG">KG</option>
+                    <option value="EP">EP</option>
+                    <option value="ES">ES</option>
+                  </select>
+                </div>
+                <div class="inline-field">
+                  <label for="copias-paginas">Paginas del original</label>
+                  <input id="copias-paginas" name="paginasOriginal" type="number" min="1" step="1" required>
+                </div>
+                <div class="inline-field">
+                  <label for="copias-cantidad">Cantidad de copias</label>
+                  <input id="copias-cantidad" name="cantidadCopias" type="number" min="1" step="1" required>
+                </div>
+                <div class="inline-field">
+                  <label for="copias-tamano">Tamano</label>
+                  <select id="copias-tamano" name="tamano" required>
+                    <option value="A4">A4</option>
+                    <option value="A3">A3</option>
+                    <option value="OFICIO">Oficio / Legal</option>
+                  </select>
+                </div>
+                <div class="inline-field">
+                  <label for="copias-modalidad">Modalidad</label>
+                  <select id="copias-modalidad" name="modalidad" required>
+                    <option value="ARMADAS">Armadas / Geheftet</option>
+                    <option value="APILADAS">Apiladas / Gestapelt</option>
+                  </select>
+                </div>
+                <fieldset class="copies-choice-group">
+                  <legend>Doble faz</legend>
+                  <label><input type="radio" name="dobleFaz" value="SI" required> Si / Ja</label>
+                  <label><input type="radio" name="dobleFaz" value="NO" required> No / Nein</label>
+                </fieldset>
+                <fieldset class="copies-choice-group">
+                  <legend>Copia color</legend>
+                  <label><input type="radio" name="color" value="SI" required> Si / Ja</label>
+                  <label><input type="radio" name="color" value="NO" required> No / Nein</label>
+                </fieldset>
+                <div class="inline-field copies-field-wide">
+                  <label for="copias-comentario">Comentario</label>
+                  <textarea id="copias-comentario" name="comentario" maxlength="500" rows="4" placeholder="Indicaciones adicionales para el trabajo"></textarea>
+                </div>
+              </div>
+
+              <div class="pedido-footer">
+                <span class="section-note">KG y EP requieren autorizacion. ES ingresa autorizado.</span>
+                <button id="copias-enviar-btn" class="btn btn-primary" type="submit">Enviar solicitud</button>
+              </div>
+            </form>
+
+            <div class="copies-list-header">
+              <h3>Mis solicitudes</h3>
+              <button class="btn btn-outline btn-small" type="button" onclick="cargarPanelCopias()">Actualizar</button>
+            </div>
+            <div id="lista-copias-propias" class="copies-list"><div class="empty-state">Cargando solicitudes...</div></div>
+          </div>
+        </section>
+      </div>
+
+      <div id="view-admin" class="hidden">
+        <div class="card">
+          <div class="section-header">
+            <div>
+              <h2 id="admin-title">Admin</h2>
+              <p id="admin-copy" class="section-copy">Panel operativo para pedidos pendientes, reposiciones y recepcion de mercaderia.</p>
+            </div>
+            <div class="admin-nav">
+              <button id="admin-nav-pedidos" class="btn btn-primary" onclick="scrollearA('sec-pedidos')">Pedidos / Anfragen</button>
+              <button id="admin-nav-compras" class="btn btn-success" onclick="scrollearA('sec-compras')">Compras / Einkaeufe</button>
+              <button id="admin-nav-copias" class="btn btn-outline" onclick="scrollearA('sec-copias')">Copias</button>
+              <button id="admin-nav-productos" class="btn btn-outline" onclick="scrollearA('sec-productos')">Productos</button>
+            </div>
+          </div>
+
+          <div id="admin-resumen" class="admin-kpis">
+            <div id="kpi-pedidos-card" class="kpi-card">
+              <strong id="kpi-pedidos">0</strong>
+              <span>Pedidos pendientes</span>
+            </div>
+            <div id="kpi-compras-card" class="kpi-card">
+              <strong id="kpi-compras">0</strong>
+              <span>Compras pendientes</span>
+            </div>
+          </div>
+        </div>
+
+        <section id="sec-pedidos" class="card collapsible-card admin-section admin-section-pedidos" data-section="admin-pedidos">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-pedidos')">
+            <span>
+              <strong class="admin-section-title">Gestion de pedidos / Anfragen verwalten</strong>
+              <span class="collapsible-copy">Procesa lineas por pedido en un solo paso: listo, retiro y cancelacion de saldos.</span>
+            </span>
+            <span class="section-indicator-pack">
+              <span id="admin-pedidos-resumen" class="status-pill status-neutral">0 pedidos</span>
+              <span class="collapsible-indicator" data-indicator-for="admin-pedidos">Ocultar</span>
+            </span>
+          </button>
+          <div class="collapsible-body" data-body-for="admin-pedidos">
+            <div class="section-tools">
+              <input id="filtro-pedidos-admin" type="search" placeholder="Buscar por pedido, solicitante o mail" oninput="actualizarFiltroPedidosAdmin()">
+              <label class="toggle">
+                <input id="filtro-pedidos-faltantes" type="checkbox" onchange="actualizarFiltroPedidosAdmin()">
+                <span>Solo con faltantes</span>
+              </label>
+            </div>
+            <div id="lista-pedidos-admin"></div>
+          </div>
+        </section>
+
+        <section id="sec-compras" class="card collapsible-card admin-section admin-section-compras" data-section="admin-nueva-compra">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-nueva-compra')">
+            <span>
+              <strong id="compra-section-title" class="admin-section-title">Nueva reposicion / Neue Bestellung</strong>
+              <span id="compra-section-copy" class="collapsible-copy">Seleccion rapida de articulos para compra, con el mismo formato agil del pedido.</span>
+            </span>
+            <span class="collapsible-indicator" data-indicator-for="admin-nueva-compra">Expandir</span>
+          </button>
+          <div class="collapsible-body" data-body-for="admin-nueva-compra">
+            <div class="toolbar">
+              <input id="buscador-compra" type="search" placeholder="Buscar producto para reposicion" oninput="actualizarVistaCompras()">
+              <label class="toggle">
+                <input id="filtro-compra-stock" type="checkbox" onchange="actualizarVistaCompras()">
+                <span>Solo con stock / Nur mit Bestand</span>
+              </label>
+              <label class="toggle">
+                <input id="filtro-compra-seleccionados" type="checkbox" onchange="actualizarVistaCompras()">
+                <span>Solo seleccionados / Nur ausgewaehlte</span>
+              </label>
+            </div>
+
+            <div class="grid-shell">
+              <table class="grid-table">
+                <thead>
+                  <tr>
+                    <th>Producto / Produkt</th>
+                    <th class="col-cantidad">Cantidad</th>
+                    <th id="compra-referencia-header">Referencia</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpo-compra-grid"></tbody>
+              </table>
+            </div>
+
+            <div id="compra-vacia" class="empty-state hidden">No hay productos para mostrar con el filtro actual.</div>
+
+            <div class="pedido-footer">
+              <div class="pedido-resumen">
+                <div><strong id="resumen-compra-items">0</strong><span> productos seleccionados</span></div>
+                <div><strong id="resumen-compra-unidades">0</strong><span> unidades pedidas</span></div>
+              </div>
+              <button id="btn-enviar-compra" class="btn btn-success" onclick="enviarCompraMasiva()">Solicitar compra / Einkauf anfragen</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-productos" class="card collapsible-card admin-section" data-section="admin-productos">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-productos')">
+            <span>
+              <strong class="admin-section-title">Alta de producto</strong>
+              <span class="collapsible-copy">Crea el producto y su stock inicial sin editar las hojas a mano.</span>
+            </span>
+            <span class="collapsible-indicator" data-indicator-for="admin-productos">Expandir</span>
+          </button>
+          <div class="collapsible-body" data-body-for="admin-productos">
+            <div class="inline-field-grid">
+              <div class="inline-field">
+                <label for="producto-categoria">Categoria</label>
+                <input id="producto-categoria" type="text" placeholder="Ej.: Papel, Cartulina, Libreria">
+              </div>
+              <div class="inline-field">
+                <label for="producto-unidad">Unidad</label>
+                <input id="producto-unidad" type="text" value="unidad">
+              </div>
+              <div class="inline-field">
+                <label for="producto-nombre-es">Nombre ES</label>
+                <input id="producto-nombre-es" type="text" placeholder="Nombre en castellano">
+              </div>
+              <div class="inline-field">
+                <label for="producto-nombre-de">Nombre DE</label>
+                <input id="producto-nombre-de" type="text" placeholder="Nombre en aleman">
+              </div>
+              <div class="inline-field">
+                <label for="producto-stock-minimo">Stock minimo</label>
+                <input id="producto-stock-minimo" type="number" min="0" step="1" value="0">
+              </div>
+              <div class="inline-field">
+                <label for="producto-stock-inicial">Stock inicial</label>
+                <input id="producto-stock-inicial" type="number" min="0" step="1" value="0">
+              </div>
+            </div>
+            <div class="pedido-footer">
+              <div class="section-note">El ID se genera automaticamente desde la categoria.</div>
+              <button class="btn btn-primary" type="button" onclick="crearProductoDesdeAdmin()">Crear producto</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-recepcion" class="card collapsible-card admin-section admin-section-recepcion" data-section="admin-recepcion">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-recepcion')">
+            <span>
+              <strong class="admin-section-title">Recepcionar mercaderia / Wareneingang</strong>
+              <span class="collapsible-copy">Carga cantidades y recepciona un lote completo sin procesar linea por linea.</span>
+            </span>
+            <span class="section-indicator-pack">
+              <span id="admin-recepcion-resumen" class="status-pill status-neutral">0 lotes</span>
+              <span class="collapsible-indicator" data-indicator-for="admin-recepcion">Ocultar</span>
+            </span>
+          </button>
+          <div class="collapsible-body" data-body-for="admin-recepcion">
+            <div class="section-tools">
+              <input id="filtro-recepcion-admin" type="search" placeholder="Buscar por lote, producto o fecha" oninput="actualizarFiltroComprasAdmin()">
+              <label class="toggle">
+                <input id="filtro-recepcion-pendientes" type="checkbox" checked onchange="actualizarFiltroComprasAdmin()">
+                <span>Solo con saldo</span>
+              </label>
+            </div>
+            <div id="lista-compras-pendientes"></div>
+          </div>
+        </section>
+
+        <section id="sec-copias" class="card collapsible-card admin-section copies-section" data-section="admin-copias">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-copias')">
+            <span>
+              <strong class="admin-section-title">Gestion de copias</strong>
+              <span class="collapsible-copy">Consulta trabajos autorizados y marcalos listos para retirar.</span>
+            </span>
+            <span class="section-indicator-pack">
+              <span id="admin-copias-resumen" class="status-pill status-neutral">0 solicitudes</span>
+              <span class="collapsible-indicator" data-indicator-for="admin-copias">Expandir</span>
+            </span>
+          </button>
+          <div class="collapsible-body" data-body-for="admin-copias">
+            <div class="section-tools">
+              <input id="filtro-copias-admin" type="search" placeholder="Buscar por solicitud, nivel o solicitante" oninput="renderizarCopiasOperativas_()">
+              <select id="estado-copias-admin" onchange="renderizarCopiasOperativas_()">
+                <option value="PENDIENTES">Solicitadas y autorizadas</option>
+                <option value="TODAS">Todos los estados</option>
+                <option value="SOLICITADO">Solicitadas</option>
+                <option value="AUTORIZADO">Autorizadas</option>
+                <option value="RECHAZADO">Rechazadas</option>
+                <option value="FINALIZADO">Finalizadas</option>
+              </select>
+            </div>
+            <div id="lista-copias-operativas" class="copies-list"><div class="empty-state">Cargando solicitudes...</div></div>
+          </div>
+        </section>
+
+        <section id="sec-actividad" class="card collapsible-card" data-section="admin-actividad">
+          <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-actividad')">
+            <span>
+              <strong>Actividad reciente / Letzte Aktivitaet</strong>
+              <span class="collapsible-copy">Resumen de acciones administrativas y cambios recientes del sistema.</span>
+            </span>
+            <span class="collapsible-indicator" data-indicator-for="admin-actividad">Expandir</span>
+          </button>
+          <div class="collapsible-body" data-body-for="admin-actividad">
+            <div id="lista-actividad-admin"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <?!= include('UiState'); ?>
+    <?!= include('UiBase'); ?>
+    <?!= include('UiPedidos'); ?>
+    <?!= include('UiAdmin'); ?>
+    <?!= include('UiCompras'); ?>
+    <?!= include('UiCopias'); ?>
+    <?!= include('InstructivoPanel'); ?>
+
+    <div id="ajuste-stock-backdrop" class="modal-backdrop hidden" onclick="cerrarAjusteStockPedido()"></div>
+    <div id="ajuste-stock-modal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="ajuste-stock-titulo">
+      <div class="modal-header">
+        <div>
+          <strong id="ajuste-stock-titulo">Ajustar stock real</strong>
+          <div class="modal-copy">Corrige el stock fisico contado y deja registro del cambio.</div>
+        </div>
+        <button class="btn btn-light btn-small modal-close" type="button" onclick="cerrarAjusteStockPedido()">Cerrar</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-producto" id="ajuste-stock-producto">-</div>
+        <div class="modal-stats">
+          <span class="status-pill status-neutral">Sistema: <strong id="ajuste-stock-actual">0</strong></span>
+          <span class="status-pill status-info">Diferencia: <strong id="ajuste-stock-diferencia">0</strong></span>
+        </div>
+        <div class="inline-field">
+          <label for="ajuste-stock-real">Stock real contado</label>
+          <input id="ajuste-stock-real" type="number" min="0" step="1" oninput="actualizarPreviewAjusteStock_()">
+        </div>
+        <div class="inline-field">
+          <label for="ajuste-stock-motivo">Motivo</label>
+          <input id="ajuste-stock-motivo" type="text" placeholder="Conteo manual, faltante, sobrante...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" type="button" onclick="cerrarAjusteStockPedido()">Cancelar</button>
+        <button class="btn btn-primary" type="button" onclick="guardarAjusteStockPedido()">Guardar ajuste</button>
+      </div>
+    </div>
+
+    <div id="copias-decision-backdrop" class="modal-backdrop hidden"></div>
+    <div id="copias-decision-modal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="copias-decision-title">
+      <div class="modal-header">
+        <div>
+          <strong id="copias-decision-title">Decision de solicitud</strong>
+          <div id="copias-decision-copy" class="modal-copy">Cargando...</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="copias-decision-detail" class="copies-decision-detail"></div>
+        <div id="copias-rechazo-field" class="inline-field hidden">
+          <label for="copias-rechazo-motivo">Motivo del rechazo</label>
+          <textarea id="copias-rechazo-motivo" maxlength="500" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" type="button" onclick="cerrarDecisionCopias_()">Cerrar</button>
+        <button id="copias-confirmar-decision" class="btn btn-primary" type="button" onclick="confirmarDecisionCopias_()">Confirmar</button>
+      </div>
+    </div>
+  </body>
+</html>

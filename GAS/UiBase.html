@@ -1,0 +1,359 @@
+<script>
+  function inicializarAplicacion() {
+    google.script.run
+      .withSuccessHandler(function(data) {
+        rolActual = data.role;
+        appInfoActual = data.appInfo || null;
+        listaProductosGlobal = ordenarProductos(data.productos || []);
+        renderizarAppInfo_(appInfoActual);
+        setupUI(rolActual);
+        actualizarVistaProductos();
+        prepararFormularioCompras_();
+        cargarPanelCopias();
+        procesarAccionCopiasDesdeUrl_();
+        marcarInitCompleto_();
+  
+        if (rolActual && rolActual.isAdmin) {
+          cargarDashboardAdmin();
+        }
+      })
+      .withFailureHandler(manejarError)
+      .getBootstrapData();
+  }
+  
+  function marcarInitCompleto_() {
+    initPendiente -= 1;
+    if (initPendiente <= 0) {
+      ocultarLoading();
+    }
+  }
+  
+  function mostrarLoading(mensaje) {
+    const loading = document.getElementById("loading");
+    loading.querySelector("h3").innerText = mensaje;
+    loading.style.display = "flex";
+  }
+  
+  function ocultarLoading() {
+    document.getElementById("loading").style.display = "none";
+  }
+
+  function renderizarAppInfo_(appInfo) {
+    const node = document.getElementById("app-version-info");
+    if (!node) return;
+
+    const info = appInfo || {};
+    const entorno = String(info.environment || "PRODUCCION").toUpperCase();
+    const version = info.version || "sin version";
+    const fechaDeploy = info.deployedAtLabel || "sin fecha de deploy";
+    const descripcion = info.description ? ` - ${info.description}` : "";
+
+    node.innerText = `${entorno} | GAS ${version} | Deploy ${fechaDeploy}${descripcion}`;
+    node.classList.toggle("app-version-dev", entorno !== "PRODUCCION");
+    node.classList.toggle("app-version-prod", entorno === "PRODUCCION");
+    node.title = node.innerText;
+  }
+  
+  function normalizarMensaje_(mensaje) {
+    return String(mensaje || "")
+      .replace(/\u00c3\u00a1/g, "a")
+      .replace(/\u00c3\u00a9/g, "e")
+      .replace(/\u00c3\u00ad/g, "i")
+      .replace(/\u00c3\u00b3/g, "o")
+      .replace(/\u00c3\u00ba/g, "u")
+      .replace(/\u00c3\u00b1/g, "n")
+      .replace(/\u00c2\u00bf/g, "?")
+      .replace(/\u00c3\u00a4/g, "a")
+      .replace(/\u00c3\u00bc/g, "u")
+      .replace(/\u00c3/g, "");
+  }
+  
+  function manejarError(error) {
+    ocultarLoading();
+    const mensaje = error && error.message
+      ? normalizarMensaje_(error.message)
+      : "Ocurrio un error inesperado. / Unerwarteter Fehler.";
+    mostrarAviso("error", mensaje);
+  }
+  
+  function escapeHtml_(valor) {
+    return String(valor || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+  
+  function obtenerProductoPorId(id) {
+    return listaProductosGlobal.find(producto => producto.id === String(id));
+  }
+  
+  function obtenerEtiquetaProducto(producto) {
+    if (!producto) return "";
+    return producto.nombre || [producto.nombreEs, producto.nombreDe].filter(Boolean).join(" / ");
+  }
+
+  function obtenerCategoriaProducto_(producto) {
+    const categoria = producto && producto.categoria ? String(producto.categoria).trim() : "";
+    return categoria || "Sin categoria";
+  }
+
+  function ordenarProductosPorCategoria(productos) {
+    return [...(productos || [])].sort((a, b) => {
+      const categoriaA = obtenerCategoriaProducto_(a).toLocaleLowerCase("es");
+      const categoriaB = obtenerCategoriaProducto_(b).toLocaleLowerCase("es");
+      const cmpCategoria = categoriaA.localeCompare(categoriaB, "es");
+      if (cmpCategoria !== 0) return cmpCategoria;
+
+      const etiquetaA = obtenerEtiquetaProducto(a).toLocaleLowerCase("es");
+      const etiquetaB = obtenerEtiquetaProducto(b).toLocaleLowerCase("es");
+      return etiquetaA.localeCompare(etiquetaB, "es");
+    });
+  }
+
+  function renderizarFilasAgrupadasPorCategoria_(productos, renderFila, colspan) {
+    let categoriaActual = null;
+    return ordenarProductosPorCategoria(productos).map(function(producto) {
+      const categoria = obtenerCategoriaProducto_(producto);
+      const encabezado = categoria !== categoriaActual
+        ? `<tr class="category-row"><td colspan="${colspan}">${escapeHtml_(categoria)}</td></tr>`
+        : "";
+      categoriaActual = categoria;
+      return encabezado + renderFila(producto);
+    }).join("");
+  }
+
+  function renderizarOpcionesProductoPorCategoria_(productoDefaultId) {
+    let categoriaActual = null;
+    return ordenarProductosPorCategoria(listaProductosGlobal).map(function(producto) {
+      const categoria = obtenerCategoriaProducto_(producto);
+      const abreGrupo = categoria !== categoriaActual
+        ? `${categoriaActual === null ? "" : "</optgroup>"}<optgroup label="${escapeHtml_(categoria)}">`
+        : "";
+      categoriaActual = categoria;
+      const selected = productoDefaultId === producto.id ? "selected" : "";
+      return `${abreGrupo}<option value="${escapeHtml_(producto.id)}" ${selected}>${escapeHtml_(obtenerEtiquetaProducto(producto))}</option>`;
+    }).join("") + (categoriaActual === null ? "" : "</optgroup>");
+  }
+  
+  function ordenarProductos(productos) {
+    return ordenarProductosPorCategoria(productos);
+  }
+  
+  function normalizarCantidadInput(valor) {
+    const numero = parseInt(valor, 10);
+    return Number.isFinite(numero) && numero > 0 ? numero : 0;
+  }
+  
+  function crearClaveDomSegura_() {
+    return Array.prototype.slice.call(arguments).join("-").replace(/[^a-zA-Z0-9_-]/g, "");
+  }
+  
+  function scrollearA(id) {
+    const destino = document.getElementById(id);
+    if (destino) {
+      destino.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+  
+  function aplicarEstadoSecciones_() {
+    document.querySelectorAll("[data-section]").forEach(function(elemento) {
+      const id = elemento.getAttribute("data-section");
+      const contraida = !!seccionesContraidas[id];
+      elemento.classList.toggle("is-collapsed", contraida);
+  
+      const body = elemento.querySelector(`[data-body-for="${id}"]`);
+      if (body) {
+        body.style.display = contraida ? "none" : "";
+      }
+  
+      const indicador = elemento.querySelector(`[data-indicator-for="${id}"]`);
+      if (indicador) {
+        indicador.innerText = contraida ? "Expandir" : "Ocultar";
+      }
+    });
+  }
+  
+  function inicializarSeccionesContraidas_(role) {
+    seccionesContraidas = {
+      "user-pedido": !!(role && role.isAdmin),
+      "user-mis-pedidos": true,
+      "admin-pedidos": true,
+      "admin-nueva-compra": true,
+      "admin-productos": true,
+      "admin-recepcion": true,
+      "user-copias": true,
+      "admin-copias": true,
+      "admin-actividad": true
+    };
+    aplicarEstadoSecciones_();
+  }
+  
+  function toggleSection(id) {
+    seccionesContraidas[id] = !seccionesContraidas[id];
+    aplicarEstadoSecciones_();
+  }
+  
+  function toggleInstructivo(abrir) {
+    const panel = document.getElementById("instructivo-panel");
+    const backdrop = document.getElementById("instructivo-backdrop");
+    if (!panel || !backdrop) return;
+  
+    const visible = typeof abrir === "boolean" ? abrir : panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", !visible);
+    backdrop.classList.toggle("hidden", !visible);
+    panel.setAttribute("aria-hidden", visible ? "false" : "true");
+  }
+
+  function mostrarAviso(tipo, mensaje) {
+    let toast = document.getElementById("toast-global");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "toast-global";
+      toast.className = "toast-global hidden";
+      document.body.appendChild(toast);
+    }
+
+    toast.className = `toast-global toast-${tipo || "info"}`;
+    toast.innerText = normalizarMensaje_(mensaje || "");
+    window.clearTimeout(toastTimerGlobal);
+    toastTimerGlobal = window.setTimeout(function() {
+      toast.className = "toast-global hidden";
+    }, 3400);
+  }
+  
+  function actualizarStockGlobal() {
+    google.script.run
+      .withSuccessHandler(function(productos) {
+        listaProductosGlobal = ordenarProductos(productos);
+  
+        actualizarVistaProductos();
+        actualizarVistaCompras();
+      })
+      .withFailureHandler(manejarError)
+      .obtenerProductosConStock();
+  }
+  
+  function setupUI(role) {
+    document.getElementById("user-info").innerText = role.email;
+    document.getElementById("view-user").classList.remove("hidden");
+    document.getElementById("rol-usuario").innerText = role.isAdmin
+      ? "Perfil: administrador / Administrator"
+      : "Perfil: usuario / Benutzer";
+  
+    if (!role.isGoethe) {
+      document.getElementById("estado-usuario").innerText = "Acceso externo detectado.";
+      document.getElementById("estado-usuario").classList.remove("hidden");
+    }
+  
+    if (role.isCuentaGeneral) {
+      document.getElementById("general-requester-wrap").classList.remove("hidden");
+      document.getElementById("estado-usuario").innerText = "Cuenta general: ingresar nombre, apellido y mail del solicitante.";
+      document.getElementById("estado-usuario").classList.remove("hidden");
+    }
+
+    if (typeof actualizarVisibilidadStockPedido_ === "function") {
+      actualizarVisibilidadStockPedido_();
+    }
+  
+    inicializarSeccionesContraidas_(role);
+    aplicarModoOperadorEntrega_(role);
+  
+    if (role.isAdmin) {
+      document.getElementById("view-admin").classList.remove("hidden");
+      mostrarPlaceholdersAdmin_();
+    } else {
+      document.getElementById("admin-resumen").classList.add("hidden");
+    }
+  }
+
+  function setVisible_(id, visible) {
+    const node = document.getElementById(id);
+    if (node) node.classList.toggle("hidden", !visible);
+  }
+
+  function setText_(id, text) {
+    const node = document.getElementById(id);
+    if (node) node.innerText = text;
+  }
+
+  function aplicarModoOperadorEntrega_(role) {
+    const esOperador = !!(role && role.isOperadorEntrega);
+    document.body.classList.toggle("delivery-mode", esOperador);
+
+    if (!esOperador) return;
+
+    setText_("rol-usuario", "Perfil: operador de entrega");
+    setText_("admin-title", "Gestion de pedidos");
+    setText_("admin-copy", "Entrega simple de pedidos e ingreso rapido de stock.");
+    setText_("compra-section-title", "Ingreso de stock");
+    setText_("compra-section-copy", "Carga reposiciones reales y actualiza stock en el momento.");
+    setText_("btn-enviar-compra", "Registrar ingreso");
+
+    setVisible_("admin-nav-productos", false);
+    setVisible_("kpi-compras-card", false);
+    setVisible_("sec-productos", false);
+    setVisible_("sec-recepcion", false);
+    setVisible_("sec-actividad", false);
+    setVisible_("compra-referencia-header", false);
+  }
+  
+  function renderizarResumenAdmin_() {
+    if (!rolActual || !rolActual.isAdmin) return;
+
+    document.getElementById("kpi-pedidos").innerText = String(pedidosAdminActuales.length);
+    const comprasKpi = document.getElementById("kpi-compras");
+    if (comprasKpi) comprasKpi.innerText = String(comprasAdminActuales.length);
+
+  const pedidosResumen = document.getElementById("admin-pedidos-resumen");
+  const recepcionResumen = document.getElementById("admin-recepcion-resumen");
+  if (pedidosResumen) {
+    const conFaltantes = pedidosAdminActuales.filter(function(pedido) {
+      return pedido.items.some(function(item) { return item.faltante > 0; });
+    }).length;
+    pedidosResumen.innerText = `${pedidosAdminActuales.length} pedidos | ${conFaltantes} con faltantes`;
+  }
+  if (recepcionResumen) {
+    const lotes = {};
+    comprasAdminActuales.forEach(function(item) { lotes[item.id] = true; });
+    recepcionResumen.innerText = `${Object.keys(lotes).length} lotes | ${comprasAdminActuales.length} lineas`;
+  }
+}
+  
+  function mostrarPlaceholdersAdmin_() {
+    const pedidos = document.getElementById("lista-pedidos-admin");
+    const compras = document.getElementById("lista-compras-pendientes");
+    const actividad = document.getElementById("lista-actividad-admin");
+  
+    if (pedidos) pedidos.innerHTML = '<div class="empty-state">Cargando pedidos...</div>';
+    if (compras) compras.innerHTML = '<div class="empty-state">Cargando compras...</div>';
+    if (actividad) actividad.innerHTML = '<div class="empty-state">Cargando actividad...</div>';
+  }
+  
+  function cargarDashboardAdmin() {
+    google.script.run
+      .withSuccessHandler(function(data) {
+        pedidosAdminActuales = data && data.pedidos ? data.pedidos : [];
+        comprasAdminActuales = data && data.compras ? data.compras : [];
+        actividadAdminActual = data && data.actividad ? data.actividad : [];
+  
+        renderizarResumenAdmin_();
+        renderizarPedidosAdmin_();
+        renderizarComprasAdmin_();
+        renderizarActividadAdminLista_();
+        prepararFormularioCompras_();
+      })
+      .withFailureHandler(manejarError)
+      .getAdminDashboardData();
+  }
+
+  function actualizarActividadYResumenDesdeOperacion_(actividad) {
+    if (Array.isArray(actividad)) {
+      actividadAdminActual = actividad;
+      renderizarActividadAdminLista_();
+    }
+    renderizarResumenAdmin_();
+  }
+</script>
+  

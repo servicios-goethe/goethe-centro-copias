@@ -1,0 +1,1 @@
+/home/joaco/docker/ai/core/conventions.md

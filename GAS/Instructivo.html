@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructivo Sistema de Inventario</title>
+    <style>
+      :root {
+        --primary: #006225;
+        --accent: #9a8348;
+        --bg: #f4f7f6;
+        --card: #ffffff;
+        --line: #d9e3dd;
+        --text: #243129;
+        --muted: #5d6d63;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(180deg, #eef4f1 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 18px 40px;
+      }
+
+      .hero {
+        background: var(--card);
+        border-left: 6px solid var(--primary);
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        margin-bottom: 18px;
+      }
+
+      .hero h1 {
+        margin: 0 0 8px;
+        color: var(--primary);
+        font-size: 1.9rem;
+      }
+
+      .hero p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      details {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        margin-bottom: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
+      }
+
+      summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 18px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        background: #fbfcfb;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .summary-title {
+        display: block;
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: var(--primary);
+      }
+
+      .summary-copy {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.92rem;
+        font-weight: 400;
+      }
+
+      .chevron {
+        min-width: 32px;
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        background: #fff;
+        font-size: 1rem;
+      }
+
+      details[open] .chevron {
+        transform: rotate(180deg);
+      }
+
+      .content {
+        padding: 0 20px 20px;
+        border-top: 1px solid var(--line);
+      }
+
+      .section {
+        margin-top: 18px;
+      }
+
+      .section h2 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+        color: var(--accent);
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      li {
+        margin: 0 0 8px;
+        line-height: 1.5;
+      }
+
+      .note {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: #eef6ff;
+        border: 1px solid #d7e6f7;
+        color: #285579;
+      }
+
+      .warn {
+        background: #fff7e8;
+        border-color: #efddaf;
+        color: #7a5a16;
+      }
+
+      @media (max-width: 700px) {
+        .hero,
+        summary,
+        .content {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .hero h1 {
+          font-size: 1.55rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero">
+        <h1>Instructivo del Sistema de Inventario</h1>
+        <p>
+          Guia rapida para operar el sistema. Los bloques se pueden expandir y contraer
+          segun el perfil de uso.
+        </p>
+      </section>
+
+      <details open>
+        <summary>
+          <span>
+            <span class="summary-title">Usuario</span>
+            <span class="summary-copy">Como buscar productos, cargar cantidades, enviar y revisar pedidos propios.</span>
+          </span>
+          <span class="chevron">v</span>
+        </summary>
+        <div class="content">
+          <div class="section">
+            <h2>Para que sirve</h2>
+            <ul>
+              <li>Permite solicitar productos del inventario de forma rapida.</li>
+              <li>Se puede pedir aunque no haya stock suficiente.</li>
+              <li>El usuario no ve stock ni faltantes; administracion gestiona disponibilidad y preparacion.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Como hacer un pedido</h2>
+            <ul>
+              <li>Buscar el producto por nombre o por ID en el campo de busqueda.</li>
+              <li>Abrir la categoria correspondiente; las categorias arrancan contraidas.</li>
+              <li>Cargar la cantidad deseada directamente en la grilla.</li>
+              <li>Revisar el resumen inferior con articulos seleccionados y unidades totales.</li>
+              <li>Presionar <strong>Enviar pedido</strong>.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Mis pedidos</h2>
+            <ul>
+              <li>Permite revisar pedidos propios pendientes.</li>
+              <li>Puede editar cantidades o eliminar items solo si no fueron preparados ni entregados.</li>
+              <li>Si una linea ya fue preparada o entregada, queda bloqueada.</li>
+              <li>Para cambiar una linea bloqueada, debe solicitar revision a administracion.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Casos especiales</h2>
+            <ul>
+              <li>Si no encuentra el producto, debe escribir a <strong>copias@goethe.edu.ar</strong>.</li>
+              <li>Si usa la terminal de biblioteca, debe completar obligatoriamente el mail del solicitante.</li>
+            </ul>
+          </div>
+
+          <div class="note">
+            El pedido queda registrado aunque no haya stock suficiente. El equipo administrativo
+            preparara lo disponible y avisara cuando el resto este listo.
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span>
+            <span class="summary-title">Operador</span>
+            <span class="summary-copy">Como entregar pedidos completos e ingresar reposiciones directas.</span>
+          </span>
+          <span class="chevron">v</span>
+        </summary>
+        <div class="content">
+          <div class="section">
+            <h2>Perfil operador</h2>
+            <ul>
+              <li>El perfil operador se configura en la hoja <strong>Usuarios_Admin</strong> con Perfil = <strong>operador</strong>.</li>
+              <li>Ve una pantalla simplificada para entrega de pedidos e ingreso directo de stock.</li>
+              <li>No ve recepcion de mercaderia, alta de producto ni actividad reciente.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Entrega de pedidos</h2>
+            <ul>
+              <li>Abrir el pedido pendiente.</li>
+              <li>Revisar si todas las lineas tienen stock suficiente.</li>
+              <li><strong>Registrar entrega parcial</strong> entrega todo lo que tenga stock y deja el saldo pendiente.</li>
+              <li><strong>Registrar entrega</strong> se usa para cerrar el saldo cuando todo lo pendiente tiene stock suficiente.</li>
+              <li>No se marca preparado/listo y no se envia aviso de listo.</li>
+              <li>El sistema envia al solicitante el mail de retiro con el detalle efectivamente entregado.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Ingreso de stock</h2>
+            <ul>
+              <li>Entrar a <strong>Ingreso de stock</strong>.</li>
+              <li>Buscar productos y cargar cantidades recibidas.</li>
+              <li>Presionar <strong>Registrar ingreso</strong>.</li>
+              <li>El stock se actualiza directamente y queda movimiento registrado.</li>
+            </ul>
+          </div>
+
+          <div class="note">
+            Este perfil esta pensado para entrega personal de pedidos y reposicion fisica de stock, sin gestionar compras.
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>
+          <span>
+            <span class="summary-title">Admin</span>
+            <span class="summary-copy">Como gestionar pedidos, compras, productos, recepciones y actividad reciente.</span>
+          </span>
+          <span class="chevron">v</span>
+        </summary>
+        <div class="content">
+          <div class="section">
+            <h2>Vista general</h2>
+            <ul>
+              <li>Al ingresar, el bloque de pedido de usuario aparece contraido para priorizar la operacion administrativa.</li>
+              <li>Los pedidos y lotes de compra aparecen minimizados para facilitar el trabajo con muchos registros.</li>
+              <li>Todas las secciones pueden expandirse y contraerse.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Gestion de pedidos</h2>
+            <ul>
+              <li>Abrir un pedido para ver sus lineas.</li>
+              <li>Cada linea muestra producto, estado, solicitada, lista, retirada, pendiente, disponible y fisico.</li>
+              <li>Las acciones se muestran solo al elegir el modo: <strong>Listo</strong>, <strong>Retiro</strong> o <strong>Cancelar</strong>.</li>
+              <li><strong>Listo</strong>: registra cantidad preparada para retirar y envia aviso al solicitante.</li>
+              <li><strong>Retiro</strong>: registra la cantidad efectivamente retirada y descuenta stock.</li>
+              <li><strong>Cancelar</strong>: anula el saldo pendiente de la linea y requiere motivo.</li>
+              <li>Los botones rapidos cargan cantidades disponibles para evitar repetir datos manualmente; siempre se pueden ajustar antes de procesar.</li>
+              <li><strong>Deshacer preparado</strong>: vuelve una linea preparada a pendiente si aun no fue retirada; requiere motivo.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Nueva reposicion</h2>
+            <ul>
+              <li>Funciona con la misma logica visual que el pedido del usuario.</li>
+              <li>Permite buscar productos por nombre o ID.</li>
+              <li>Se cargan cantidades y, si hace falta, una referencia u observacion opcional.</li>
+              <li>Al enviar, se registra la solicitud de compra y se notifica al responsable.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Recepcionar mercaderia</h2>
+            <ul>
+              <li>Los lotes se abren solo cuando hace falta procesarlos.</li>
+              <li>El selector <strong>Producto recibido</strong> viene preseleccionado con el mismo producto solicitado.</li>
+              <li>Solo debe cambiarse si llega un producto distinto.</li>
+              <li>La recepcion puede ser parcial o total.</li>
+              <li>El stock impacta sobre el producto realmente recibido.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Alta de productos</h2>
+            <ul>
+              <li>Permite crear productos nuevos desde el panel admin.</li>
+              <li>El sistema genera el ID automaticamente desde la categoria.</li>
+              <li>Al crear el producto tambien se crea su fila de stock inicial.</li>
+              <li>El sistema bloquea IDs o nombres duplicados.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Perfiles</h2>
+            <ul>
+              <li>La hoja <strong>Usuarios_Admin</strong> puede tener columnas <strong>Email</strong> y <strong>Perfil</strong>.</li>
+              <li><strong>admin</strong>: acceso completo al panel.</li>
+              <li><strong>operador</strong>: acceso simplificado a entrega e ingreso directo de stock.</li>
+              <li><strong>general</strong>: cuenta compartida que debe ingresar nombre, apellido y mail del solicitante.</li>
+              <li>Si la hoja queda con una sola columna de mails, esos usuarios se consideran admin.</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h2>Actividad reciente</h2>
+            <ul>
+              <li>Muestra acciones administrativas y cambios recientes.</li>
+              <li>Permite revisar usuario, fecha y descripcion de cada movimiento.</li>
+            </ul>
+          </div>
+
+          <div class="warn note">
+            Recomendacion operativa: trabajar siempre pedido por pedido o lote por lote, usando los bloques
+            contraidos para mantener una vista limpia cuando hay muchos pendientes.
+          </div>
+        </div>
+      </details>
+    </div>
+  </body>
+</html>

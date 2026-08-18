@@ -1,0 +1,324 @@
+<script>
+function obtenerProductosFiltrados() {
+  const termino = (document.getElementById("buscador-productos") || { value: "" }).value.trim().toLocaleLowerCase("es");
+  const soloSeleccionados = document.getElementById("filtro-seleccionados") ? document.getElementById("filtro-seleccionados").checked : false;
+
+  return listaProductosGlobal.filter(producto => {
+    const cantidad = cantidadesPedido[producto.id] || 0;
+    const coincideBusqueda = !termino ||
+      obtenerEtiquetaProducto(producto).toLocaleLowerCase("es").includes(termino) ||
+      String(producto.id).toLocaleLowerCase("es").includes(termino);
+    const coincideSeleccion = !soloSeleccionados || cantidad > 0;
+    return coincideBusqueda && coincideSeleccion;
+  });
+}
+
+function mostrarStockEnPedidoUsuario_() {
+  return !!(rolActual && rolActual.isAdmin);
+}
+
+function actualizarVisibilidadStockPedido_() {
+  const header = document.getElementById("pedido-stock-header");
+  const mostrarStock = mostrarStockEnPedidoUsuario_();
+
+  if (header) {
+    header.classList.toggle("hidden", !mostrarStock);
+  }
+}
+
+function actualizarVistaProductos() {
+  const tbody = document.getElementById("cuerpo-pedido-grid");
+  if (!tbody) return;
+
+  actualizarVisibilidadStockPedido_();
+  const productos = obtenerProductosFiltrados();
+  const vacio = document.getElementById("pedido-vacio");
+  const mostrarStock = mostrarStockEnPedidoUsuario_();
+
+  if (!productos.length) {
+    tbody.innerHTML = "";
+    vacio.classList.remove("hidden");
+    actualizarResumenPedido();
+    return;
+  }
+
+  vacio.classList.add("hidden");
+  tbody.innerHTML = renderizarFilasPedidoPorCategoria_(productos, mostrarStock);
+
+  actualizarResumenPedido();
+}
+
+function renderizarFilasPedidoPorCategoria_(productos, mostrarStock) {
+  const colspan = mostrarStock ? 3 : 2;
+  const termino = (document.getElementById("buscador-productos") || { value: "" }).value.trim();
+  const soloSeleccionados = document.getElementById("filtro-seleccionados") ? document.getElementById("filtro-seleccionados").checked : false;
+  const grupos = {};
+  ordenarProductosPorCategoria(productos).forEach(function(producto) {
+    const categoria = obtenerCategoriaProducto_(producto);
+    if (!grupos[categoria]) grupos[categoria] = [];
+    grupos[categoria].push(producto);
+  });
+
+  return Object.keys(grupos).map(function(categoria) {
+    const claveCategoria = crearClaveDomSegura_("cat", categoria);
+    const seleccionados = grupos[categoria].filter(function(producto) {
+      return (cantidadesPedido[producto.id] || 0) > 0;
+    }).length;
+    const expandida = categoriasPedidoExpandido[claveCategoria] === true || !!termino || soloSeleccionados;
+    const filas = expandida ? grupos[categoria].map(function(producto) {
+      return renderizarFilaProductoPedido_(producto, mostrarStock);
+    }).join("") : "";
+
+    return `
+      <tr class="category-row category-row-toggle ${expandida ? "is-open" : ""}" onclick="toggleCategoriaPedido('${claveCategoria}')">
+        <td colspan="${colspan}">
+          <button type="button" class="category-toggle-btn">
+            <span>${escapeHtml_(categoria)}</span>
+            <span class="category-meta">${grupos[categoria].length} producto(s)${seleccionados ? ` | ${seleccionados} seleccionado(s)` : ""} | ${expandida ? "Ocultar" : "Expandir"}</span>
+          </button>
+        </td>
+      </tr>
+      ${filas}`;
+  }).join("");
+}
+
+function renderizarFilaProductoPedido_(producto, mostrarStock) {
+    const cantidad = cantidadesPedido[producto.id] || "";
+    const faltante = mostrarStock ? Math.max((cantidadesPedido[producto.id] || 0) - Number(producto.stock || 0), 0) : 0;
+    const detalleStock = Number(producto.stockComprometido || 0) > 0
+      ? `Fisico: ${producto.stockFisico} | Comprometido: ${producto.stockComprometido}`
+      : `Fisico: ${producto.stockFisico}`;
+    return `
+      <tr class="${cantidad ? "row-selected" : ""}">
+        <td class="producto-cell">
+          ${escapeHtml_(obtenerEtiquetaProducto(producto))}
+          ${mostrarStock ? `<span class="producto-subcopy">${detalleStock}</span>` : ""}
+          ${faltante > 0 ? `<span class="faltante-copy">Faltan ${faltante}</span>` : ""}
+        </td>
+        ${mostrarStock ? `<td class="col-stock">${producto.stock}</td>` : ""}
+        <td class="col-cantidad">
+          <input
+            type="number"
+            min="0"
+            class="cantidad-input ${faltante > 0 ? "input-error" : ""}"
+            value="${cantidad}"
+            oninput="actualizarCantidadProducto('${escapeHtml_(producto.id)}', this)"
+          >
+        </td>
+      </tr>`;
+}
+
+function toggleCategoriaPedido(claveCategoria) {
+  categoriasPedidoExpandido[claveCategoria] = !categoriasPedidoExpandido[claveCategoria];
+  actualizarVistaProductos();
+}
+
+function actualizarCantidadProducto(id, input) {
+  const cantidad = normalizarCantidadInput(input.value);
+
+  if (cantidad > 0) {
+    cantidadesPedido[id] = cantidad;
+  } else {
+    delete cantidadesPedido[id];
+  }
+
+  actualizarEstadoVisualFilaPedido_(id, input);
+  actualizarResumenPedido();
+}
+
+function actualizarEstadoVisualFilaPedido_(id, input) {
+  const fila = input && input.closest ? input.closest("tr") : null;
+  const producto = obtenerProductoPorId(id);
+  if (!fila || !producto) return;
+
+  const cantidad = cantidadesPedido[id] || 0;
+  const mostrarStock = mostrarStockEnPedidoUsuario_();
+  const faltante = mostrarStock ? Math.max(cantidad - Number(producto.stock || 0), 0) : 0;
+  fila.classList.toggle("row-selected", cantidad > 0);
+  input.classList.toggle("input-error", faltante > 0);
+
+  const celdaProducto = fila.querySelector(".producto-cell");
+  if (!celdaProducto) return;
+
+  let faltanteNode = fila.querySelector(".faltante-copy");
+  if (faltante > 0) {
+    if (!faltanteNode) {
+      faltanteNode = document.createElement("span");
+      faltanteNode.className = "faltante-copy";
+      celdaProducto.appendChild(faltanteNode);
+    }
+    faltanteNode.innerText = `Faltan ${faltante}`;
+  } else if (faltanteNode) {
+    faltanteNode.remove();
+  }
+}
+
+function obtenerPedidoDesdeGrilla() {
+  return Object.keys(cantidadesPedido).map(id => ({
+    id: id,
+    cantidad: cantidadesPedido[id]
+  })).filter(item => item.cantidad > 0);
+}
+
+function actualizarResumenPedido() {
+  const pedido = obtenerPedidoDesdeGrilla();
+  const items = pedido.length;
+  const unidades = pedido.reduce((total, item) => total + item.cantidad, 0);
+
+  document.getElementById("resumen-items").innerText = String(items);
+  document.getElementById("resumen-unidades").innerText = String(unidades);
+}
+
+function obtenerSolicitanteMailDesdeUI_() {
+  if (!rolActual || !rolActual.isCuentaGeneral) {
+    return "";
+  }
+
+  return String((document.getElementById("solicitante-mail") || {}).value || "").trim();
+}
+
+function obtenerNombreSolicitanteDesdeUI_() {
+  if (!rolActual || !rolActual.isCuentaGeneral) return "";
+  return String((document.getElementById("solicitante-nombre") || {}).value || "").trim();
+}
+
+function obtenerApellidoSolicitanteDesdeUI_() {
+  if (!rolActual || !rolActual.isCuentaGeneral) return "";
+  return String((document.getElementById("solicitante-apellido") || {}).value || "").trim();
+}
+
+function enviarPedidoMasivo() {
+  const pedido = obtenerPedidoDesdeGrilla();
+
+  if (!pedido.length) {
+    alert("Por favor, carga al menos un producto. / Bitte mindestens ein Produkt laden.");
+    return;
+  }
+
+  const solicitanteMail = obtenerSolicitanteMailDesdeUI_();
+  const nombreSolicitante = obtenerNombreSolicitanteDesdeUI_();
+  const apellidoSolicitante = obtenerApellidoSolicitanteDesdeUI_();
+  if (rolActual && rolActual.isCuentaGeneral && (!nombreSolicitante || !apellidoSolicitante || !solicitanteMail)) {
+    alert("Ingresa nombre, apellido y mail del solicitante.");
+    return;
+  }
+
+  mostrarLoading("Registrando pedido... / Anfrage wird gespeichert...");
+
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      alert(normalizarMensaje_(respuesta));
+      cantidadesPedido = {};
+      if (document.getElementById("solicitante-mail")) {
+        document.getElementById("solicitante-mail").value = "";
+      }
+      if (document.getElementById("solicitante-nombre")) {
+        document.getElementById("solicitante-nombre").value = "";
+      }
+      if (document.getElementById("solicitante-apellido")) {
+        document.getElementById("solicitante-apellido").value = "";
+      }
+      if (rolActual && rolActual.isAdmin) {
+        cargarDashboardAdmin();
+      }
+      actualizarStockGlobal();
+    })
+    .withFailureHandler(manejarError)
+    .registrarPedidoMasivo({
+      solicitanteMail: solicitanteMail,
+      nombreSolicitante: nombreSolicitante,
+      apellidoSolicitante: apellidoSolicitante,
+      items: pedido
+    });
+}
+
+function cargarMisPedidos() {
+  const contenedor = document.getElementById("lista-mis-pedidos");
+  if (!contenedor) return;
+
+  contenedor.innerHTML = '<div class="empty-state">Cargando pedidos...</div>';
+  google.script.run
+    .withSuccessHandler(function(pedidos) {
+      renderizarMisPedidos_(pedidos || []);
+    })
+    .withFailureHandler(manejarError)
+    .obtenerMisPedidosEditables();
+}
+
+function renderizarMisPedidos_(pedidos) {
+  const contenedor = document.getElementById("lista-mis-pedidos");
+  if (!contenedor) return;
+
+  if (!pedidos.length) {
+    contenedor.innerHTML = '<div class="empty-state">No tenes pedidos pendientes editables.</div>';
+    return;
+  }
+
+  contenedor.innerHTML = pedidos.map(function(pedido) {
+    return `
+      <section class="admin-block">
+        <div class="admin-title-row">
+          <strong>Pedido: ${escapeHtml_(pedido.id)}</strong>
+          <span class="status-pill status-neutral">${escapeHtml_(pedido.fecha || "-")}</span>
+        </div>
+        <div class="pedido-lineas-shell">
+          ${(pedido.items || []).map(function(item) { return renderizarLineaMiPedido_(pedido.id, item); }).join("")}
+        </div>
+      </section>`;
+  }).join("");
+}
+
+function renderizarLineaMiPedido_(idPedido, item) {
+  const clave = crearClaveDomSegura_("mi", idPedido, item.productoId || item.producto);
+  return `
+    <article class="linea-operativa ${item.editable ? "" : "linea-operativa-riesgo"}">
+      <div class="linea-operativa-main">
+        <div class="linea-producto">
+          <strong>${escapeHtml_(item.producto)}</strong>
+          <span class="producto-subcopy">Estado: ${escapeHtml_(item.estado)} | Solicitado: ${item.cantidadSolicitada}</span>
+          ${item.editable ? "" : `<span class="faltante-copy">${escapeHtml_(item.motivoBloqueo || "No editable")}</span>`}
+        </div>
+        <div class="linea-metricas">
+          <span class="linea-metrica"><strong>${item.cantidadLista}</strong><small>Lista</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadRetirada}</strong><small>Retir.</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadPendiente}</strong><small>Pend.</small></span>
+        </div>
+        <div class="linea-stock">
+          <input id="cantidad-${clave}" type="number" min="0" class="cantidad-input" value="${item.cantidadSolicitada}" ${item.editable ? "" : "disabled"}>
+        </div>
+      </div>
+      <div class="quick-action-row">
+        <button class="btn btn-chip" type="button" ${item.editable ? "" : "disabled"} onclick="guardarItemPedidoPropio('${escapeHtml_(idPedido)}', '${escapeHtml_(item.productoId || "")}', '${clave}')">Guardar cantidad</button>
+        <button class="btn btn-chip btn-chip-danger" type="button" ${item.editable ? "" : "disabled"} onclick="eliminarItemPedidoPropio('${escapeHtml_(idPedido)}', '${escapeHtml_(item.productoId || "")}')">Eliminar item</button>
+      </div>
+    </article>`;
+}
+
+function guardarItemPedidoPropio(idPedido, productoId, clave) {
+  const input = document.getElementById(`cantidad-${clave}`);
+  const cantidad = normalizarCantidadInput((input || {}).value);
+  if (cantidad <= 0) {
+    mostrarAviso("info", "Para eliminar un item usa el boton Eliminar item.");
+    return;
+  }
+  actualizarItemPedidoPropio_(idPedido, productoId, cantidad);
+}
+
+function eliminarItemPedidoPropio(idPedido, productoId) {
+  actualizarItemPedidoPropio_(idPedido, productoId, 0);
+}
+
+function actualizarItemPedidoPropio_(idPedido, productoId, cantidad) {
+  mostrarLoading("Actualizando pedido...");
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || "Pedido actualizado.");
+      renderizarMisPedidos_(respuesta.pedidos || []);
+      if (rolActual && rolActual.isAdmin) cargarDashboardAdmin();
+    })
+    .withFailureHandler(manejarError)
+    .actualizarItemPedidoPropio(idPedido, productoId, cantidad);
+}
+</script>

@@ -1,0 +1,152 @@
+<div id="instructivo-backdrop" class="instructivo-backdrop hidden" onclick="toggleInstructivo(false)"></div>
+<aside id="instructivo-panel" class="instructivo-panel hidden" aria-hidden="true">
+  <div class="instructivo-panel-header">
+    <div>
+      <h2>Instructivo rapido</h2>
+      <p class="section-copy">Guia operativa para consultar mientras se cargan o procesan pedidos.</p>
+    </div>
+    <button class="btn btn-light btn-small" type="button" onclick="toggleInstructivo(false)">Cerrar</button>
+  </div>
+
+  <details class="help-block">
+    <summary class="help-summary">
+      <span>
+        <strong>Usuario</strong>
+        <span class="help-summary-copy">Buscar productos, cargar cantidades, enviar y revisar pedidos propios.</span>
+      </span>
+      <span class="help-chevron">v</span>
+    </summary>
+    <div class="help-content">
+      <div class="help-section">
+        <h3>Uso general</h3>
+        <ul>
+          <li>Buscar productos por nombre o por ID.</li>
+          <li>Las categorias del catalogo arrancan contraidas; abrir solo la categoria necesaria.</li>
+          <li>Cargar la cantidad directamente en la grilla.</li>
+          <li>El resumen inferior muestra articulos seleccionados y unidades totales.</li>
+          <li>El pedido puede enviarse aunque falte stock.</li>
+          <li>El stock no se muestra al usuario; lo gestiona administracion.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Mis pedidos</h3>
+        <ul>
+          <li>Permite editar cantidad o eliminar items propios mientras no hayan sido preparados.</li>
+          <li>Si una linea ya fue preparada o entregada, queda bloqueada.</li>
+          <li>Para cambiar una linea bloqueada, solicitar revision a administracion.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Casos especiales</h3>
+        <ul>
+          <li>Si no encuentra el producto, escribir a <strong>copias@goethe.edu.ar</strong>.</li>
+          <li>En la terminal de biblioteca se debe completar el mail del solicitante.</li>
+        </ul>
+      </div>
+
+      <div class="help-note">
+        El pedido queda registrado aunque no haya stock suficiente. Se preparara lo disponible y se avisara cuando el resto este listo.
+      </div>
+    </div>
+  </details>
+
+  <details class="help-block">
+    <summary class="help-summary">
+      <span>
+        <strong>Operador</strong>
+        <span class="help-summary-copy">Entregar pedidos completos e ingresar reposiciones directas.</span>
+      </span>
+      <span class="help-chevron">v</span>
+    </summary>
+    <div class="help-content">
+      <div class="help-section">
+        <h3>Gestion de pedidos</h3>
+        <ul>
+          <li>El operador ve una version simplificada del panel.</li>
+          <li><strong>Registrar entrega parcial</strong> entrega todo lo disponible y deja el saldo pendiente.</li>
+          <li><strong>Registrar entrega</strong> queda para cerrar el saldo cuando todo lo pendiente tiene stock suficiente.</li>
+          <li>No marca preparado/listo ni envia aviso de listo.</li>
+          <li>El mail de retiro se envia al solicitante con el detalle efectivamente entregado.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Ingreso de stock</h3>
+        <ul>
+          <li>La seccion de reposicion funciona como ingreso directo de stock.</li>
+          <li>Seleccionar productos, cargar cantidades y registrar ingreso.</li>
+          <li>No se usa recepcion de mercaderia ni gestion de compras en este perfil.</li>
+        </ul>
+      </div>
+
+      <div class="help-note">
+        El perfil operador se configura en <strong>Usuarios_Admin</strong> con Perfil = <strong>operador</strong>. Para una cuenta general de carga, usar Perfil = <strong>general</strong>.
+      </div>
+    </div>
+  </details>
+
+  <details class="help-block">
+    <summary class="help-summary">
+      <span>
+        <strong>Admin</strong>
+        <span class="help-summary-copy">Gestionar pedidos, compras, productos, recepciones y actividad reciente.</span>
+      </span>
+      <span class="help-chevron">v</span>
+    </summary>
+    <div class="help-content">
+      <div class="help-section">
+        <h3>Vista operativa</h3>
+        <ul>
+          <li>El bloque de pedido de usuario arranca contraido para priorizar la operacion.</li>
+          <li>Pedidos y lotes se muestran minimizados para trabajar mejor con mucho volumen.</li>
+          <li>Todas las secciones pueden expandirse y contraerse.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Gestion de pedidos</h3>
+        <ul>
+          <li>Cada linea muestra solicitada, lista, retirada, pendiente, disponible y fisico.</li>
+          <li><strong>Listo</strong>: registra cantidad preparada y avisa al solicitante.</li>
+          <li><strong>Retiro</strong>: registra lo efectivamente retirado y descuenta stock.</li>
+          <li><strong>Cancelar</strong>: anula el saldo pendiente de la linea y pide motivo.</li>
+          <li>Los botones rapidos cargan cantidades disponibles para evitar repetir datos manualmente.</li>
+          <li><strong>Deshacer preparado</strong>: vuelve una linea preparada a pendiente si todavia no fue retirada; requiere motivo.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Reposicion y recepcion</h3>
+        <ul>
+          <li>La reposicion usa la misma busqueda y carga visual que el pedido de usuarios.</li>
+          <li>La referencia u observacion es opcional y puede ser texto o link.</li>
+          <li>El selector <strong>Producto recibido</strong> ya viene con el producto solicitado.</li>
+          <li>Solo hay que cambiarlo si llego un producto distinto.</li>
+          <li>El stock impacta sobre el producto realmente recibido.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Alta de productos</h3>
+        <ul>
+          <li>El alta de producto crea el registro del catalogo y su fila de stock inicial.</li>
+          <li>El ID se genera automaticamente desde la categoria.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Perfiles</h3>
+        <ul>
+          <li>En <strong>Usuarios_Admin</strong>, Perfil = <strong>admin</strong> ve todo el panel.</li>
+          <li>Perfil = <strong>operador</strong> ve solo entrega simple e ingreso directo de stock.</li>
+        </ul>
+      </div>
+
+      <div class="help-note help-note-warning">
+        Recomendacion: procesar pedido por pedido o lote por lote, manteniendo cerrados los bloques que no se esten usando.
+      </div>
+    </div>
+  </details>
+</aside>

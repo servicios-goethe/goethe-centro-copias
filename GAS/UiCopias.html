@@ -1,0 +1,256 @@
+<script>
+let copiasPropiasActuales = [];
+let copiasOperativasActuales = [];
+let copiasDecisionContexto = null;
+let copiasEnviando = false;
+
+function cargarPanelCopias() {
+  google.script.run
+    .withSuccessHandler(function(data) {
+      copiasPropiasActuales = data && data.propias ? data.propias : [];
+      copiasOperativasActuales = data && data.operativas ? data.operativas : [];
+      renderizarCopiasPropias_();
+      renderizarCopiasOperativas_();
+    })
+    .withFailureHandler(function(error) {
+      const propias = document.getElementById("lista-copias-propias");
+      const operativas = document.getElementById("lista-copias-operativas");
+      if (propias) propias.innerHTML = `<div class="empty-state">${escapeHtml_(normalizarMensaje_(error.message || error))}</div>`;
+      if (operativas) operativas.innerHTML = `<div class="empty-state">${escapeHtml_(normalizarMensaje_(error.message || error))}</div>`;
+    })
+    .getCopiasPanelData();
+}
+
+function validarArchivoCopiasCliente_(input) {
+  const info = document.getElementById("copias-archivo-info");
+  const file = input && input.files ? input.files[0] : null;
+  if (!file) {
+    if (info) info.innerText = "Selecciona un archivo de hasta 80 MB.";
+    return true;
+  }
+  const maxBytes = 80 * 1024 * 1024;
+  const extension = String(file.name || "").split(".").pop().toLowerCase();
+  const permitidas = ["pdf", "doc", "docx", "jpg", "png", "txt", "zip"];
+  if (!permitidas.includes(extension)) {
+    input.value = "";
+    if (info) info.innerText = "Formato no admitido.";
+    mostrarAviso("error", "Formato no admitido. Usa PDF, DOC, DOCX, JPG, PNG, TXT o ZIP.");
+    return false;
+  }
+  if (file.size > maxBytes) {
+    input.value = "";
+    if (info) info.innerText = "El archivo supera los 80 MB.";
+    mostrarAviso("error", "El archivo supera el maximo de 80 MB.");
+    return false;
+  }
+  if (info) info.innerText = `${file.name} - ${(file.size / 1024 / 1024).toFixed(1)} MB`;
+  return true;
+}
+
+function enviarSolicitudCopias(form, event) {
+  event.preventDefault();
+  if (copiasEnviando) return;
+  const input = document.getElementById("copias-archivo");
+  if (!validarArchivoCopiasCliente_(input) || !form.reportValidity()) return;
+
+  copiasEnviando = true;
+  const button = document.getElementById("copias-enviar-btn");
+  if (button) {
+    button.disabled = true;
+    button.innerText = "Subiendo archivo...";
+  }
+  mostrarLoading("Subiendo archivo y registrando solicitud...");
+
+  google.script.run
+    .withSuccessHandler(function(result) {
+      copiasEnviando = false;
+      ocultarLoading();
+      if (button) {
+        button.disabled = false;
+        button.innerText = "Enviar solicitud";
+      }
+      form.reset();
+      const info = document.getElementById("copias-archivo-info");
+      if (info) info.innerText = "Selecciona un archivo de hasta 80 MB.";
+      mostrarAviso("success", result.message || "Solicitud registrada.");
+      cargarPanelCopias();
+    })
+    .withFailureHandler(function(error) {
+      copiasEnviando = false;
+      if (button) {
+        button.disabled = false;
+        button.innerText = "Enviar solicitud";
+      }
+      manejarError(error);
+    })
+    .registrarSolicitudCopias(form);
+}
+
+function claseEstadoCopias_(estado) {
+  if (estado === "AUTORIZADO") return "status-info";
+  if (estado === "FINALIZADO") return "status-ok";
+  if (estado === "RECHAZADO") return "status-danger";
+  return "status-warning";
+}
+
+function renderizarTarjetaCopias_(item, operativa) {
+  const finalizar = operativa && item.estado === "AUTORIZADO"
+    ? `<button class="btn btn-primary btn-small" type="button" onclick="finalizarSolicitudCopiasUI_('${escapeHtml_(item.id)}')">Marcar finalizado</button>`
+    : "";
+  const motivo = item.motivoRechazo
+    ? `<div class="copies-note"><strong>Motivo:</strong> ${escapeHtml_(item.motivoRechazo)}</div>`
+    : "";
+  return `<article class="copies-item">
+    <div class="copies-item-main">
+      <div>
+        <div class="admin-title-row">
+          <strong>${escapeHtml_(item.id)}</strong>
+          <span class="status-pill ${claseEstadoCopias_(item.estado)}">${escapeHtml_(item.estado)}</span>
+          <span class="status-pill status-neutral">${escapeHtml_(item.nivel)}</span>
+        </div>
+        <div class="admin-meta">
+          ${operativa ? `<span>${escapeHtml_(item.solicitante)}</span>` : ""}
+          <span>${escapeHtml_(item.fecha)}</span>
+          <span>${escapeHtml_(item.cantidadCopias)} copia(s) de ${escapeHtml_(item.paginasOriginal)} pagina(s)</span>
+        </div>
+      </div>
+      <div class="copies-item-actions">
+        <a class="btn btn-outline btn-small" href="${escapeHtml_(item.archivoUrl)}" target="_blank" rel="noopener">Abrir archivo</a>
+        ${finalizar}
+      </div>
+    </div>
+    <div class="copies-specs">
+      <span>${escapeHtml_(item.tamano)}</span>
+      <span>${escapeHtml_(item.modalidad)}</span>
+      <span>Doble faz: ${escapeHtml_(item.dobleFaz)}</span>
+      <span>Color: ${escapeHtml_(item.color)}</span>
+    </div>
+    ${item.comentario ? `<div class="copies-note">${escapeHtml_(item.comentario)}</div>` : ""}
+    ${motivo}
+  </article>`;
+}
+
+function renderizarCopiasPropias_() {
+  const container = document.getElementById("lista-copias-propias");
+  if (!container) return;
+  container.innerHTML = copiasPropiasActuales.length
+    ? copiasPropiasActuales.map(function(item) { return renderizarTarjetaCopias_(item, false); }).join("")
+    : '<div class="empty-state">Todavia no tenes solicitudes de copias.</div>';
+}
+
+function renderizarCopiasOperativas_() {
+  const container = document.getElementById("lista-copias-operativas");
+  if (!container) return;
+  if (!rolActual || !rolActual.isAdmin) {
+    container.innerHTML = "";
+    return;
+  }
+  const termino = String((document.getElementById("filtro-copias-admin") || {}).value || "").trim().toLowerCase();
+  const estado = String((document.getElementById("estado-copias-admin") || {}).value || "PENDIENTES");
+  const filtradas = copiasOperativasActuales.filter(function(item) {
+    const coincideEstado = estado === "TODAS"
+      || (estado === "PENDIENTES" && ["SOLICITADO", "AUTORIZADO"].includes(item.estado))
+      || item.estado === estado;
+    const base = [item.id, item.nivel, item.solicitante, item.archivoNombre].join(" ").toLowerCase();
+    return coincideEstado && (!termino || base.includes(termino));
+  });
+  const resumen = document.getElementById("admin-copias-resumen");
+  if (resumen) resumen.innerText = `${filtradas.length} solicitud(es)`;
+  container.innerHTML = filtradas.length
+    ? filtradas.map(function(item) { return renderizarTarjetaCopias_(item, true); }).join("")
+    : '<div class="empty-state">No hay solicitudes para el filtro actual.</div>';
+}
+
+function finalizarSolicitudCopiasUI_(id) {
+  if (!window.confirm(`Marcar ${id} como finalizada y avisar al solicitante?`)) return;
+  mostrarLoading("Finalizando solicitud...");
+  google.script.run
+    .withSuccessHandler(function(result) {
+      ocultarLoading();
+      mostrarAviso("success", result.message);
+      cargarPanelCopias();
+    })
+    .withFailureHandler(manejarError)
+    .finalizarSolicitudCopias(id);
+}
+
+function procesarAccionCopiasDesdeUrl_() {
+  const params = new URLSearchParams(window.location.search);
+  const accion = String(params.get("copiasAccion") || "").toLowerCase();
+  const token = String(params.get("copiasToken") || "");
+  if (!["autorizar", "rechazar"].includes(accion) || !token) return;
+  copiasDecisionContexto = { accion: accion, token: token, solicitud: null };
+  abrirDecisionCopias_();
+  google.script.run
+    .withSuccessHandler(function(solicitud) {
+      copiasDecisionContexto.solicitud = solicitud;
+      renderizarDecisionCopias_(solicitud);
+    })
+    .withFailureHandler(function(error) {
+      document.getElementById("copias-decision-copy").innerText = normalizarMensaje_(error.message || error);
+      document.getElementById("copias-decision-detail").innerHTML = "";
+      document.getElementById("copias-confirmar-decision").classList.add("hidden");
+    })
+    .getDecisionCopiasData(token);
+}
+
+function abrirDecisionCopias_() {
+  document.getElementById("copias-decision-backdrop").classList.remove("hidden");
+  document.getElementById("copias-decision-modal").classList.remove("hidden");
+  document.getElementById("copias-decision-copy").innerText = "Validando permisos y estado...";
+  document.getElementById("copias-confirmar-decision").classList.remove("hidden");
+}
+
+function renderizarDecisionCopias_(solicitud) {
+  const accion = copiasDecisionContexto.accion;
+  const esRechazo = accion === "rechazar";
+  document.getElementById("copias-decision-title").innerText = esRechazo ? "Rechazar solicitud" : "Autorizar solicitud";
+  document.getElementById("copias-decision-copy").innerText = `Confirma la decision para ${solicitud.id}.`;
+  document.getElementById("copias-decision-detail").innerHTML = `
+    <div class="copies-specs">
+      <span>${escapeHtml_(solicitud.nivel)}</span>
+      <span>${escapeHtml_(solicitud.solicitante)}</span>
+      <span>${escapeHtml_(solicitud.cantidadCopias)} copia(s)</span>
+      <span>${escapeHtml_(solicitud.paginasOriginal)} pagina(s)</span>
+    </div>`;
+  document.getElementById("copias-rechazo-field").classList.toggle("hidden", !esRechazo);
+  const button = document.getElementById("copias-confirmar-decision");
+  button.innerText = esRechazo ? "Confirmar rechazo" : "Confirmar autorizacion";
+  button.className = `btn ${esRechazo ? "btn-danger" : "btn-primary"}`;
+}
+
+function confirmarDecisionCopias_() {
+  if (!copiasDecisionContexto || !copiasDecisionContexto.solicitud) return;
+  const esRechazo = copiasDecisionContexto.accion === "rechazar";
+  const motivo = String(document.getElementById("copias-rechazo-motivo").value || "").trim();
+  if (esRechazo && !motivo) {
+    mostrarAviso("error", "Ingresa el motivo del rechazo.");
+    return;
+  }
+  const button = document.getElementById("copias-confirmar-decision");
+  button.disabled = true;
+  google.script.run
+    .withSuccessHandler(function(result) {
+      button.disabled = false;
+      document.getElementById("copias-decision-copy").innerText = result.message;
+      document.getElementById("copias-decision-detail").innerHTML = `<span class="status-pill ${claseEstadoCopias_(result.estado)}">${escapeHtml_(result.estado)}</span>`;
+      document.getElementById("copias-rechazo-field").classList.add("hidden");
+      button.classList.add("hidden");
+      cargarPanelCopias();
+    })
+    .withFailureHandler(function(error) {
+      button.disabled = false;
+      mostrarAviso("error", error.message || error);
+    })
+    .decidirSolicitudCopias(copiasDecisionContexto.token, esRechazo ? "RECHAZAR" : "AUTORIZAR", motivo);
+}
+
+function cerrarDecisionCopias_() {
+  document.getElementById("copias-decision-backdrop").classList.add("hidden");
+  document.getElementById("copias-decision-modal").classList.add("hidden");
+  copiasDecisionContexto = null;
+  if (window.history && window.history.replaceState) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+}
+</script>

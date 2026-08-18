@@ -1,0 +1,27 @@
+<script>
+let listaProductosGlobal = [];
+let cantidadesPedido = {};
+let cantidadesCompra = {};
+let linksCompra = {};
+let rolActual = null;
+let pedidosAdminActuales = [];
+let comprasAdminActuales = [];
+let actividadAdminActual = [];
+let initPendiente = 1;
+let seccionesContraidas = {};
+let pedidosExpandido = {};
+let comprasExpandido = {};
+let categoriasPedidoExpandido = {};
+let modosAccionPedido = {};
+let toastTimerGlobal = null;
+let filtroPedidosAdmin = { termino: "", soloFaltantes: false };
+let filtroComprasAdmin = { termino: "", soloPendientes: true };
+let ajusteStockContexto = null;
+let appInfoActual = null;
+let creandoProducto = false;
+
+window.onload = function() {
+  mostrarLoading("Iniciando sistema... / System wird gestartet...");
+  inicializarAplicacion();
+};
+</script>

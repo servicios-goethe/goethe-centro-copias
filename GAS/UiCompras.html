@@ -1,0 +1,339 @@
+<script>
+function prepararFormularioCompras_() {
+  actualizarVistaCompras();
+}
+
+function obtenerProductosFiltradosCompra_() {
+  const termino = (document.getElementById("buscador-compra") || { value: "" }).value.trim().toLocaleLowerCase("es");
+  const soloConStock = document.getElementById("filtro-compra-stock") ? document.getElementById("filtro-compra-stock").checked : false;
+  const soloSeleccionados = document.getElementById("filtro-compra-seleccionados") ? document.getElementById("filtro-compra-seleccionados").checked : false;
+
+  return listaProductosGlobal.filter(function(producto) {
+    const cantidad = cantidadesCompra[producto.id] || 0;
+    const coincideBusqueda = !termino ||
+      obtenerEtiquetaProducto(producto).toLocaleLowerCase("es").includes(termino) ||
+      String(producto.id).toLocaleLowerCase("es").includes(termino);
+    const coincideStock = !soloConStock || producto.stockFisico > 0;
+    const coincideSeleccion = !soloSeleccionados || cantidad > 0;
+    return coincideBusqueda && coincideStock && coincideSeleccion;
+  });
+}
+
+function actualizarVistaCompras() {
+  const tbody = document.getElementById("cuerpo-compra-grid");
+  if (!tbody) return;
+
+  const productos = obtenerProductosFiltradosCompra_();
+  const vacio = document.getElementById("compra-vacia");
+  const mostrarReferencia = !(rolActual && rolActual.isOperadorEntrega);
+  const referenciaHeader = document.getElementById("compra-referencia-header");
+  if (referenciaHeader) referenciaHeader.classList.toggle("hidden", !mostrarReferencia);
+
+  if (!productos.length) {
+    tbody.innerHTML = "";
+    vacio.classList.remove("hidden");
+    actualizarResumenCompra_();
+    return;
+  }
+
+  vacio.classList.add("hidden");
+  tbody.innerHTML = renderizarFilasAgrupadasPorCategoria_(productos, function(producto) {
+    const cantidad = cantidadesCompra[producto.id] || "";
+    const referencia = linksCompra[producto.id] || "";
+    const detalleStock = producto.stockComprometido > 0
+      ? `Fisico: ${producto.stockFisico} | Comprometido: ${producto.stockComprometido}`
+      : `Fisico: ${producto.stockFisico}`;
+
+    return `
+      <tr class="${cantidad ? "row-selected" : ""}">
+        <td class="producto-cell">
+          ${escapeHtml_(obtenerEtiquetaProducto(producto))}
+          <span class="producto-subcopy">${detalleStock}</span>
+        </td>
+        <td class="col-cantidad">
+          <input
+            type="number"
+            min="0"
+            class="cantidad-input"
+            value="${cantidad}"
+            oninput="actualizarCantidadCompra('${escapeHtml_(producto.id)}', this)"
+          >
+        </td>
+        ${mostrarReferencia ? `<td>
+          <input
+            type="text"
+            placeholder="Referencia u observacion opcional"
+            value="${escapeHtml_(referencia)}"
+            oninput="actualizarReferenciaCompra('${escapeHtml_(producto.id)}', this.value)"
+          >
+        </td>` : ""}
+      </tr>`;
+  }, mostrarReferencia ? 3 : 2);
+
+  actualizarResumenCompra_();
+}
+
+function actualizarCantidadCompra(id, input) {
+  const cantidad = normalizarCantidadInput(input.value);
+
+  if (cantidad > 0) {
+    cantidadesCompra[id] = cantidad;
+  } else {
+    delete cantidadesCompra[id];
+    delete linksCompra[id];
+  }
+
+  actualizarEstadoVisualFilaCompra_(id, input);
+  actualizarResumenCompra_();
+}
+
+function actualizarEstadoVisualFilaCompra_(id, input) {
+  const fila = input && input.closest ? input.closest("tr") : null;
+  if (!fila) return;
+  const cantidad = cantidadesCompra[id] || 0;
+  fila.classList.toggle("row-selected", cantidad > 0);
+}
+
+function actualizarReferenciaCompra(id, valor) {
+  linksCompra[id] = String(valor || "").trim();
+}
+
+function actualizarLinkCompra(id, valor) {
+  actualizarReferenciaCompra(id, valor);
+}
+
+function actualizarResumenCompra_() {
+  const ids = Object.keys(cantidadesCompra).filter(function(id) {
+    return cantidadesCompra[id] > 0;
+  });
+  const unidades = ids.reduce(function(total, id) {
+    return total + (cantidadesCompra[id] || 0);
+  }, 0);
+
+  document.getElementById("resumen-compra-items").innerText = String(ids.length);
+  document.getElementById("resumen-compra-unidades").innerText = String(unidades);
+}
+
+function enviarCompraMasiva() {
+  const items = Object.keys(cantidadesCompra).map(function(id) {
+    return {
+      id: id,
+      cantidad: cantidadesCompra[id],
+      referencia: linksCompra[id] || "",
+      link: linksCompra[id] || ""
+    };
+  }).filter(function(item) {
+    return item.id && item.cantidad > 0;
+  });
+
+  if (!items.length) {
+    mostrarAviso("info", rolActual && rolActual.isOperadorEntrega ? "Carga items para el ingreso." : "Carga items para la compra.");
+    return;
+  }
+
+  mostrarLoading(rolActual && rolActual.isOperadorEntrega ? "Registrando ingreso..." : "Solicitando compra...");
+
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta);
+      cantidadesCompra = {};
+      linksCompra = {};
+      actualizarVistaCompras();
+      cargarDashboardAdmin();
+    })
+    .withFailureHandler(manejarError)
+    .registrarCompraMasiva(items);
+}
+
+function cargarComprasAdmin() {
+  cargarDashboardAdmin();
+}
+
+function renderizarComprasAdmin_() {
+  const contenedor = document.getElementById("lista-compras-pendientes");
+  if (!contenedor) return;
+
+  if (!comprasAdminActuales.length) {
+    contenedor.innerHTML = "<div class=\"empty-state\">Sin pendientes.</div>";
+    return;
+  }
+
+  const agrupados = {};
+  comprasAdminActuales.forEach(function(compra) {
+    if (!agrupados[compra.id]) {
+      agrupados[compra.id] = { id: compra.id, fecha: compra.fecha, items: [] };
+    }
+    agrupados[compra.id].items.push(compra);
+  });
+
+  const lotesFiltrados = Object.values(agrupados).filter(filtrarCompraAdmin_);
+  if (!lotesFiltrados.length) {
+    contenedor.innerHTML = "<div class=\"empty-state\">No hay lotes que coincidan con el filtro actual.</div>";
+    return;
+  }
+
+  contenedor.innerHTML = lotesFiltrados.map(renderizarCompraAdmin_).join("");
+}
+
+function actualizarFiltroComprasAdmin() {
+  filtroComprasAdmin.termino = String((document.getElementById("filtro-recepcion-admin") || {}).value || "").trim().toLocaleLowerCase("es");
+  filtroComprasAdmin.soloPendientes = !!((document.getElementById("filtro-recepcion-pendientes") || {}).checked);
+  renderizarComprasAdmin_();
+}
+
+function filtrarCompraAdmin_(lote) {
+  const termino = filtroComprasAdmin.termino || "";
+  const soloPendientes = !!filtroComprasAdmin.soloPendientes;
+  const coincidePendiente = !soloPendientes || lote.items.some(function(item) {
+    return item.cantidadPendiente > 0;
+  });
+
+  if (!termino) return coincidePendiente;
+
+  const base = [lote.id, lote.fecha].join(" ").toLocaleLowerCase("es");
+  const coincideLote = base.includes(termino);
+  const coincideItem = lote.items.some(function(item) {
+    return [item.producto, item.productoRecibido, item.estado].join(" ").toLocaleLowerCase("es").includes(termino);
+  });
+  return coincidePendiente && (coincideLote || coincideItem);
+}
+
+function renderizarCompraAdmin_(lote) {
+  const claveLote = crearClaveDomSegura_(lote.id);
+  const expandido = !!comprasExpandido[claveLote];
+
+  return `
+    <section class="admin-block admin-block-compras">
+      <button class="admin-block-toggle" type="button" onclick="toggleCompraAdmin('${claveLote}')">
+        <div class="admin-block-header">
+          <div>
+            <div class="admin-title-row">
+              <strong>Lote: ${escapeHtml_(lote.id)}</strong>
+              <span class="status-pill status-pending">${lote.items.length} linea(s)</span>
+            </div>
+            <div class="admin-meta">
+              <span>${escapeHtml_(lote.fecha || "-")}</span>
+            </div>
+          </div>
+          <span class="section-note">${expandido ? "Ocultar" : "Ver detalle"}</span>
+        </div>
+      </button>
+      <div class="${expandido ? "" : "hidden"}">
+        <div class="batch-toolbar batch-toolbar-success">
+          <span class="batch-toolbar-copy">Completa cantidades, cancela saldos si hace falta y procesa el lote completo.</span>
+          <button class="btn btn-success btn-small" onclick="procesarRecepcionLote('${escapeHtml_(lote.id)}')">Recepcionar lote</button>
+        </div>
+        <div class="pedido-lineas-shell">
+          ${lote.items.map(item => renderizarLineaCompraAdmin_(lote.id, item)).join("")}
+        </div>
+      </div>
+    </section>`;
+}
+
+function renderizarLineaCompraAdmin_(compraId, item) {
+  const clave = crearClaveDomSegura_(compraId, item.productoId || item.producto);
+  const productoDefaultId = item.productoRecibidoId || item.productoId || "";
+  const opciones = '<option value="">Producto recibido...</option>' + renderizarOpcionesProductoPorCategoria_(productoDefaultId);
+
+  return `
+    <article class="linea-operativa linea-operativa-compra">
+      <div class="linea-operativa-main">
+        <div class="linea-producto">
+          <strong>${escapeHtml_(item.producto)}</strong>
+          <span class="producto-subcopy">Estado: ${escapeHtml_(item.estado)}${item.productoRecibido ? ` | Recibido: ${escapeHtml_(item.productoRecibido)}` : ""}</span>
+        </div>
+        <div class="linea-metricas">
+          <span class="linea-metrica"><strong>${item.cantidadSolicitada}</strong><small>Solic.</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadRecibida}</strong><small>Recib.</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadPendiente}</strong><small>Pend.</small></span>
+        </div>
+      </div>
+      <div class="linea-operativa-actions">
+        <div class="batch-input-grid batch-input-grid-compra">
+          <label class="batch-field batch-field-wide">
+            <span>Producto recibido</span>
+            <select id="prod-rec-${clave}" class="compra-select">${opciones}</select>
+          </label>
+          <label class="batch-field">
+            <span>Cantidad</span>
+            <input type="number" min="0" class="cant-rec" id="cant-rec-${clave}" placeholder="0">
+          </label>
+          <label class="batch-field batch-field-check">
+            <input type="checkbox" id="cancelar-compra-${clave}">
+            <span>Cancelar saldo</span>
+          </label>
+          <label class="batch-field batch-field-wide">
+            <span>Motivo</span>
+            <input type="text" id="motivo-compra-${clave}" placeholder="Obligatorio si cancela">
+          </label>
+        </div>
+      </div>
+    </article>`;
+}
+
+function toggleCompraAdmin(claveLote) {
+  comprasExpandido[claveLote] = !comprasExpandido[claveLote];
+  renderizarComprasAdmin_();
+}
+
+function procesarRecepcionLote(compraId) {
+  const lote = comprasAdminActuales.filter(function(item) {
+    return item.id === compraId;
+  });
+
+  if (!lote.length) {
+    mostrarAviso("info", "No se encontro el lote a procesar.");
+    return;
+  }
+
+  const cambios = lote.map(function(item) {
+    const clave = crearClaveDomSegura_(compraId, item.productoId || item.producto);
+    return {
+      productoSolicitadoId: item.productoId || "",
+      productoRecibidoId: String((document.getElementById(`prod-rec-${clave}`) || {}).value || ""),
+      cantidadRecibida: normalizarCantidadInput((document.getElementById(`cant-rec-${clave}`) || {}).value),
+      cancelarSaldo: !!((document.getElementById(`cancelar-compra-${clave}`) || {}).checked),
+      motivo: String((document.getElementById(`motivo-compra-${clave}`) || {}).value || "").trim()
+    };
+  }).filter(function(cambio) {
+    return cambio.cantidadRecibida > 0 || cambio.cancelarSaldo;
+  });
+
+  const cancelacionSinMotivo = cambios.find(function(cambio) {
+    return cambio.cancelarSaldo && !cambio.motivo;
+  });
+  if (cancelacionSinMotivo) {
+    mostrarAviso("error", "Ingresa un motivo para cancelar saldo de compra.");
+    return;
+  }
+
+  if (!cambios.length) {
+    mostrarAviso("info", "No hay cambios para procesar en este lote.");
+    return;
+  }
+
+  mostrarLoading("Procesando recepcion...");
+
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || respuesta);
+      if (respuesta && "lote" in respuesta) {
+        comprasAdminActuales = comprasAdminActuales.filter(function(item) {
+          return item.id !== compraId;
+        });
+        if (Array.isArray(respuesta.lote) && respuesta.lote.length) {
+          comprasAdminActuales = comprasAdminActuales.concat(respuesta.lote);
+        }
+        renderizarComprasAdmin_();
+        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+      } else {
+        cargarDashboardAdmin();
+      }
+      actualizarStockGlobal();
+    })
+    .withFailureHandler(manejarError)
+    .procesarRecepcionLote(compraId, cambios);
+}
+</script>

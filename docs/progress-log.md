@@ -49,6 +49,8 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 
 ### Hito 2 — Material no listado
 
+- Commit: `c18bef4` (`fix(pedidos): treat unlisted material as informational`).
+- Sincronizado con GAS de desarrollo el 2026-08-27 a las 00:45 UTC, preservando `AppConfig.js` de desarrollo.
 - Las líneas de material no listado se identifican explícitamente como solicitudes informativas.
 - La interfaz oculta las acciones de preparar, retirar y ajustar stock para esas líneas.
 - El servidor rechaza las mismas acciones incluso si se invocan fuera de la interfaz; cancelar el saldo sigue permitido.

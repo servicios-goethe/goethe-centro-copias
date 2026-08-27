@@ -59,7 +59,7 @@ stock disponible = máximo(stock físico - stock comprometido, 0)
 - Para usuarios normales, el solicitante es el email de la sesión.
 - Una cuenta general debe aportar email válido, nombre y apellido del solicitante; el nombre visible se guarda junto al email.
 - La creación no rechaza explícitamente un pedido por falta de stock: el faltante se gestiona durante preparación o entrega.
-- Se puede agregar un material no listado con un enlace HTTP(S) de referencia opcional. Se registra como una línea trazable del pedido para revisión operativa.
+- Se puede agregar un material no listado con un enlace HTTP(S) de referencia opcional. Se registra como una línea trazable e informativa para revisión operativa; no reserva, descuenta, ajusta ni puede marcarse como lista desde stock. El saldo puede cancelarse con motivo.
 
 ### 4.2 Edición por el solicitante
 

@@ -25,6 +25,17 @@ function agregarObservacionPedido_(observaciones, mensaje) {
   return base ? `${base} | ${detalle}` : detalle;
 }
 
+function esMaterialNoListado_(retiro) {
+  return String(retiro && retiro.productoId || "").startsWith("NO-LISTADO-")
+    || /^\[No listado\]/i.test(String(retiro && retiro.productoNombre || ""));
+}
+
+function asegurarMaterialConStock_(retiro, accion) {
+  if (esMaterialNoListado_(retiro)) {
+    throw new Error(`El material no listado es una solicitud informativa y no se puede ${accion}.`);
+  }
+}
+
 function calcularEstadoRetiro_(retiro) {
   if (retiro.cantidadPendiente <= 0 && retiro.cantidadLista <= 0 && retiro.cantidadRetirada <= 0) {
     return ESTADOS.RETIRO_CANCELADO;
@@ -199,6 +210,7 @@ function obtenerPedidosParaGestionDesdeSpreadsheet_(ss) {
       stockInicialDisponible: stockInicialDisponible,
       stockDisponible: stockActualDisponible,
       stockDisponibleLote: stockInicialDisponible,
+      esMaterialNoListado: esMaterialNoListado_(retiro),
       faltante: Math.max(retiro.cantidadPendiente - stockActualDisponible, 0),
       observaciones: retiro.observaciones || "",
       requiereRevision: requiereRevision,
@@ -323,6 +335,9 @@ function actualizarCantidadPedidoOperador(idPedido, productoId, nuevaCantidad) {
     for (let i = 1; i < retirosCtx.rows.length; i++) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
       if (retiro.pedidoId !== String(idPedido) || String(retiro.productoId) !== String(productoId)) continue;
+      if (esMaterialNoListado_(retiro)) {
+        throw new Error("El material no listado no tiene cantidad de stock para corregir.");
+      }
       if (!itemPedidoEditablePorOperador_(retiro)) {
         throw new Error("Solo se pueden editar cantidades pendientes que aun no fueron preparadas ni retiradas.");
       }
@@ -437,6 +452,7 @@ function marcarCantidadLista(idPedido, productoId, cantidadListaAccion) {
     for (let i = 1; i < retirosCtx.rows.length; i++) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
       if (retiro.pedidoId !== idPedido || retiro.productoId !== String(productoId)) continue;
+      asegurarMaterialConStock_(retiro, "marcar como listo para retirar");
       const estadoAnterior = retiro.estado;
 
       const cantidadAListar = Math.min(cantidad, retiro.cantidadPendiente);
@@ -494,6 +510,7 @@ function marcarCantidadRetirada(idPedido, productoId, cantidadRetiradaAccion) {
     for (let i = 1; i < retirosCtx.rows.length; i++) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
       if (retiro.pedidoId !== idPedido || retiro.productoId !== String(productoId)) continue;
+      asegurarMaterialConStock_(retiro, "registrar como retirado");
 
       const cantidadARetirar = Math.min(cantidad, retiro.cantidadLista);
       if (cantidadARetirar <= 0) {
@@ -604,6 +621,16 @@ function procesarCambiosPedido(idPedido, cambios) {
         cambiosPorProducto[String(cambio.productoId)] = cambio;
       }
     });
+
+    for (let i = 1; i < retirosCtx.rows.length; i++) {
+      const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
+      if (retiro.pedidoId !== idPedido) continue;
+      const cambio = cambiosPorProducto[String(retiro.productoId)];
+      if (!cambio || !esMaterialNoListado_(retiro)) continue;
+      if (normalizarCantidad_(cambio.cantidadLista) > 0 || normalizarCantidad_(cambio.cantidadRetirada) > 0) {
+        asegurarMaterialConStock_(retiro, "procesar con acciones de stock");
+      }
+    }
 
     for (let i = 1; i < retirosCtx.rows.length; i++) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
@@ -757,6 +784,8 @@ function entregarPedidoCompleto(idPedido) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
       if (retiro.pedidoId !== idPedido) continue;
       if (retiro.estado === ESTADOS.RETIRO_RETIRADO || retiro.estado === ESTADOS.RETIRO_CANCELADO) continue;
+
+      asegurarMaterialConStock_(retiro, "entregar como pedido completo");
 
       const cantidadAEntregar = normalizarCantidad_(retiro.cantidadPendiente) + normalizarCantidad_(retiro.cantidadLista);
       if (cantidadAEntregar <= 0) continue;
@@ -951,6 +980,9 @@ function ajustarStockDesdePedido(idPedido, productoId, nuevoStockReal, motivo) {
     const stockIndices = obtenerIndicesStock_(stockSheet);
     const stockMap = obtenerMapaStockPorId_(ss);
     const productosMap = obtenerMapaProductos_(ss);
+    if (String(productoId || "").startsWith("NO-LISTADO-")) {
+      throw new Error("El material no listado no posee stock para ajustar.");
+    }
     const stockItem = stockMap[String(productoId)];
     const nuevoStock = normalizarCantidad_(nuevoStockReal);
 

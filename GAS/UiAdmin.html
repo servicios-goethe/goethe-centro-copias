@@ -166,6 +166,19 @@ function renderizarPedidoEntregaSimple_(pedido) {
 }
 
 function renderizarLineaEntregaSimple_(idPedido, item) {
+  if (item.esMaterialNoListado) {
+    return `
+      <article class="linea-operativa linea-operativa-riesgo">
+        <div class="linea-operativa-main linea-operativa-main-simple">
+          <div class="linea-producto">
+            <strong>${escapeHtml_(item.producto)}</strong>
+            <span class="producto-subcopy">Solicitud informativa: requiere revisión manual; no descuenta ni reserva stock.</span>
+            ${item.observaciones ? `<span class="producto-subcopy">Obs.: ${escapeHtml_(item.observaciones)}</span>` : ""}
+          </div>
+          <div class="linea-stock"><span class="status-pill status-neutral">Sin acciones de stock</span></div>
+        </div>
+      </article>`;
+  }
   const pendienteTotal = Number(item.cantidadPendiente || 0) + Number(item.cantidadLista || 0);
   const suficiente = Number(item.stockActual || 0) >= pendienteTotal && Number(item.cantidadRetirada || 0) === 0;
   const clave = crearClaveDomSegura_("operador", item.productoId || item.producto);
@@ -221,6 +234,7 @@ function guardarCantidadPedidoOperador_(idPedido, productoId, clave) {
 
 function renderizarLineaPedidoAdmin_(pedido, item) {
   const clave = crearClaveDomSegura_(pedido.id, item.productoId || item.producto);
+  const esMaterialNoListado = !!item.esMaterialNoListado;
   const stockClase = item.faltante > 0 ? "status-pill status-danger" : "status-pill status-ok";
 
   return `
@@ -228,7 +242,7 @@ function renderizarLineaPedidoAdmin_(pedido, item) {
       <div class="linea-operativa-main">
         <div class="linea-producto">
           <strong>${escapeHtml_(item.producto)}</strong>
-          <span class="producto-subcopy">Estado: ${escapeHtml_(item.estado)}${item.faltante > 0 ? ` | Faltan ${item.faltante}` : ""}${item.requiereRevision ? " | Revisar cierre" : ""}</span>
+          <span class="producto-subcopy">${esMaterialNoListado ? "Solicitud informativa: sin reserva ni movimientos de stock." : `Estado: ${escapeHtml_(item.estado)}${item.faltante > 0 ? ` | Faltan ${item.faltante}` : ""}${item.requiereRevision ? " | Revisar cierre" : ""}`}</span>
           ${item.observaciones ? `<span class="producto-subcopy">Obs.: ${escapeHtml_(item.observaciones)}</span>` : ""}
         </div>
         <div class="linea-metricas">
@@ -238,21 +252,19 @@ function renderizarLineaPedidoAdmin_(pedido, item) {
           <span class="linea-metrica"><strong>${item.cantidadPendiente}</strong><small>Pend.</small></span>
         </div>
         <div class="linea-stock">
-          <span class="${stockClase}">Disp. ${item.stockDisponible}</span>
-          <span class="status-pill status-neutral">Fisico ${item.stockActual}</span>
-          <button class="btn btn-chip" type="button" onclick="abrirAjusteStockPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}')">Ajustar stock</button>
+          ${esMaterialNoListado ? '<span class="status-pill status-neutral">Sin acciones de stock</span>' : `<span class="${stockClase}">Disp. ${item.stockDisponible}</span><span class="status-pill status-neutral">Fisico ${item.stockActual}</span><button class="btn btn-chip" type="button" onclick="abrirAjusteStockPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}')">Ajustar stock</button>`}
         </div>
       </div>
       <div class="linea-operativa-actions">
         <div class="batch-input-grid batch-input-grid-pedido">
-          <label class="batch-field">
+          ${esMaterialNoListado ? "" : `<label class="batch-field">
             <span>Listo</span>
             <input type="number" min="0" class="cantidad-admin" id="lista-${clave}" placeholder="0">
           </label>
           <label class="batch-field">
             <span>Retiro</span>
             <input type="number" min="0" class="cantidad-admin" id="retira-${clave}" placeholder="0">
-          </label>
+          </label>`}
           <label class="batch-field batch-field-check">
             <input type="checkbox" id="cancelar-${clave}">
             <span>Cancelar saldo</span>
@@ -262,12 +274,12 @@ function renderizarLineaPedidoAdmin_(pedido, item) {
             <input type="text" id="motivo-cancelar-${clave}" placeholder="Obligatorio si cancela">
           </label>
         </div>
-        <div class="quick-action-row">
+        ${esMaterialNoListado ? "" : `<div class="quick-action-row">
           <button class="btn btn-chip" type="button" onclick="aplicarAccionRapidaPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}', 'listo')">Todo listo</button>
           <button class="btn btn-chip" type="button" onclick="aplicarAccionRapidaPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}', 'retirar')">Retirar listo</button>
           <button class="btn btn-chip" type="button" onclick="aplicarAccionRapidaPedido('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}', 'listo-retirar')">Listo y retirar</button>
           ${item.cantidadLista > 0 && item.cantidadRetirada <= 0 ? `<button class="btn btn-chip btn-chip-danger" type="button" onclick="deshacerPreparacionPedidoAdmin('${escapeHtml_(pedido.id)}', '${escapeHtml_(item.productoId || "")}')">Deshacer preparado</button>` : ""}
-        </div>
+        </div>`}
       </div>
     </article>`;
 }
@@ -307,7 +319,7 @@ function obtenerDisponibleParaLinea_(item) {
 
 function aplicarAccionRapidaPedido(idPedido, productoId, accion, silencioso) {
   const item = obtenerLineaPedidoAdmin_(idPedido, productoId);
-  if (!item) return 0;
+  if (!item || item.esMaterialNoListado) return 0;
 
   const pendiente = Number(item.cantidadPendiente || 0);
   const lista = Number(item.cantidadLista || 0);

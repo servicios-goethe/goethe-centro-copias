@@ -19,6 +19,8 @@
 
 ## Hito 2 — Material no listado
 
+**Estado:** Completado y validado localmente.
+
 **Objetivo:** registrar descripción y enlace opcional con validación cliente/servidor, sin confundir una solicitud informativa con stock físico inexistente.
 
 **Archivos afectados:** `GAS/UiPedidos.html`, `GAS/Pedidos.js`.

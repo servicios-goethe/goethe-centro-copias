@@ -47,10 +47,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - El deployment de desarrollo vigente es la versión 26, `Desarrollo - Hito 1 mejoras`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
+### Hito 2 — Material no listado
+
+- Las líneas de material no listado se identifican explícitamente como solicitudes informativas.
+- La interfaz oculta las acciones de preparar, retirar y ajustar stock para esas líneas.
+- El servidor rechaza las mismas acciones incluso si se invocan fuera de la interfaz; cancelar el saldo sigue permitido.
+
 ### Pendientes conocidos incluidos en este corte
 
 El árbol contiene avances de hitos posteriores que todavía deben corregirse y validarse:
 
-- Hito 2: impedir acciones de stock sobre líneas de material no listado.
 - Hito 3: incluir el ID del pedido en la clave DOM de edición del operador.
 - Hitos 4 a 8: completar su validación individual antes de considerar un release productivo.

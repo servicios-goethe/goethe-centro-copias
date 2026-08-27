@@ -24,9 +24,19 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 
 - Rama Git: `feat/feedback-usuarios-dev`.
 - Proyecto GAS de desarrollo: `1ISG1EqFAsTqPsuKP8QstbflRLcQ7mKOm88HsZYSrSbWIjpB-NGOqO38N`.
-- Estado de push GitHub: pendiente.
-- Estado de sincronización GAS: pendiente.
+- Commit del corte: `6b709cd` (`feat(gas): prepare user feedback development snapshot`).
+- Estado de push GitHub: rama publicada en `origin/feat/feedback-usuarios-dev`.
+- Estado de sincronización GAS: 25 archivos sincronizados el 2026-08-27 a las 00:17 UTC.
+- Verificación posterior: clonación limpia sin diferencias de código respecto del corte local, excluyendo la configuración específica del ambiente.
+- Deployment de prueba `@HEAD`: `AKfycbyEv1OEyjeFhDkZsNRQLm8ZqqgUnyVI6yMtNVWCS98`.
+- Configuración preservada: `ENVIRONMENT = "DESARROLLO"` y Spreadsheet de desarrollo `1QDlVdMC9GSrUeysk9RHDAyz-YhbYTz8H3s9kHmUgD9k`.
 - No se modifica ni despliega el proyecto GAS productivo.
+
+### Restricciones de la prueba
+
+- La carpeta Drive de copias y los destinatarios de correo siguen compartidos con la configuración productiva.
+- Este corte debe probar únicamente el formulario de pedidos del Hito 1.
+- No crear compras ni solicitudes de copias hasta separar esos recursos por ambiente.
 
 ### Pendientes conocidos incluidos en este corte
 
@@ -35,4 +45,3 @@ El árbol contiene avances de hitos posteriores que todavía deben corregirse y 
 - Hito 2: impedir acciones de stock sobre líneas de material no listado.
 - Hito 3: incluir el ID del pedido en la clave DOM de edición del operador.
 - Hitos 4 a 8: completar su validación individual antes de considerar un release productivo.
-

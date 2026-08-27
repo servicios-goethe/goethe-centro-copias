@@ -75,11 +75,11 @@ El Spreadsheet configurado en `CONFIG.SPREADSHEET_ID` es la fuente de verdad ope
 | `Pedidos_Retiro` | Líneas de pedidos de retiro. | `ID_Pedido`, `Producto_ID`, `Solicitante_Mail` |
 | `Log_Auditoria` | Auditoría funcional general. | acción y detalle JSON; la referencia se almacena dentro del detalle |
 | `Movimientos_Stock` | Libro de movimientos de stock. | `ID_Relacionado`, `Producto_ID` |
-| `Solicitudes_Copias` | Solicitudes y estado de copias. | `ID_Solicitud`, `Archivo_ID` |
+| `Solicitudes_Copias` | Solicitudes y estado de copias, con email y nombre visible del solicitante. | `ID_Solicitud`, `Archivo_ID`, `Solicitante_Email` |
 | `Usuarios_Copias` | Autorizadores por nivel. | email y nivel |
 | `Log_Copias` | Auditoría específica de copias. | `ID_Solicitud` |
 
-`Movimientos_Stock`, `Solicitudes_Copias`, `Usuarios_Copias` y `Log_Copias` pueden crearse automáticamente. Las demás hojas y sus encabezados son precondiciones operativas.
+`Movimientos_Stock`, `Solicitudes_Copias`, `Usuarios_Copias` y `Log_Copias` pueden crearse automáticamente. El módulo de copias agrega encabezados faltantes de forma compatible. Las demás hojas y sus encabezados son precondiciones operativas.
 
 ### Consistencia e integridad
 

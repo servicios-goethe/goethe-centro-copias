@@ -162,8 +162,9 @@ function obtenerPedidoDesdeGrilla() {
 
 function actualizarResumenPedido() {
   const pedido = obtenerPedidoDesdeGrilla();
-  const items = pedido.length;
-  const unidades = pedido.reduce((total, item) => total + item.cantidad, 0);
+  const incluyeMaterialNoListado = !!String((document.getElementById("material-no-listado") || {}).value || "").trim();
+  const items = pedido.length + (incluyeMaterialNoListado ? 1 : 0);
+  const unidades = pedido.reduce((total, item) => total + item.cantidad, 0) + (incluyeMaterialNoListado ? 1 : 0);
 
   document.getElementById("resumen-items").innerText = String(items);
   document.getElementById("resumen-unidades").innerText = String(unidades);
@@ -177,29 +178,30 @@ function obtenerSolicitanteMailDesdeUI_() {
   return String((document.getElementById("solicitante-mail") || {}).value || "").trim();
 }
 
-function obtenerNombreSolicitanteDesdeUI_() {
+function obtenerNombreCompletoSolicitanteDesdeUI_() {
   if (!rolActual || !rolActual.isCuentaGeneral) return "";
-  return String((document.getElementById("solicitante-nombre") || {}).value || "").trim();
-}
-
-function obtenerApellidoSolicitanteDesdeUI_() {
-  if (!rolActual || !rolActual.isCuentaGeneral) return "";
-  return String((document.getElementById("solicitante-apellido") || {}).value || "").trim();
+  return String((document.getElementById("solicitante-nombre-completo") || {}).value || "").trim();
 }
 
 function enviarPedidoMasivo() {
   const pedido = obtenerPedidoDesdeGrilla();
+  const materialNoListado = String((document.getElementById("material-no-listado") || {}).value || "").trim();
+  const materialNoListadoLink = String((document.getElementById("material-no-listado-link") || {}).value || "").trim();
 
-  if (!pedido.length) {
-    alert("Por favor, carga al menos un producto. / Bitte mindestens ein Produkt laden.");
+  if (!pedido.length && !materialNoListado) {
+    alert("Carga al menos un producto o describe un material no listado.");
+    return;
+  }
+
+  if (materialNoListadoLink && !materialNoListado) {
+    alert("Describe el material no listado asociado al link de referencia.");
     return;
   }
 
   const solicitanteMail = obtenerSolicitanteMailDesdeUI_();
-  const nombreSolicitante = obtenerNombreSolicitanteDesdeUI_();
-  const apellidoSolicitante = obtenerApellidoSolicitanteDesdeUI_();
-  if (rolActual && rolActual.isCuentaGeneral && (!nombreSolicitante || !apellidoSolicitante || !solicitanteMail)) {
-    alert("Ingresa nombre, apellido y mail del solicitante.");
+  const nombreCompletoSolicitante = obtenerNombreCompletoSolicitanteDesdeUI_();
+  if (rolActual && rolActual.isCuentaGeneral && (!nombreCompletoSolicitante || !solicitanteMail)) {
+    alert("Ingresa nombre y apellido, y mail del solicitante.");
     return;
   }
 
@@ -213,12 +215,11 @@ function enviarPedidoMasivo() {
       if (document.getElementById("solicitante-mail")) {
         document.getElementById("solicitante-mail").value = "";
       }
-      if (document.getElementById("solicitante-nombre")) {
-        document.getElementById("solicitante-nombre").value = "";
+      if (document.getElementById("solicitante-nombre-completo")) {
+        document.getElementById("solicitante-nombre-completo").value = "";
       }
-      if (document.getElementById("solicitante-apellido")) {
-        document.getElementById("solicitante-apellido").value = "";
-      }
+      document.getElementById("material-no-listado").value = "";
+      document.getElementById("material-no-listado-link").value = "";
       if (rolActual && rolActual.isAdmin) {
         cargarDashboardAdmin();
       }
@@ -227,8 +228,9 @@ function enviarPedidoMasivo() {
     .withFailureHandler(manejarError)
     .registrarPedidoMasivo({
       solicitanteMail: solicitanteMail,
-      nombreSolicitante: nombreSolicitante,
-      apellidoSolicitante: apellidoSolicitante,
+      nombreCompletoSolicitante: nombreCompletoSolicitante,
+      materialNoListado: materialNoListado,
+      materialNoListadoLink: materialNoListadoLink,
       items: pedido
     });
 }

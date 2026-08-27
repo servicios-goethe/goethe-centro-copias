@@ -1,5 +1,5 @@
 const COPIAS_HEADERS = [
-  "ID_Solicitud", "Fecha_Solicitud", "Solicitante_Email", "Nivel",
+  "ID_Solicitud", "Fecha_Solicitud", "Solicitante_Email", "Solicitante_Nombre", "Nivel",
   "Archivo_Nombre", "Archivo_ID", "Archivo_URL", "Paginas_Original",
   "Comentario", "Tamano", "Cantidad_Copias", "Modalidad", "Doble_Faz",
   "Color", "Estado", "Autorizado_Por", "Fecha_Decision", "Motivo_Rechazo",
@@ -23,6 +23,14 @@ function asegurarHojaCopias_(ss, nombre, headers) {
   if (sheet.getLastRow() === 0) {
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.setFrozenRows(1);
+  } else {
+    const existentes = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(function(header) {
+      return String(header || "").trim();
+    });
+    const faltantes = headers.filter(function(header) { return !existentes.includes(header); });
+    if (faltantes.length) {
+      sheet.getRange(1, sheet.getLastColumn() + 1, 1, faltantes.length).setValues([faltantes]);
+    }
   }
   return sheet;
 }
@@ -48,7 +56,9 @@ function validarDatosSolicitudCopias_(data) {
   const cantidad = Number.parseInt(data.cantidadCopias, 10);
   const tamano = String(data.tamano || "").trim().toUpperCase();
   const modalidad = String(data.modalidad || "").trim().toUpperCase();
+  const solicitanteNombre = String(data.solicitanteNombre || "").trim().slice(0, 120);
 
+  if (!solicitanteNombre) throw new Error("Ingresa el nombre del solicitante.");
   if (!nivel) throw new Error("Selecciona un nivel valido: KG, EP o ES.");
   if (!Number.isFinite(paginas) || paginas < 1) throw new Error("La cantidad de paginas debe ser mayor a cero.");
   if (!Number.isFinite(cantidad) || cantidad < 1) throw new Error("La cantidad de copias debe ser mayor a cero.");
@@ -61,6 +71,7 @@ function validarDatosSolicitudCopias_(data) {
     cantidadCopias: cantidad,
     tamano: tamano,
     modalidad: modalidad,
+    solicitanteNombre: solicitanteNombre,
     dobleFaz: normalizarSiNoCopias_(data.dobleFaz),
     color: normalizarSiNoCopias_(data.color),
     comentario: String(data.comentario || "").trim().slice(0, 500)
@@ -89,6 +100,7 @@ function leerSolicitudCopias_(row, indices, rowNumber) {
     id: String(valorCopias_(row, indices, "ID_Solicitud") || ""),
     fecha: valorCopias_(row, indices, "Fecha_Solicitud"),
     solicitante: String(valorCopias_(row, indices, "Solicitante_Email") || "").trim(),
+    solicitanteNombre: String(valorCopias_(row, indices, "Solicitante_Nombre") || "").trim(),
     nivel: String(valorCopias_(row, indices, "Nivel") || ""),
     archivoNombre: String(valorCopias_(row, indices, "Archivo_Nombre") || ""),
     archivoId: String(valorCopias_(row, indices, "Archivo_ID") || ""),
@@ -116,6 +128,7 @@ function serializarSolicitudCopias_(solicitud) {
     id: solicitud.id,
     fecha: solicitud.fecha ? Utilities.formatDate(new Date(solicitud.fecha), CONFIG.TIMEZONE, "dd/MM/yyyy HH:mm") : "",
     solicitante: solicitud.solicitante,
+    solicitanteNombre: solicitud.solicitanteNombre || solicitud.solicitante,
     nivel: solicitud.nivel,
     archivoNombre: solicitud.archivoNombre,
     archivoUrl: solicitud.archivoUrl,
@@ -246,11 +259,12 @@ function registrarSolicitudCopias(form) {
     const file = guardarArchivoCopias_(blob, id, data.nivel);
     const sheet = getSheetOrThrow_(ss, TABS.COPIAS);
     const indices = obtenerIndicesCopias_(sheet);
-    const row = new Array(COPIAS_HEADERS.length).fill("");
+    const row = new Array(sheet.getLastColumn()).fill("");
     const values = {
       ID_Solicitud: id,
       Fecha_Solicitud: now,
       Solicitante_Email: role.email,
+      Solicitante_Nombre: data.solicitanteNombre,
       Nivel: data.nivel,
       Archivo_Nombre: archivoNombre,
       Archivo_ID: file.getId(),
@@ -274,8 +288,8 @@ function registrarSolicitudCopias(form) {
     };
     Object.keys(values).forEach(function(header) { row[indices[header]] = values[header]; });
     appendRows_(sheet, [row]);
-    registrarLogCopias_(ss, id, "solicitud_creada", { nivel: data.nivel, estado: estado, archivoBytes: archivoBytes });
-    registrarAuditoria_(ss, "copias_solicitud_creada", { solicitudId: id, nivel: data.nivel, estado: estado });
+    registrarLogCopias_(ss, id, "solicitud_creada", { nivel: data.nivel, estado: estado, archivoBytes: archivoBytes, solicitanteNombre: data.solicitanteNombre });
+    registrarAuditoria_(ss, "copias_solicitud_creada", { solicitudId: id, nivel: data.nivel, estado: estado, solicitanteNombre: data.solicitanteNombre });
 
     enviarMailCopiasSeguro_(ss, id, "solicitud_recibida", [role.email], function() {
       return buildMailCopiasRecibida_(id, data, estado);

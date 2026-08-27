@@ -100,6 +100,7 @@ function renderizarTarjetaCopias_(item, operativa) {
   const motivo = item.motivoRechazo
     ? `<div class="copies-note"><strong>Motivo:</strong> ${escapeHtml_(item.motivoRechazo)}</div>`
     : "";
+  const nombreSolicitante = item.solicitanteNombre || item.solicitante || "-";
   return `<article class="copies-item">
     <div class="copies-item-main">
       <div>
@@ -109,9 +110,9 @@ function renderizarTarjetaCopias_(item, operativa) {
           <span class="status-pill status-neutral">${escapeHtml_(item.nivel)}</span>
         </div>
         <div class="admin-meta">
-          ${operativa ? `<span>${escapeHtml_(item.solicitante)}</span>` : ""}
-          <span>${escapeHtml_(item.fecha)}</span>
-          <span>${escapeHtml_(item.cantidadCopias)} copia(s) de ${escapeHtml_(item.paginasOriginal)} pagina(s)</span>
+          <span><strong>Solicitante:</strong> ${escapeHtml_(nombreSolicitante)}</span>
+          <span><strong>Fecha/Hora:</strong> ${escapeHtml_(item.fecha)}</span>
+          <span>${escapeHtml_(item.cantidadCopias)} copia(s) · ${escapeHtml_(item.paginasOriginal)} pagina(s) · ${escapeHtml_(item.tamano)} · ${escapeHtml_(item.modalidad)} · Doble faz ${escapeHtml_(item.dobleFaz)} · Color ${escapeHtml_(item.color)}</span>
         </div>
       </div>
       <div class="copies-item-actions">
@@ -119,13 +120,7 @@ function renderizarTarjetaCopias_(item, operativa) {
         ${finalizar}
       </div>
     </div>
-    <div class="copies-specs">
-      <span>${escapeHtml_(item.tamano)}</span>
-      <span>${escapeHtml_(item.modalidad)}</span>
-      <span>Doble faz: ${escapeHtml_(item.dobleFaz)}</span>
-      <span>Color: ${escapeHtml_(item.color)}</span>
-    </div>
-    ${item.comentario ? `<div class="copies-note">${escapeHtml_(item.comentario)}</div>` : ""}
+    ${item.comentario ? `<div class="copies-note"><strong>Indicaciones:</strong> ${escapeHtml_(item.comentario)}</div>` : ""}
     ${motivo}
   </article>`;
 }
@@ -151,7 +146,7 @@ function renderizarCopiasOperativas_() {
     const coincideEstado = estado === "TODAS"
       || (estado === "PENDIENTES" && ["SOLICITADO", "AUTORIZADO"].includes(item.estado))
       || item.estado === estado;
-    const base = [item.id, item.nivel, item.solicitante, item.archivoNombre].join(" ").toLowerCase();
+    const base = [item.id, item.nivel, item.solicitanteNombre, item.solicitante, item.archivoNombre].join(" ").toLowerCase();
     return coincideEstado && (!termino || base.includes(termino));
   });
   const resumen = document.getElementById("admin-copias-resumen");

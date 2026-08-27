@@ -15,6 +15,7 @@ Aplicación web interna de Goethe-Schule Buenos Aires construida con Google Apps
 
 - [Arquitectura GAS](docs/gas-architecture.md)
 - [Reglas de negocio](docs/business-rules.md)
+- [Registro de avances y despliegues](docs/progress-log.md)
 - [Estándar de ingeniería](CONVENTIONS.md)
 
 La solución es un monolito modular de Google Apps Script. Usa Google Spreadsheet como fuente de verdad, Google Drive para archivos de copias y Google Mail para notificaciones. No existe actualmente una integración con el DWH central; cualquier diseño de esa integración requiere un ADR.

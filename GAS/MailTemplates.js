@@ -78,31 +78,6 @@ function buildMailShell_(options) {
     </div>`;
 }
 
-function buildMailPedidoRegistrado_(pedidoId, solicitanteMail, items) {
-  return buildMailShell_({
-    title: "Pedido recibido",
-    metaRows: [
-      { label: "Pedido", value: pedidoId },
-      { label: "Solicitante", value: solicitanteMail },
-      { label: "Fecha", value: formatDateMail_(new Date()) }
-    ],
-    bodyHtml: `
-      <p style="margin:0 0 16px;color:#4f6157;line-height:1.6;">
-        Recibimos tu pedido y ya fue registrado en el sistema.
-      </p>
-      <table role="presentation" style="width:100%;border-collapse:collapse;border:1px solid #e7ece9;border-radius:12px;overflow:hidden;">
-        <thead>
-          <tr style="background:#f7f9f8;">
-            <th style="padding:10px 12px;text-align:left;color:#6b7b71;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;">Producto</th>
-            <th style="padding:10px 12px;text-align:right;color:#6b7b71;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;">Solicitado</th>
-          </tr>
-        </thead>
-        <tbody>${buildMailListItems_(items)}</tbody>
-      </table>`,
-    noteHtml: "Si algun producto no estuviera disponible de inmediato, te avisaremos cuando quede listo para retirar."
-  });
-}
-
 function buildMailPedidoListo_(pedidoId, items, tienePendiente) {
   return buildMailShell_({
     title: "Pedido listo para retirar",
@@ -127,29 +102,6 @@ function buildMailPedidoListo_(pedidoId, items, tienePendiente) {
       ? "Aun falta recibir algunos productos. Les avisaremos cuando esten disponibles."
       : "Podes acercarte a retirar el pedido cuando te resulte conveniente.",
     noteTone: tienePendiente ? "warning" : "info"
-  });
-}
-
-function buildMailPedidoRetirado_(pedidoId, items) {
-  return buildMailShell_({
-    title: "Retiro registrado",
-    metaRows: [
-      { label: "Pedido", value: pedidoId },
-      { label: "Fecha", value: formatDateMail_(new Date()) }
-    ],
-    bodyHtml: `
-      <p style="margin:0 0 16px;color:#4f6157;line-height:1.6;">
-        Se registro correctamente el retiro de los siguientes productos.
-      </p>
-      <table role="presentation" style="width:100%;border-collapse:collapse;border:1px solid #e7ece9;border-radius:12px;overflow:hidden;">
-        <thead>
-          <tr style="background:#f7f9f8;">
-            <th style="padding:10px 12px;text-align:left;color:#6b7b71;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;">Producto</th>
-            <th style="padding:10px 12px;text-align:right;color:#6b7b71;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;">Retirado</th>
-          </tr>
-        </thead>
-        <tbody>${buildMailListItems_(items)}</tbody>
-      </table>`
   });
 }
 

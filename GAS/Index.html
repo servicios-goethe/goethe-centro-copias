@@ -28,20 +28,13 @@
           <button class="collapsible-toggle" type="button" onclick="toggleSection('user-pedido')">
             <span>
               <strong>Nuevo pedido / Neue Anfrage</strong>
-              <span class="collapsible-copy">Busca productos y carga cantidades directamente en la grilla.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="user-pedido">Ocultar</span>
           </button>
           <div class="collapsible-body" data-body-for="user-pedido">
-            <div class="section-header">
-              <div>
-                <h2>Nuevo pedido / Neue Anfrage</h2>
-                <p class="section-copy">Busca productos y carga cantidades directamente en la grilla.</p>
-              </div>
-              <div class="section-sidecopy">
-                <span id="rol-usuario" class="section-note"></span>
-                <span id="estado-usuario" class="section-note section-note-warning hidden"></span>
-              </div>
+            <div class="pedido-context-row">
+              <span id="rol-usuario" class="section-note"></span>
+              <span id="estado-usuario" class="section-note section-note-warning hidden"></span>
             </div>
 
             <div class="toolbar">
@@ -52,22 +45,14 @@
               </label>
             </div>
 
-            <div class="helper-banner">
-              Los articulos estan agrupados en categorias; podras expandir la categoria o usar el buscador.
-            </div>
-
-            <div id="general-requester-wrap" class="hidden inline-field-grid">
+            <div id="general-requester-wrap" class="hidden inline-field-grid requester-field-grid">
               <div class="inline-field">
-                <label for="solicitante-nombre">Nombre</label>
-                <input id="solicitante-nombre" type="text" placeholder="Nombre">
-              </div>
-              <div class="inline-field">
-                <label for="solicitante-apellido">Apellido</label>
-                <input id="solicitante-apellido" type="text" placeholder="Apellido">
+                <label for="solicitante-nombre-completo">Nombre y apellido</label>
+                <input id="solicitante-nombre-completo" type="text" maxlength="120" placeholder="Nombre y apellido" autocomplete="name">
               </div>
               <div class="inline-field">
                 <label for="solicitante-mail">Mail del solicitante</label>
-                <input id="solicitante-mail" type="email" placeholder="usuario@goethe.edu.ar">
+                <input id="solicitante-mail" type="email" maxlength="254" placeholder="usuario@goethe.edu.ar" autocomplete="email">
               </div>
             </div>
 
@@ -85,6 +70,17 @@
             </div>
 
             <div id="pedido-vacio" class="empty-state hidden">No hay productos para mostrar con el filtro actual.</div>
+
+            <div class="unlisted-material-grid">
+              <div class="inline-field">
+                <label for="material-no-listado">Material no listado <span class="field-optional">(opcional)</span></label>
+                <input id="material-no-listado" type="text" maxlength="200" placeholder="Describe el material que necesitas" oninput="actualizarResumenPedido()">
+              </div>
+              <div class="inline-field">
+                <label for="material-no-listado-link">Link de referencia <span class="field-optional">(opcional)</span></label>
+                <input id="material-no-listado-link" type="url" maxlength="1000" placeholder="https://www.mercadolibre.com.ar/...">
+              </div>
+            </div>
 
             <div class="pedido-footer">
               <div class="pedido-resumen">
@@ -131,6 +127,10 @@
               </div>
 
               <div class="copies-form-grid">
+                <div class="inline-field copies-field-wide">
+                  <label for="copias-solicitante-nombre">Nombre del solicitante</label>
+                  <input id="copias-solicitante-nombre" name="solicitanteNombre" type="text" maxlength="120" autocomplete="name" required>
+                </div>
                 <div class="inline-field copies-field-wide">
                   <label for="copias-archivo">Archivo</label>
                   <input id="copias-archivo" name="archivo" type="file" accept=".pdf,.doc,.docx,.jpg,.png,.txt,.zip" required onchange="validarArchivoCopiasCliente_(this)">

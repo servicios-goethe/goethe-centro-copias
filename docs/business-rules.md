@@ -53,12 +53,13 @@ stock disponible = máximo(stock físico - stock comprometido, 0)
 ### 4.1 Creación
 
 - Un pedido contiene una o más líneas válidas; las líneas repetidas del mismo producto se consolidan sumando cantidades positivas.
-- El producto debe existir en el mapa de stock.
+- Los productos listados deben existir en el mapa de stock.
 - El ID de lote usa `RET-<epoch en milisegundos>`.
 - Cada línea inicia con `cantidadSolicitada = cantidadPendiente`, `cantidadLista = 0`, `cantidadRetirada = 0` y estado `Pendiente`.
 - Para usuarios normales, el solicitante es el email de la sesión.
 - Una cuenta general debe aportar email válido, nombre y apellido del solicitante; el nombre visible se guarda junto al email.
 - La creación no rechaza explícitamente un pedido por falta de stock: el faltante se gestiona durante preparación o entrega.
+- Se puede agregar un material no listado con un enlace HTTP(S) de referencia opcional. Se registra como una línea trazable del pedido para revisión operativa.
 
 ### 4.2 Edición por el solicitante
 
@@ -67,6 +68,7 @@ stock disponible = máximo(stock físico - stock comprometido, 0)
 - Una cantidad mayor que cero reemplaza lo solicitado y pendiente.
 - Una cantidad cero elimina lógicamente la línea: deja todas las cantidades activas en cero y el estado calculado pasa a `Cancelado`.
 - Toda edición o eliminación agrega una observación y un evento de auditoría.
+- El operador puede corregir la cantidad solicitada mientras la línea permanezca pendiente, sin preparación ni retiro previo; el cambio conserva auditoría.
 
 ### 4.3 Preparación, retiro y cancelación
 
@@ -141,6 +143,7 @@ La última igualdad puede dejar de cumplirse después de una cancelación de sal
 ### 6.1 Creación y archivo
 
 - Solo una cuenta con email `@goethe.edu.ar` puede crear la solicitud.
+- Cada solicitud registra el nombre declarado del solicitante junto con su email autenticado y fecha/hora; las filas históricas sin nombre muestran el email como respaldo.
 - Niveles admitidos: `KG`, `EP`, `ES`.
 - Páginas originales y cantidad de copias deben ser enteros mayores que cero.
 - Tamaños admitidos: `A4`, `A3`, `OFICIO`.
@@ -189,6 +192,7 @@ stateDiagram-v2
 - Los cambios de existencias también se agregan a `Movimientos_Stock`.
 - Copias mantiene además `Log_Copias`, que incluye la solicitud correlacionada y resultados de correo.
 - Las fallas de correo no deben revertir una operación de negocio exitosa; se devuelven como advertencia o quedan en log.
+- En pedidos de materiales, el único correo al solicitante se envía cuando una línea cambia efectivamente a `Listo para retirar`; no se envían correos por creación ni por retiro.
 - La auditoría actual usa timestamps locales de GAS y claves locales. No incluye una clave de correlación ni estado de sincronización con DWH.
 
 Todo nuevo modelo satélite debe incorporar campos de auditoría y claves de trazabilidad hacia el DWH central. El contrato exacto debe aprobarse mediante ADR antes de modificar el esquema.

@@ -159,32 +159,64 @@ function renderizarPedidoEntregaSimple_(pedido) {
           </div>
         </div>
         <div class="pedido-lineas-shell">
-          ${pedido.items.map(renderizarLineaEntregaSimple_).join("")}
+          ${pedido.items.map(function(item) { return renderizarLineaEntregaSimple_(pedido.id, item); }).join("")}
         </div>
       </div>
     </section>`;
 }
 
-function renderizarLineaEntregaSimple_(item) {
+function renderizarLineaEntregaSimple_(idPedido, item) {
   const pendienteTotal = Number(item.cantidadPendiente || 0) + Number(item.cantidadLista || 0);
   const suficiente = Number(item.stockActual || 0) >= pendienteTotal && Number(item.cantidadRetirada || 0) === 0;
+  const clave = crearClaveDomSegura_("operador", item.productoId || item.producto);
   return `
     <article class="linea-operativa ${suficiente ? "" : "linea-operativa-riesgo"}">
       <div class="linea-operativa-main linea-operativa-main-simple">
         <div class="linea-producto">
           <strong>${escapeHtml_(item.producto)}</strong>
-          <span class="producto-subcopy">Pedido: ${pendienteTotal} | Stock fisico: ${item.stockActual}</span>
+          <span class="producto-subcopy">Estado: ${escapeHtml_(item.estado)}</span>
           ${item.cantidadRetirada > 0 ? '<span class="faltante-copy">Ya tuvo entrega parcial. Este es el saldo pendiente.</span>' : ""}
         </div>
-        <div class="linea-metricas">
-          <span class="linea-metrica"><strong>${item.cantidadSolicitada}</strong><small>Solic.</small></span>
-          <span class="linea-metrica"><strong>${pendienteTotal}</strong><small>A entregar</small></span>
+        <div class="linea-metricas linea-metricas-stock">
+          <span class="linea-metrica"><strong>${item.stockInicialDisponible}</strong><small>Stock inicial</small></span>
+          <span class="linea-metrica"><strong>${item.cantidadSolicitada}</strong><small>Cant. solicitada</small></span>
+          <span class="linea-metrica"><strong>${item.stockDisponible}</strong><small>Stock actual disponible</small></span>
         </div>
         <div class="linea-stock">
           <span class="${suficiente ? "status-pill status-ok" : "status-pill status-danger"}">${suficiente ? "Stock suficiente" : `Faltan ${Math.max(pendienteTotal - Number(item.stockActual || 0), 0)}`}</span>
         </div>
       </div>
+      <div class="operator-edit-row">
+        <label class="batch-field">
+          <span>Corregir cantidad solicitada</span>
+          <input id="cantidad-operador-${clave}" type="number" min="1" step="1" value="${item.cantidadSolicitada}" ${item.editableOperador ? "" : "disabled"}>
+        </label>
+        <button class="btn btn-outline btn-small" type="button" ${item.editableOperador ? "" : "disabled"} onclick="guardarCantidadPedidoOperador_('${escapeHtml_(idPedido)}', '${escapeHtml_(item.productoId || "")}', '${clave}')">Guardar cantidad</button>
+      </div>
     </article>`;
+}
+
+function guardarCantidadPedidoOperador_(idPedido, productoId, clave) {
+  const cantidad = normalizarCantidadInput((document.getElementById(`cantidad-operador-${clave}`) || {}).value);
+  if (cantidad <= 0) {
+    mostrarAviso("error", "Ingresa una cantidad mayor a cero.");
+    return;
+  }
+
+  mostrarLoading("Actualizando cantidad...");
+  google.script.run
+    .withSuccessHandler(function(respuesta) {
+      ocultarLoading();
+      mostrarAviso("success", respuesta.mensaje || "Cantidad actualizada.");
+      if (respuesta.pedido) {
+        const index = pedidosAdminActuales.findIndex(function(item) { return item.id === respuesta.pedido.id; });
+        if (index >= 0) pedidosAdminActuales[index] = respuesta.pedido;
+      }
+      renderizarPedidosAdmin_();
+      actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+    })
+    .withFailureHandler(manejarError)
+    .actualizarCantidadPedidoOperador(idPedido, productoId, cantidad);
 }
 
 function renderizarLineaPedidoAdmin_(pedido, item) {

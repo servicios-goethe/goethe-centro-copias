@@ -4,9 +4,10 @@ function construirSolicitantePedido_(solicitanteMail) {
 
 function construirSolicitanteVisible_(user, pedido, solicitanteMail, role) {
   if (role && role.isCuentaGeneral) {
-    const nombre = String(pedido.nombreSolicitante || "").trim();
-    const apellido = String(pedido.apellidoSolicitante || "").trim();
-    const nombreCompleto = [nombre, apellido].filter(Boolean).join(" ").trim();
+    const nombreCompleto = String(pedido.nombreCompletoSolicitante || "").trim()
+      || [pedido.nombreSolicitante, pedido.apellidoSolicitante].map(function(valor) {
+        return String(valor || "").trim();
+      }).filter(Boolean).join(" ").trim();
     return nombreCompleto ? `${nombreCompleto} <${solicitanteMail}>` : construirSolicitantePedido_(solicitanteMail);
   }
 
@@ -22,16 +23,6 @@ function agregarObservacionPedido_(observaciones, mensaje) {
   const detalle = String(mensaje || "").trim();
   if (!detalle) return base;
   return base ? `${base} | ${detalle}` : detalle;
-}
-
-function construirItemsMailPedido_(items, stockMap) {
-  return (items || []).map(function(item) {
-    const producto = stockMap[item.id];
-    return {
-      producto: producto ? obtenerNombreProducto_(producto) : String(item.id || ""),
-      cantidad: item.cantidad
-    };
-  });
 }
 
 function calcularEstadoRetiro_(retiro) {
@@ -63,8 +54,12 @@ function registrarPedidoMasivo(payload) {
     const ss = getSpreadsheet_();
     const pedido = Array.isArray(payload) ? { items: payload } : (payload || {});
     const items = consolidarArticulosPorId_(pedido.items);
-    if (!items.length) {
-      throw new Error("Carga al menos un producto valido.");
+    const materialNoListado = String(pedido.materialNoListado || "").trim().slice(0, 200);
+    const materialNoListadoLink = String(pedido.materialNoListadoLink || "").trim().slice(0, 1000);
+    if (!items.length && !materialNoListado) throw new Error("Carga al menos un producto o describe un material no listado.");
+    if (materialNoListadoLink && !materialNoListado) throw new Error("Describe el material no listado asociado al link de referencia.");
+    if (materialNoListadoLink && !/^https?:\/\/[^\s]+$/i.test(materialNoListadoLink)) {
+      throw new Error("El link de referencia debe comenzar con http:// o https://.");
     }
 
     const retirosCtx = obtenerContextoRetiros_(ss);
@@ -84,7 +79,8 @@ function registrarPedidoMasivo(payload) {
       throw new Error("Ingresa un mail valido para el solicitante.");
     }
 
-    if (role.isCuentaGeneral && (!String(pedido.nombreSolicitante || "").trim() || !String(pedido.apellidoSolicitante || "").trim())) {
+    if (role.isCuentaGeneral && !String(pedido.nombreCompletoSolicitante || "").trim()
+      && (!String(pedido.nombreSolicitante || "").trim() || !String(pedido.apellidoSolicitante || "").trim())) {
       throw new Error("Ingresa nombre y apellido del solicitante.");
     }
     const idPedido = "RET-" + new Date().getTime();
@@ -114,17 +110,37 @@ function registrarPedidoMasivo(payload) {
         OBSERVACIONES: ""
       }));
     });
+    if (materialNoListado) {
+      const referencia = materialNoListadoLink ? ` | Referencia: ${materialNoListadoLink}` : "";
+      filasPedido.push(crearFilaRetiroNueva_(retirosCtx.indices, {
+        ID_PEDIDO: idPedido,
+        FECHA: new Date(),
+        SOLICITANTE: solicitanteVisible,
+        PRODUCTO: `[No listado] ${materialNoListado}`,
+        CANTIDAD: 1,
+        ESTADO: ESTADOS.RETIRO_PENDIENTE,
+        AUTORIZADOR: "",
+        ENTREGADO_POR: "",
+        SOLICITANTE_MAIL: solicitanteMail,
+        PRODUCTO_ID: `NO-LISTADO-${Utilities.getUuid()}`,
+        CANTIDAD_SOLICITADA: 1,
+        CANTIDAD_LISTA: 0,
+        CANTIDAD_RETIRADA: 0,
+        CANTIDAD_PENDIENTE: 1,
+        OBSERVACIONES: `Material no listado${referencia}`
+      }));
+    }
     appendRows_(retirosCtx.sheet, filasPedido);
 
     registrarAuditoria_(ss, "pedido_registrado", {
       loteId: idPedido,
       solicitanteMail: solicitanteMail,
-      items: items
+      items: items,
+      materialNoListado: materialNoListado,
+      materialNoListadoLink: materialNoListadoLink
     });
     bumpDataVersion_();
-    const mailWarning = enviarMailPedidoRegistrado_(solicitanteMail, idPedido, construirItemsMailPedido_(items, stockMap));
-
-    return agregarAdvertenciaMail_("Pedido registrado correctamente.", mailWarning);
+    return "Pedido registrado correctamente.";
   });
 }
 
@@ -163,6 +179,8 @@ function obtenerPedidosParaGestionDesdeSpreadsheet_(ss) {
     const comprometidoLote = productoId && stockComprometidoPorLote[productoId]
       ? (stockComprometidoPorLote[productoId][retiro.pedidoId] || 0)
       : 0;
+    const stockInicialDisponible = calcularStockDisponible_(stockFisico, comprometidoTotal - comprometidoLote);
+    const stockActualDisponible = calcularStockDisponible_(stockFisico, comprometidoTotal);
     const requiereRevision = retiro.estado === ESTADOS.RETIRO_RETIRADO_PARCIAL
       && retiro.cantidadPendiente <= 0
       && retiro.cantidadLista <= 0;
@@ -178,11 +196,13 @@ function obtenerPedidosParaGestionDesdeSpreadsheet_(ss) {
       cantidadRetirada: retiro.cantidadRetirada,
       cantidadPendiente: retiro.cantidadPendiente,
       stockActual: stockFisico,
-      stockDisponible: calcularStockDisponible_(stockFisico, comprometidoTotal),
-      stockDisponibleLote: calcularStockDisponible_(stockFisico, comprometidoTotal - comprometidoLote),
-      faltante: Math.max(retiro.cantidadPendiente - calcularStockDisponible_(stockFisico, comprometidoTotal), 0),
+      stockInicialDisponible: stockInicialDisponible,
+      stockDisponible: stockActualDisponible,
+      stockDisponibleLote: stockInicialDisponible,
+      faltante: Math.max(retiro.cantidadPendiente - stockActualDisponible, 0),
       observaciones: retiro.observaciones || "",
-      requiereRevision: requiereRevision
+      requiereRevision: requiereRevision,
+      editableOperador: itemPedidoEditablePorOperador_(retiro)
     });
   }
 
@@ -190,6 +210,12 @@ function obtenerPedidosParaGestionDesdeSpreadsheet_(ss) {
 }
 
 function itemPedidoEditablePorSolicitante_(retiro) {
+  return retiro.estado === ESTADOS.RETIRO_PENDIENTE
+    && normalizarCantidad_(retiro.cantidadLista) === 0
+    && normalizarCantidad_(retiro.cantidadRetirada) === 0;
+}
+
+function itemPedidoEditablePorOperador_(retiro) {
   return retiro.estado === ESTADOS.RETIRO_PENDIENTE
     && normalizarCantidad_(retiro.cantidadLista) === 0
     && normalizarCantidad_(retiro.cantidadRetirada) === 0;
@@ -286,6 +312,55 @@ function actualizarItemPedidoPropio(idPedido, productoId, nuevaCantidad) {
   });
 }
 
+function actualizarCantidadPedidoOperador(idPedido, productoId, nuevaCantidad) {
+  return withScriptLock_(() => {
+    const admin = asegurarAdmin_();
+    const ss = getSpreadsheet_();
+    const retirosCtx = obtenerContextoRetiros_(ss);
+    const cantidad = normalizarCantidad_(nuevaCantidad);
+    if (cantidad <= 0) throw new Error("Ingresa una cantidad mayor a cero.");
+
+    for (let i = 1; i < retirosCtx.rows.length; i++) {
+      const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
+      if (retiro.pedidoId !== String(idPedido) || String(retiro.productoId) !== String(productoId)) continue;
+      if (!itemPedidoEditablePorOperador_(retiro)) {
+        throw new Error("Solo se pueden editar cantidades pendientes que aun no fueron preparadas ni retiradas.");
+      }
+
+      const cantidadAnterior = retiro.cantidadSolicitada;
+      retiro.observaciones = agregarObservacionPedido_(retiro.observaciones, `Cantidad corregida por operador: ${cantidadAnterior} -> ${cantidad}`);
+      escribirFilaRetiro_(retirosCtx.sheet, i + 1, retirosCtx.indices, {
+        CANTIDAD: cantidad,
+        CANTIDAD_SOLICITADA: cantidad,
+        CANTIDAD_PENDIENTE: cantidad,
+        OBSERVACIONES: retiro.observaciones,
+        AUTORIZADOR: admin.email
+      });
+      registrarAuditoria_(ss, "pedido_item_editado_operador", {
+        loteId: String(idPedido),
+        productoId: String(productoId),
+        cantidadAnterior: cantidadAnterior,
+        cantidadNueva: cantidad,
+        operador: admin.email
+      });
+      bumpDataVersion_();
+
+      const pedidosActualizados = obtenerPedidosParaGestionDesdeSpreadsheet_(ss);
+      return {
+        mensaje: "Cantidad del pedido actualizada.",
+        pedido: pedidosActualizados.find(function(pedido) { return pedido.id === String(idPedido); }) || null,
+        actividad: admin.isOperadorEntrega ? [] : obtenerActividadRecienteDesdeSpreadsheet_(ss, 12),
+        resumen: {
+          pedidos: pedidosActualizados.length,
+          compras: admin.isOperadorEntrega ? 0 : obtenerComprasPendientesDesdeSpreadsheet_(ss).length
+        }
+      };
+    }
+
+    throw new Error("No se encontro la linea del pedido.");
+  });
+}
+
 function deshacerPreparacionItemPedido(idPedido, productoId, motivo) {
   return withScriptLock_(() => {
     const admin = asegurarAdmin_();
@@ -362,6 +437,7 @@ function marcarCantidadLista(idPedido, productoId, cantidadListaAccion) {
     for (let i = 1; i < retirosCtx.rows.length; i++) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
       if (retiro.pedidoId !== idPedido || retiro.productoId !== String(productoId)) continue;
+      const estadoAnterior = retiro.estado;
 
       const cantidadAListar = Math.min(cantidad, retiro.cantidadPendiente);
       if (cantidadAListar <= 0) {
@@ -379,11 +455,14 @@ function marcarCantidadLista(idPedido, productoId, cantidadListaAccion) {
         CANTIDAD_PENDIENTE: retiro.cantidadPendiente
       });
 
-      const producto = productosMap[retiro.productoId];
-      const mailWarning = enviarMailRetiroListo_(retiro.solicitanteMail, idPedido, [{
-        producto: producto ? obtenerNombreProducto_(producto) : retiro.productoNombre,
-        cantidad: cantidadAListar
-      }], retiro.cantidadPendiente > 0);
+      let mailWarning = "";
+      if (estadoAnterior !== ESTADOS.RETIRO_LISTO && retiro.estado === ESTADOS.RETIRO_LISTO) {
+        const producto = productosMap[retiro.productoId];
+        mailWarning = enviarMailRetiroListo_(retiro.solicitanteMail, idPedido, [{
+          producto: producto ? obtenerNombreProducto_(producto) : retiro.productoNombre,
+          cantidad: retiro.cantidadLista
+        }], retiro.cantidadPendiente > 0);
+      }
 
       registrarAuditoria_(ss, "pedido_listo_retirar", {
         loteId: idPedido,
@@ -442,12 +521,6 @@ function marcarCantidadRetirada(idPedido, productoId, cantidadRetiradaAccion) {
         CANTIDAD_PENDIENTE: retiro.cantidadPendiente
       });
 
-      const producto = productosMap[retiro.productoId];
-      const mailWarning = enviarMailRetiroRetirado_(retiro.solicitanteMail, idPedido, [{
-        producto: producto ? obtenerNombreProducto_(producto) : retiro.productoNombre,
-        cantidad: cantidadARetirar
-      }]);
-
       registrarAuditoria_(ss, "pedido_retirado", {
         loteId: idPedido,
         productoId: retiro.productoId,
@@ -464,7 +537,7 @@ function marcarCantidadRetirada(idPedido, productoId, cantidadRetiradaAccion) {
         observacion: `Retiro registrado por ${admin.email}`
       });
       bumpDataVersion_();
-      return agregarAdvertenciaMail_("Retiro registrado correctamente.", mailWarning);
+      return "Retiro registrado correctamente.";
     }
 
     throw new Error("No se encontro la linea del pedido.");
@@ -540,6 +613,8 @@ function procesarCambiosPedido(idPedido, cambios) {
       if (!cambio) continue;
 
       let huboCambio = false;
+      const estadoAnterior = retiro.estado;
+      let cantidadMarcadaLista = 0;
 
       const cantidadLista = normalizarCantidad_(cambio.cantidadLista);
       if (cantidadLista > 0) {
@@ -547,10 +622,7 @@ function procesarCambiosPedido(idPedido, cambios) {
         if (cantidadAListar > 0) {
           retiro.cantidadLista += cantidadAListar;
           retiro.cantidadPendiente -= cantidadAListar;
-          listosMail.push({
-            producto: productosMap[retiro.productoId] ? obtenerNombreProducto_(productosMap[retiro.productoId]) : retiro.productoNombre,
-            cantidad: cantidadAListar
-          });
+          cantidadMarcadaLista = cantidadAListar;
           huboCambio = true;
         }
       }
@@ -601,6 +673,12 @@ function procesarCambiosPedido(idPedido, cambios) {
       if (!huboCambio) continue;
 
       retiro.estado = calcularEstadoRetiro_(retiro);
+      if (cantidadMarcadaLista > 0 && estadoAnterior !== ESTADOS.RETIRO_LISTO && retiro.estado === ESTADOS.RETIRO_LISTO) {
+        listosMail.push({
+          producto: productosMap[retiro.productoId] ? obtenerNombreProducto_(productosMap[retiro.productoId]) : retiro.productoNombre,
+          cantidad: retiro.cantidadLista
+        });
+      }
       escribirFilaRetiro_(retirosCtx.sheet, i + 1, retirosCtx.indices, {
         ESTADO: retiro.estado,
         AUTORIZADOR: admin.email,
@@ -638,8 +716,6 @@ function procesarCambiosPedido(idPedido, cambios) {
     }
 
     if (pedidoActualizado && retiradosMail.length) {
-      const warning = enviarMailRetiroRetirado_(pedidoActualizado.solicitanteMail, idPedido, retiradosMail);
-      if (warning) mailWarnings.push(warning);
       registrarAuditoria_(ss, "pedido_retirado", {
         loteId: idPedido,
         lineas: retiradosMail.length,
@@ -676,7 +752,6 @@ function entregarPedidoCompleto(idPedido) {
     const lineas = [];
     const faltantes = [];
     const retiradosMail = [];
-    let solicitanteMail = "";
 
     for (let i = 1; i < retirosCtx.rows.length; i++) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
@@ -697,7 +772,6 @@ function entregarPedidoCompleto(idPedido) {
         cantidad: cantidadAEntregar,
         stockItem: stockItem
       });
-      if (!solicitanteMail) solicitanteMail = retiro.solicitanteMail;
     }
 
     if (!lineas.length) {
@@ -756,11 +830,9 @@ function entregarPedidoCompleto(idPedido) {
       modo: "entrega_completa"
     });
     bumpDataVersion_();
-    const mailWarning = enviarMailRetiroRetirado_(solicitanteMail, idPedido, retiradosMail);
-
     const pedidosActualizados = obtenerPedidosParaGestionDesdeSpreadsheet_(ss);
     return {
-      mensaje: agregarAdvertenciaMail_(`Pedido entregado completo. Lineas entregadas: ${lineas.length}.`, mailWarning),
+      mensaje: `Pedido entregado completo. Lineas entregadas: ${lineas.length}.`,
       pedido: pedidosActualizados.find(function(pedido) { return pedido.id === idPedido; }) || null,
       actividad: admin.isOperadorEntrega ? [] : obtenerActividadRecienteDesdeSpreadsheet_(ss, 12),
       resumen: {
@@ -782,7 +854,6 @@ function entregarPedidoParcialDisponible(idPedido) {
     const productosMap = obtenerMapaProductos_(ss);
     const lineas = [];
     const retiradosMail = [];
-    let solicitanteMail = "";
 
     for (let i = 1; i < retirosCtx.rows.length; i++) {
       const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
@@ -803,7 +874,6 @@ function entregarPedidoParcialDisponible(idPedido) {
         cantidad: cantidadAEntregar,
         stockItem: stockItem
       });
-      if (!solicitanteMail) solicitanteMail = retiro.solicitanteMail;
     }
 
     if (!lineas.length) {
@@ -860,11 +930,9 @@ function entregarPedidoParcialDisponible(idPedido) {
       modo: "entrega_parcial"
     });
     bumpDataVersion_();
-    const mailWarning = enviarMailRetiroRetirado_(solicitanteMail, idPedido, retiradosMail);
-
     const pedidosActualizados = obtenerPedidosParaGestionDesdeSpreadsheet_(ss);
     return {
-      mensaje: agregarAdvertenciaMail_(`Entrega parcial registrada. Lineas entregadas: ${lineas.length}.`, mailWarning),
+      mensaje: `Entrega parcial registrada. Lineas entregadas: ${lineas.length}.`,
       pedido: pedidosActualizados.find(function(pedido) { return pedido.id === idPedido; }) || null,
       actividad: admin.isOperadorEntrega ? [] : obtenerActividadRecienteDesdeSpreadsheet_(ss, 12),
       resumen: {
@@ -944,32 +1012,6 @@ function enviarMailRetiroListo_(to, pedidoId, items, tienePendiente) {
       to: to,
       subject: `Pedido listo para retirar - ${pedidoId}`,
       htmlBody: buildMailPedidoListo_(pedidoId, items, tienePendiente),
-      name: "Goethe Schule Inventario"
-    });
-  });
-}
-
-function enviarMailRetiroRetirado_(to, pedidoId, items) {
-  if (!to) return "";
-
-  return ejecutarEnvioMailSeguro_(`pedido retirado ${pedidoId}`, function() {
-    MailApp.sendEmail({
-      to: to,
-      subject: `Pedido retirado - ${pedidoId}`,
-      htmlBody: buildMailPedidoRetirado_(pedidoId, items),
-      name: "Goethe Schule Inventario"
-    });
-  });
-}
-
-function enviarMailPedidoRegistrado_(to, pedidoId, items) {
-  if (!to) return "";
-
-  return ejecutarEnvioMailSeguro_(`pedido recibido ${pedidoId}`, function() {
-    MailApp.sendEmail({
-      to: to,
-      subject: `Pedido recibido - ${pedidoId}`,
-      htmlBody: buildMailPedidoRegistrado_(pedidoId, to, items),
       name: "Goethe Schule Inventario"
     });
   });

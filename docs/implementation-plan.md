@@ -49,6 +49,8 @@
 
 ## Hito 5 — Datos del solicitante de copias
 
+**Estado:** Completado y validado localmente.
+
 **Objetivo:** persistir el nombre con compatibilidad hacia filas históricas y mantener la decisión estructural documentada.
 
 **Archivos afectados:** `GAS/Copias.js`, `docs/adr/ADR-001-copias-solicitante-nombre.md`.

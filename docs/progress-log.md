@@ -73,8 +73,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Métricas, correcciones y acciones rápidas conservan separación visual; textos largos se quiebran dentro de la tarjeta.
 - El texto del perfil operador describe las métricas visibles: stock inicial, solicitado y disponible.
 
+### Hito 5 — Datos del solicitante de copias
+
+- Implementación presente desde el corte `6b709cd` (`feat(gas): prepare user feedback development snapshot`) y, por lo tanto, incluida en el deployment de desarrollo versión 28.
+- `COPIAS_HEADERS` incorpora `Solicitante_Nombre`; al inicializar una hoja existente, el encabezado faltante se agrega al final sin reordenar las columnas previas.
+- Las nuevas solicitudes validan y persisten el nombre; la serialización de registros históricos usa el email cuando ese dato aún no existe.
+- La decisión estructural y sus consecuencias están registradas en `docs/adr/ADR-001-copias-solicitante-nombre.md`.
+
 ### Pendientes conocidos incluidos en este corte
 
 El árbol contiene avances de hitos posteriores que todavía deben corregirse y validarse:
 
-- Hitos 5 a 8: completar su validación individual antes de considerar un release productivo.
+- Hitos 6 a 8: completar su validación individual antes de considerar un release productivo.

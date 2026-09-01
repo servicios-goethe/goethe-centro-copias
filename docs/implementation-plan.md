@@ -69,6 +69,8 @@
 
 ## Hito 7 — Correo solo al quedar listo
 
+**Estado:** Completado y validado localmente.
+
 **Objetivo:** eliminar notificaciones de creación y retiro de pedidos y conservar únicamente la transición efectiva a `Listo para retirar`.
 
 **Archivos afectados:** `GAS/Pedidos.js`, `GAS/MailTemplates.js`.

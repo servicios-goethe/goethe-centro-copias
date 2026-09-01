@@ -87,8 +87,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Cada tarjeta muestra solicitante, fecha/hora, estado, nivel y un resumen compacto del trabajo; el nombre usa el email como respaldo si la fila es histórica.
 - La búsqueda operativa incluye ID, nivel, nombre, email y nombre de archivo; en móvil la tarjeta y sus acciones se apilan para conservar legibilidad.
 
+### Hito 7 — Correo solo al quedar listo
+
+- Implementación presente desde el corte `6b709cd` y, por lo tanto, incluida en el deployment de desarrollo versión 28.
+- En `Pedidos.js`, la única invocación a `MailApp` para pedidos está centralizada en `enviarMailRetiroListo_`.
+- Las acciones simples y masivas notifican solo ante una transición real desde otro estado a `Listo para retirar`; una acción repetida sin transición no duplica el correo.
+- Registrar, editar, retirar o entregar no invoca ese helper. Los correos de compras y de copias permanecen fuera de este alcance.
+
 ### Pendientes conocidos incluidos en este corte
 
 El árbol contiene avances de hitos posteriores que todavía deben corregirse y validarse:
 
-- Hitos 7 y 8: completar su validación individual antes de considerar un release productivo.
+- Hito 8: completar su validación individual antes de considerar un release productivo.

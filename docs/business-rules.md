@@ -69,6 +69,7 @@ stock disponible = máximo(stock físico - stock comprometido, 0)
 - Una cantidad cero elimina lógicamente la línea: deja todas las cantidades activas en cero y el estado calculado pasa a `Cancelado`.
 - Toda edición o eliminación agrega una observación y un evento de auditoría.
 - El operador puede corregir la cantidad solicitada mientras la línea permanezca pendiente, sin preparación ni retiro previo; el cambio conserva auditoría.
+- En la vista operativa, cada línea muestra el stock disponible antes de reservar el propio pedido, la cantidad solicitada y el stock disponible tras considerar todas las reservas actuales. Los controles de corrección se identifican por pedido y producto, por lo que no se comparten entre pedidos distintos.
 
 ### 4.3 Preparación, retiro y cancelación
 

@@ -29,6 +29,8 @@
 
 ## Hito 3 — Stock visible y edición del operador
 
+**Estado:** Completado y validado localmente.
+
 **Objetivo:** mostrar stock inicial disponible, cantidad solicitada y stock actual disponible, y permitir correcciones auditadas antes de preparar o retirar.
 
 **Archivos afectados:** `GAS/Pedidos.js`, `GAS/UiAdmin.html`.

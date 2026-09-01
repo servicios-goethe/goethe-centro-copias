@@ -55,9 +55,14 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - La interfaz oculta las acciones de preparar, retirar y ajustar stock para esas líneas.
 - El servidor rechaza las mismas acciones incluso si se invocan fuera de la interfaz; cancelar el saldo sigue permitido.
 
+### Hito 3 — Stock visible y edición del operador
+
+- La vista del operador muestra stock disponible antes de la reserva del pedido, cantidad solicitada y stock disponible actual.
+- La corrección de cantidad queda limitada en servidor a líneas pendientes sin preparación ni retiro, y conserva auditoría.
+- La clave DOM del control incorpora pedido y producto, evitando colisiones cuando dos pedidos contienen el mismo material.
+
 ### Pendientes conocidos incluidos en este corte
 
 El árbol contiene avances de hitos posteriores que todavía deben corregirse y validarse:
 
-- Hito 3: incluir el ID del pedido en la clave DOM de edición del operador.
 - Hitos 4 a 8: completar su validación individual antes de considerar un release productivo.

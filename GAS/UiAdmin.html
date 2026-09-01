@@ -181,7 +181,7 @@ function renderizarLineaEntregaSimple_(idPedido, item) {
   }
   const pendienteTotal = Number(item.cantidadPendiente || 0) + Number(item.cantidadLista || 0);
   const suficiente = Number(item.stockActual || 0) >= pendienteTotal && Number(item.cantidadRetirada || 0) === 0;
-  const clave = crearClaveDomSegura_("operador", item.productoId || item.producto);
+  const clave = crearClaveDomSegura_("operador", idPedido, item.productoId || item.producto);
   return `
     <article class="linea-operativa ${suficiente ? "" : "linea-operativa-riesgo"}">
       <div class="linea-operativa-main linea-operativa-main-simple">

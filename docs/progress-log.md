@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 26, `Desarrollo - Hito 1 mejoras`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 27, `Desarrollo - Hitos 1 a 3`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -59,6 +59,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 
 - Commit: `81607c0` (`fix(operador): isolate order quantity controls`).
 - Sincronizado con GAS de desarrollo el 2026-09-01 a las 21:47 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 27 creada y deployment de desarrollo actualizado el 2026-09-01; el enlace `/exec` ya usa los Hitos 1 a 3.
 - La vista del operador muestra stock disponible antes de la reserva del pedido, cantidad solicitada y stock disponible actual.
 - La corrección de cantidad queda limitada en servidor a líneas pendientes sin preparación ni retiro, y conserva auditoría.
 - La clave DOM del control incorpora pedido y producto, evitando colisiones cuando dos pedidos contienen el mismo material.

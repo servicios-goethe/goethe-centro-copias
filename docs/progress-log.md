@@ -104,3 +104,9 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 ### Pendientes conocidos incluidos en este corte
 
 No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitectura fuera de alcance se mantienen registradas y requieren definición del propietario antes de abordarlas.
+
+## 2026-09-01 — Planificación de decisiones de arquitectura
+
+- Se agregó `docs/architecture-decision-plan.md` con fases, dependencias y estimaciones para aislar desarrollo, externalizar configuración, establecer seguridad mínima y preparar el ADR de DWH.
+- El alcance rápido es viable en 2–3 días hábiles si se resuelven las decisiones de entorno, embedding, retención y propietario de DWH.
+- La integración DWH no se inicia sin contrato aprobado; queda como iniciativa separada tras su ADR.

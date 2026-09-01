@@ -153,6 +153,8 @@ Todo cambio debe cumplir [CONVENTIONS.md](CONVENTIONS.md), mantener documentaci�
 
 Todo nuevo modelo satélite debe incluir auditoría, clave estable de origen y trazabilidad hacia el DWH central. El contrato concreto aún debe definirse y aprobarse.
 
+El plan de resolución rápida de estas decisiones está en [Plan de decisiones de arquitectura](docs/architecture-decision-plan.md).
+
 ## Limitaciones documentales actuales
 
 No están presentes en este repositorio `knowledge/architecture/`, `knowledge/security/threat-model.md`, `CLAUDE.md` ni `permissions.md`. Los skills citados en la solicitud (`governance/mcp-tool-wrapper.json` y `dotnet/dotnet10-clean-api.json`) tampoco están disponibles en el árbol ni cargados en la sesión. Estos documentos se basan por ello en el código de `GAS/` y en `CONVENTIONS.md`, y deberán reconciliarse cuando se incorporen las fuentes faltantes.

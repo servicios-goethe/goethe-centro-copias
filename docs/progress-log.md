@@ -118,3 +118,8 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `2055fbe` (`fix(ui): streamline request notices and sections`).
 - Sincronizado con GAS de desarrollo a las 23:33 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 29 creada y deployment de desarrollo actualizado a las 23:35 UTC.
+
+## 2026-09-01 — Encabezados de formularios de usuario
+
+- `Nuevo pedido` y `Solicitud de copias` adoptan la jerarquía visual de las secciones administrativas: borde lateral ancho, fondo suave, título destacado y descripción.
+- Se elimina el chip informativo de perfil de la vista de usuario; se mantienen los avisos necesarios para cuentas generales y accesos externos.

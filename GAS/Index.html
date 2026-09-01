@@ -24,16 +24,16 @@
 
     <div class="container">
       <div id="view-user" class="hidden">
-        <section class="card card-grid collapsible-card" data-section="user-pedido">
+        <section class="card card-grid collapsible-card admin-section admin-section-compras" data-section="user-pedido">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('user-pedido')">
             <span>
-              <strong>Nuevo pedido / Neue Anfrage</strong>
+              <strong class="admin-section-title">Nuevo pedido / Neue Anfrage</strong>
+              <span class="collapsible-copy">Selecciona articulos y carga las cantidades para tu pedido.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="user-pedido">Ocultar</span>
           </button>
           <div class="collapsible-body" data-body-for="user-pedido">
             <div class="pedido-context-row">
-              <span id="rol-usuario" class="section-note"></span>
               <span id="estado-usuario" class="section-note section-note-warning hidden"></span>
             </div>
 
@@ -108,11 +108,11 @@
           </div>
         </section>
 
-        <section class="card collapsible-card copies-section" data-section="user-copias">
+        <section class="card collapsible-card admin-section admin-section-recepcion copies-section" data-section="user-copias">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('user-copias')">
             <span>
-              <strong>Solicitud de copias / Fotokopierantrag</strong>
-              <span class="collapsible-copy">Envia un unico archivo y consulta el estado del trabajo.</span>
+              <strong class="admin-section-title">Solicitud de copias / Fotokopierantrag</strong>
+              <span class="collapsible-copy">Envia un archivo y consulta el estado de tu trabajo.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="user-copias">Expandir</span>
           </button>

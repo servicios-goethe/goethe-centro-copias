@@ -239,9 +239,6 @@
     document.getElementById("user-info").innerText = role.email;
     document.getElementById("view-user").classList.remove("hidden");
     ordenarSeccionesUsuario_(role);
-    document.getElementById("rol-usuario").innerText = role.isAdmin
-      ? "Perfil: administrador / Administrator"
-      : "Perfil: usuario / Benutzer";
   
     if (!role.isGoethe) {
       document.getElementById("estado-usuario").innerText = "Acceso externo detectado.";
@@ -296,7 +293,6 @@
 
     if (!esOperador) return;
 
-    setText_("rol-usuario", "Perfil: operador de entrega");
     setText_("admin-title", "Gestion de pedidos");
     setText_("admin-copy", "Gestiona cantidades y entregas con stock inicial, solicitado y disponible visibles.");
     setText_("compra-section-title", "Ingreso de stock");

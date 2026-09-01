@@ -238,6 +238,7 @@
   function setupUI(role) {
     document.getElementById("user-info").innerText = role.email;
     document.getElementById("view-user").classList.remove("hidden");
+    ordenarSeccionesUsuario_(role);
     document.getElementById("rol-usuario").innerText = role.isAdmin
       ? "Perfil: administrador / Administrator"
       : "Perfil: usuario / Benutzer";
@@ -266,6 +267,17 @@
     } else {
       document.getElementById("admin-resumen").classList.add("hidden");
     }
+  }
+
+  function ordenarSeccionesUsuario_(role) {
+    const misPedidos = document.getElementById("user-mis-pedidos-section");
+    const copias = document.querySelector('[data-section="user-copias"]');
+    if (misPedidos && copias) {
+      copias.insertAdjacentElement("afterend", misPedidos);
+    }
+
+    const esTerminalCopias = String(role && role.email || "").trim().toLowerCase() === "copias@goethemail.net";
+    setVisible_("user-mis-pedidos-section", !esTerminalCopias);
   }
 
   function setVisible_(id, visible) {

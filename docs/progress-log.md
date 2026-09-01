@@ -110,3 +110,8 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Se agregó `docs/architecture-decision-plan.md` con fases, dependencias y estimaciones para aislar desarrollo, externalizar configuración, establecer seguridad mínima y preparar el ADR de DWH.
 - El alcance rápido es viable en 2–3 días hábiles si se resuelven las decisiones de entorno, embedding, retención y propietario de DWH.
 - La integración DWH no se inicia sin contrato aprobado; queda como iniciativa separada tras su ADR.
+
+## 2026-09-01 — Ajustes de experiencia de usuario posteriores al cierre
+
+- Los avisos nativos de validación y éxito al registrar pedidos se reemplazan por notificaciones internas temporales, sin botón de confirmación.
+- La sección `Mis pedidos` se muestra debajo de `Solicitud de copias` y se oculta únicamente para la terminal `copias@goethemail.net`.

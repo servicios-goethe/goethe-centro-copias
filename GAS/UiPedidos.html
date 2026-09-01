@@ -189,19 +189,19 @@ function enviarPedidoMasivo() {
   const materialNoListadoLink = String((document.getElementById("material-no-listado-link") || {}).value || "").trim();
 
   if (!pedido.length && !materialNoListado) {
-    alert("Carga al menos un producto o describe un material no listado.");
+    mostrarAviso("error", "Carga al menos un producto o describe un material no listado.");
     return;
   }
 
   if (materialNoListadoLink && !materialNoListado) {
-    alert("Describe el material no listado asociado al link de referencia.");
+    mostrarAviso("error", "Describe el material no listado asociado al link de referencia.");
     return;
   }
 
   const solicitanteMail = obtenerSolicitanteMailDesdeUI_();
   const nombreCompletoSolicitante = obtenerNombreCompletoSolicitanteDesdeUI_();
   if (rolActual && rolActual.isCuentaGeneral && (!nombreCompletoSolicitante || !solicitanteMail)) {
-    alert("Ingresa nombre y apellido, y mail del solicitante.");
+    mostrarAviso("error", "Ingresa nombre y apellido, y mail del solicitante.");
     return;
   }
 
@@ -210,7 +210,7 @@ function enviarPedidoMasivo() {
   google.script.run
     .withSuccessHandler(function(respuesta) {
       ocultarLoading();
-      alert(normalizarMensaje_(respuesta));
+      mostrarAviso("success", normalizarMensaje_(respuesta));
       cantidadesPedido = {};
       if (document.getElementById("solicitante-mail")) {
         document.getElementById("solicitante-mail").value = "";

@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 28, `Desarrollo - Hitos 1 a 4`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 29, `Desarrollo - avisos sin diálogo y secciones de usuario`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -115,3 +115,6 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 
 - Los avisos nativos de validación y éxito al registrar pedidos se reemplazan por notificaciones internas temporales, sin botón de confirmación.
 - La sección `Mis pedidos` se muestra debajo de `Solicitud de copias` y se oculta únicamente para la terminal `copias@goethemail.net`.
+- Commit: `2055fbe` (`fix(ui): streamline request notices and sections`).
+- Sincronizado con GAS de desarrollo a las 23:33 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 29 creada y deployment de desarrollo actualizado a las 23:35 UTC.

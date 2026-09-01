@@ -80,8 +80,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Las nuevas solicitudes validan y persisten el nombre; la serialización de registros históricos usa el email cuando ese dato aún no existe.
 - La decisión estructural y sus consecuencias están registradas en `docs/adr/ADR-001-copias-solicitante-nombre.md`.
 
+### Hito 6 — Vista simplificada de copias
+
+- Implementación presente desde el corte `6b709cd` y, por lo tanto, incluida en el deployment de desarrollo versión 28.
+- El formulario de copias envía `solicitanteNombre` junto con el archivo y los datos del trabajo.
+- Cada tarjeta muestra solicitante, fecha/hora, estado, nivel y un resumen compacto del trabajo; el nombre usa el email como respaldo si la fila es histórica.
+- La búsqueda operativa incluye ID, nivel, nombre, email y nombre de archivo; en móvil la tarjeta y sus acciones se apilan para conservar legibilidad.
+
 ### Pendientes conocidos incluidos en este corte
 
 El árbol contiene avances de hitos posteriores que todavía deben corregirse y validarse:
 
-- Hitos 6 a 8: completar su validación individual antes de considerar un release productivo.
+- Hitos 7 y 8: completar su validación individual antes de considerar un release productivo.

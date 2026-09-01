@@ -59,6 +59,8 @@
 
 ## Hito 6 — Vista simplificada de copias
 
+**Estado:** Completado y validado localmente.
+
 **Objetivo:** capturar nombre y mostrar solicitante y fecha/hora con menor densidad visual.
 
 **Archivos afectados:** `GAS/Index.html`, `GAS/UiCopias.html`.

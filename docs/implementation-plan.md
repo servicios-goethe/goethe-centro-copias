@@ -39,6 +39,8 @@
 
 ## Hito 4 — Tarjetas operativas sin superposición
 
+**Estado:** Completado y validado localmente.
+
 **Objetivo:** corregir el layout responsivo y simplificar el texto del perfil operador.
 
 **Archivos afectados:** `GAS/Estilos.html`, `GAS/UiBase.html`.

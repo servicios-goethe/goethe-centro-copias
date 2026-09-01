@@ -64,8 +64,14 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - La corrección de cantidad queda limitada en servidor a líneas pendientes sin preparación ni retiro, y conserva auditoría.
 - La clave DOM del control incorpora pedido y producto, evitando colisiones cuando dos pedidos contienen el mismo material.
 
+### Hito 4 — Tarjetas operativas sin superposición
+
+- Las tarjetas operativas usan grillas de una columna hasta 900 px y los controles se apilan en móvil.
+- Métricas, correcciones y acciones rápidas conservan separación visual; textos largos se quiebran dentro de la tarjeta.
+- El texto del perfil operador describe las métricas visibles: stock inicial, solicitado y disponible.
+
 ### Pendientes conocidos incluidos en este corte
 
 El árbol contiene avances de hitos posteriores que todavía deben corregirse y validarse:
 
-- Hitos 4 a 8: completar su validación individual antes de considerar un release productivo.
+- Hitos 5 a 8: completar su validación individual antes de considerar un release productivo.

@@ -79,6 +79,8 @@
 
 ## Hito 8 — Documentación y verificación final
 
+**Estado:** Completado y validado localmente.
+
 **Objetivo:** sincronizar reglas y arquitectura, eliminar contradicciones y ejecutar las puertas de calidad disponibles.
 
 **Archivos afectados:** `docs/business-rules.md`, `docs/gas-architecture.md`.

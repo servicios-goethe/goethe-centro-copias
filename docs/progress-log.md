@@ -94,8 +94,13 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Las acciones simples y masivas notifican solo ante una transición real desde otro estado a `Listo para retirar`; una acción repetida sin transición no duplica el correo.
 - Registrar, editar, retirar o entregar no invoca ese helper. Los correos de compras y de copias permanecen fuera de este alcance.
 
+### Hito 8 — Documentación y verificación final
+
+- `docs/business-rules.md` y `docs/gas-architecture.md` reflejan el nombre persistido del solicitante de copias, la compatibilidad de encabezados y la política de correo de pedidos.
+- Se ejecutaron `git diff --check`, la validación sintáctica con Node.js de todos los `GAS/*.js` y de los bloques JavaScript de `GAS/Ui*.html`, sin errores.
+- El checklist manual de cierre está disponible en `docs/manual-validation-checklist.md`; no requiere publicar una nueva versión GAS porque este hito solo modifica documentación.
+- Los ocho hitos del plan están completados. Permanecen únicamente decisiones de arquitectura fuera del alcance del plan (DWH, threat model, separación de recursos por entorno y retención de archivos), ya registradas en arquitectura y reglas de negocio.
+
 ### Pendientes conocidos incluidos en este corte
 
-El árbol contiene avances de hitos posteriores que todavía deben corregirse y validarse:
-
-- Hito 8: completar su validación individual antes de considerar un release productivo.
+No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitectura fuera de alcance se mantienen registradas y requieren definición del propietario antes de abordarlas.

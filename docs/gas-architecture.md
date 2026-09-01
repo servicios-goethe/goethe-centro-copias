@@ -75,7 +75,7 @@ El Spreadsheet configurado en `CONFIG.SPREADSHEET_ID` es la fuente de verdad ope
 | `Pedidos_Retiro` | Líneas de pedidos de retiro. | `ID_Pedido`, `Producto_ID`, `Solicitante_Mail` |
 | `Log_Auditoria` | Auditoría funcional general. | acción y detalle JSON; la referencia se almacena dentro del detalle |
 | `Movimientos_Stock` | Libro de movimientos de stock. | `ID_Relacionado`, `Producto_ID` |
-| `Solicitudes_Copias` | Solicitudes y estado de copias, con email y nombre visible del solicitante. | `ID_Solicitud`, `Archivo_ID`, `Solicitante_Email` |
+| `Solicitudes_Copias` | Solicitudes y estado de copias, con email y nombre visible del solicitante. | `ID_Solicitud`, `Archivo_ID`, `Solicitante_Email`, `Solicitante_Nombre` |
 | `Usuarios_Copias` | Autorizadores por nivel. | email y nivel |
 | `Log_Copias` | Auditoría específica de copias. | `ID_Solicitud` |
 
@@ -90,6 +90,7 @@ El Spreadsheet configurado en `CONFIG.SPREADSHEET_ID` es la fuente de verdad ope
 - La actualización de varias hojas no es transaccional. Un error intermedio puede dejar una operación parcialmente aplicada porque Spreadsheet no ofrece rollback en este diseño.
 - La caché se invalida mediante `DATA_VERSION` en Script Properties después de mutaciones exitosas.
 - El envío de correo se trata como efecto secundario: su falla se registra y no revierte la operación principal.
+- En pedidos de insumos, el correo al solicitante se emite solo al cambiar efectivamente a `Listo para retirar`; no se envía por alta, edición, retiro o entrega.
 
 ## 5. Seguridad
 

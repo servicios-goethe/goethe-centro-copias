@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 27, `Desarrollo - Hitos 1 a 3`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 28, `Desarrollo - Hitos 1 a 4`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -66,6 +66,9 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 
 ### Hito 4 — Tarjetas operativas sin superposición
 
+- Commit: `5afa996` (`fix(ui): harden operator card layout`).
+- Sincronizado con GAS de desarrollo el 2026-09-01 a las 22:18 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 28 creada y deployment de desarrollo actualizado el 2026-09-01 a las 22:24 UTC; el enlace `/exec` ya usa los Hitos 1 a 4.
 - Las tarjetas operativas usan grillas de una columna hasta 900 px y los controles se apilan en móvil.
 - Métricas, correcciones y acciones rápidas conservan separación visual; textos largos se quiebran dentro de la tarjeta.
 - El texto del perfil operador describe las métricas visibles: stock inicial, solicitado y disponible.

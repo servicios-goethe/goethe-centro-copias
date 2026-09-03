@@ -46,13 +46,15 @@
             </div>
 
             <div id="general-requester-wrap" class="hidden inline-field-grid requester-field-grid">
-              <div class="inline-field">
-                <label for="solicitante-nombre-completo">Nombre y apellido</label>
-                <input id="solicitante-nombre-completo" type="text" maxlength="120" placeholder="Nombre y apellido" autocomplete="name">
+              <div id="solicitante-busqueda-field" class="inline-field">
+                <label for="solicitante-apellido-busqueda">Buscar por apellido</label>
+                <input id="solicitante-apellido-busqueda" type="search" maxlength="80" placeholder="Apellido del solicitante" autocomplete="off" oninput="buscarSolicitantesUI_(this.value)">
+                <div id="solicitantes-sugerencias" class="requester-suggestions hidden"></div>
               </div>
               <div class="inline-field">
-                <label for="solicitante-mail">Mail del solicitante</label>
-                <input id="solicitante-mail" type="email" maxlength="254" placeholder="usuario@goethe.edu.ar" autocomplete="email">
+                <label for="solicitante-nombre-completo">Solicitante seleccionado</label>
+                <input id="solicitante-nombre-completo" type="text" maxlength="120" placeholder="Selecciona una persona" autocomplete="name" readonly>
+                <input id="solicitante-mail" type="email" maxlength="254" placeholder="El mail se completa automáticamente" autocomplete="email" readonly>
               </div>
             </div>
 

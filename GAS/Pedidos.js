@@ -18,6 +18,66 @@ function esMailValido_(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
 }
 
+function esTerminalCopias_(email) {
+  return String(email || "").trim().toLowerCase() === "copias@goethemail.net";
+}
+
+function normalizarBusquedaSolicitante_(value) {
+  return String(value || "")
+    .trim()
+    .toLocaleLowerCase("es")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function leerSolicitantesCopias_(ss) {
+  const sheet = getSheetOrThrow_(ss, "Solicitantes");
+  const rows = sheet.getDataRange().getValues();
+  if (!rows.length) return [];
+  const headers = rows[0].map(normalizarEncabezadoAdmin_);
+  const idxApellido = headers.indexOf("apellido");
+  const idxNombre = headers.indexOf("nombre");
+  const idxEmail = headers.indexOf("emailprofesional");
+  const idxEstado = headers.indexOf("estado");
+  if ([idxApellido, idxNombre, idxEmail, idxEstado].some(function(index) { return index < 0; })) {
+    throw new Error("La hoja Solicitantes debe tener Apellido, Nombre, EmailProfesional y Estado.");
+  }
+
+  return rows.slice(1).map(function(row) {
+    return {
+      apellido: String(row[idxApellido] || "").trim(),
+      nombre: String(row[idxNombre] || "").trim(),
+      email: String(row[idxEmail] || "").trim().toLowerCase(),
+      estado: String(row[idxEstado] || "").trim()
+    };
+  }).filter(function(item) {
+    const estado = normalizarBusquedaSolicitante_(item.estado);
+    return item.apellido && item.nombre && esMailValido_(item.email)
+      && ["activo", "active", "si", "s", "true", "1"].includes(estado);
+  });
+}
+
+function buscarSolicitantesCopias(apellido) {
+  const role = obtenerUsuarioActual_();
+  if (!esTerminalCopias_(role.email)) throw new Error("Esta búsqueda solo está disponible en la terminal de copias.");
+  const termino = normalizarBusquedaSolicitante_(apellido);
+  if (termino.length < 2) return [];
+  return leerSolicitantesCopias_(getSpreadsheet_()).filter(function(item) {
+    return normalizarBusquedaSolicitante_(item.apellido).startsWith(termino);
+  }).slice(0, 20);
+}
+
+function validarSolicitanteTerminalCopias_(role, nombreCompleto, email) {
+  if (!esTerminalCopias_(role.email)) return;
+  const nombre = normalizarBusquedaSolicitante_(nombreCompleto);
+  const correo = String(email || "").trim().toLowerCase();
+  const coincide = leerSolicitantesCopias_(getSpreadsheet_()).some(function(item) {
+    return item.email === correo
+      && normalizarBusquedaSolicitante_(`${item.nombre} ${item.apellido}`) === nombre;
+  });
+  if (!coincide) throw new Error("Selecciona un solicitante activo de la hoja Solicitantes.");
+}
+
 function agregarObservacionPedido_(observaciones, mensaje) {
   const base = String(observaciones || "").trim();
   const detalle = String(mensaje || "").trim();
@@ -94,6 +154,7 @@ function registrarPedidoMasivo(payload) {
       && (!String(pedido.nombreSolicitante || "").trim() || !String(pedido.apellidoSolicitante || "").trim())) {
       throw new Error("Ingresa nombre y apellido del solicitante.");
     }
+    validarSolicitanteTerminalCopias_(role, pedido.nombreCompletoSolicitante, solicitanteMail);
     const idPedido = "RET-" + new Date().getTime();
     const filasPedido = [];
 

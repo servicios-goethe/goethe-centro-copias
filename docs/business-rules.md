@@ -17,6 +17,7 @@ Este documento consolida las reglas implementadas actualmente en `GAS/`. Es desc
 - Si `Usuarios_Admin` no posee encabezados reconocibles de email y perfil, todo valor con `@` se interpreta como administrador por compatibilidad heredada.
 - La pertenencia Goethe se determina por el sufijo exacto `@goethe.edu.ar`.
 - Todas las autorizaciones sensibles deben validarse en servidor.
+- La terminal `copias@goethemail.net` busca solicitantes por apellido en `Solicitantes` y solo puede seleccionar registros con estado activo; el servidor valida nuevamente nombre y `EmailProfesional` antes de registrar el pedido.
 
 ## 3. Catálogo y stock
 

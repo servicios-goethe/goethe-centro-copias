@@ -126,3 +126,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `9f0a33a` (`style(ui): align user form sections with admin`).
 - Sincronizado con GAS de desarrollo a las 23:43 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 30 creada y deployment de desarrollo actualizado.
+
+## 2026-09-03 — Selector de solicitantes para terminal de copias
+
+- La terminal `copias@goethemail.net` consulta la hoja `Solicitantes` por apellido y muestra hasta 20 coincidencias activas con nombre y `EmailProfesional`.
+- La selección completa los datos del pedido; otras cuentas generales conservan la carga manual.
+- El backend valida nuevamente que el email y nombre correspondan a un registro activo antes de guardar.
+- La estructura esperada es `Apellido`, `Nombre`, `EmailProfesional`, `Estado`.

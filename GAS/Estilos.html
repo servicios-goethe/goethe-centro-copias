@@ -551,6 +551,41 @@
     gap: 12px;
   }
 
+  .requester-suggestions {
+    display: grid;
+    gap: 4px;
+    margin-top: -6px;
+    margin-bottom: 12px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 6px 16px rgba(36, 49, 41, 0.12);
+  }
+
+  .requester-suggestion {
+    width: 100%;
+    border: 0;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: transparent;
+    color: #243129;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .requester-suggestion:hover,
+  .requester-suggestion:focus-visible {
+    background: #eef5f0;
+    outline: none;
+  }
+
+  .requester-suggestion small {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+  }
+
   .unlisted-material-grid {
     margin-top: 16px;
     padding: 14px;

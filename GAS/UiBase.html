@@ -249,6 +249,18 @@
       document.getElementById("general-requester-wrap").classList.remove("hidden");
       document.getElementById("estado-usuario").innerText = "Cuenta general: ingresar nombre y apellido, y mail del solicitante.";
       document.getElementById("estado-usuario").classList.remove("hidden");
+      const esTerminalCopias = String(role.email || "").trim().toLowerCase() === "copias@goethemail.net";
+      setVisible_("solicitante-busqueda-field", esTerminalCopias);
+      const nombreSolicitante = document.getElementById("solicitante-nombre-completo");
+      const mailSolicitante = document.getElementById("solicitante-mail");
+      if (nombreSolicitante) {
+        nombreSolicitante.readOnly = esTerminalCopias;
+        nombreSolicitante.placeholder = esTerminalCopias ? "Selecciona una persona" : "Nombre y apellido";
+      }
+      if (mailSolicitante) {
+        mailSolicitante.readOnly = esTerminalCopias;
+        mailSolicitante.placeholder = esTerminalCopias ? "El mail se completa automáticamente" : "usuario@goethe.edu.ar";
+      }
     }
 
     if (typeof actualizarVisibilidadStockPedido_ === "function") {

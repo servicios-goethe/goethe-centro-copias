@@ -178,6 +178,52 @@ function obtenerSolicitanteMailDesdeUI_() {
   return String((document.getElementById("solicitante-mail") || {}).value || "").trim();
 }
 
+let solicitantesBusquedaTimer_ = null;
+
+function buscarSolicitantesUI_(apellido) {
+  if (!rolActual || String(rolActual.email || "").trim().toLowerCase() !== "copias@goethemail.net") return;
+  const container = document.getElementById("solicitantes-sugerencias");
+  const termino = String(apellido || "").trim();
+  if (!container) return;
+  window.clearTimeout(solicitantesBusquedaTimer_);
+  if (termino.length < 2) {
+    container.innerHTML = "";
+    container.classList.add("hidden");
+    return;
+  }
+  solicitantesBusquedaTimer_ = window.setTimeout(function() {
+    google.script.run
+      .withSuccessHandler(function(resultados) {
+        if (!resultados || !resultados.length) {
+          container.innerHTML = '<span class="field-help">No se encontraron solicitantes activos.</span>';
+          container.classList.remove("hidden");
+          return;
+        }
+        container._resultados = resultados;
+        container.innerHTML = resultados.map(function(item, index) {
+          return `<button type="button" class="requester-suggestion" onclick="seleccionarSolicitanteUI_(${index})"><strong>${escapeHtml_(item.apellido)}, ${escapeHtml_(item.nombre)}</strong><small>${escapeHtml_(item.email)}</small></button>`;
+        }).join("");
+        container.classList.remove("hidden");
+      })
+      .withFailureHandler(manejarError)
+      .buscarSolicitantesCopias(termino);
+  }, 180);
+}
+
+function seleccionarSolicitanteUI_(index) {
+  const container = document.getElementById("solicitantes-sugerencias");
+  const item = container && container._resultados ? container._resultados[index] : null;
+  if (!item) return;
+  const apellido = document.getElementById("solicitante-apellido-busqueda");
+  const nombre = document.getElementById("solicitante-nombre-completo");
+  const mail = document.getElementById("solicitante-mail");
+  if (apellido) apellido.value = item.apellido;
+  if (nombre) nombre.value = `${item.nombre} ${item.apellido}`;
+  if (mail) mail.value = item.email;
+  container.innerHTML = "";
+  container.classList.add("hidden");
+}
+
 function obtenerNombreCompletoSolicitanteDesdeUI_() {
   if (!rolActual || !rolActual.isCuentaGeneral) return "";
   return String((document.getElementById("solicitante-nombre-completo") || {}).value || "").trim();
@@ -201,7 +247,9 @@ function enviarPedidoMasivo() {
   const solicitanteMail = obtenerSolicitanteMailDesdeUI_();
   const nombreCompletoSolicitante = obtenerNombreCompletoSolicitanteDesdeUI_();
   if (rolActual && rolActual.isCuentaGeneral && (!nombreCompletoSolicitante || !solicitanteMail)) {
-    mostrarAviso("error", "Ingresa nombre y apellido, y mail del solicitante.");
+    mostrarAviso("error", String(rolActual.email || "").trim().toLowerCase() === "copias@goethemail.net"
+      ? "Busca y selecciona un solicitante activo."
+      : "Ingresa nombre y apellido, y mail del solicitante.");
     return;
   }
 
@@ -217,6 +265,9 @@ function enviarPedidoMasivo() {
       }
       if (document.getElementById("solicitante-nombre-completo")) {
         document.getElementById("solicitante-nombre-completo").value = "";
+      }
+      if (document.getElementById("solicitante-apellido-busqueda")) {
+        document.getElementById("solicitante-apellido-busqueda").value = "";
       }
       document.getElementById("material-no-listado").value = "";
       document.getElementById("material-no-listado-link").value = "";

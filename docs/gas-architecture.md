@@ -71,6 +71,7 @@ El Spreadsheet configurado en `CONFIG.SPREADSHEET_ID` es la fuente de verdad ope
 | `Productos` | Maestro bilingüe de productos. | `ID_Producto` |
 | `Stock` | Existencia física actual. | `ID_Producto` |
 | `Usuarios_Admin` | Perfiles operativos. | email |
+| `Solicitantes` | Directorio de personas disponibles para cargar pedidos desde la terminal de copias. | `Apellido`, `Nombre`, `EmailProfesional`, `Estado` |
 | `Solicitudes_Compra` | Líneas de lotes de compra. | `ID_Compra`, `Producto_Solicitado_ID`, `Producto_Recibido_ID` |
 | `Pedidos_Retiro` | Líneas de pedidos de retiro. | `ID_Pedido`, `Producto_ID`, `Solicitante_Mail` |
 | `Log_Auditoria` | Auditoría funcional general. | acción y detalle JSON; la referencia se almacena dentro del detalle |

@@ -147,3 +147,4 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `f07288a` (`feat(copias): resolve requester and authorization data`).
 - Sincronizado con GAS de desarrollo a las 15:48 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 32 creada y deployment de desarrollo actualizado a las 15:52 UTC.
+- Se agrega `verificarAccesoDriveCopias()`, una comprobación de solo lectura para disparar la autorización OAuth y confirmar el acceso efectivo a la carpeta configurada.

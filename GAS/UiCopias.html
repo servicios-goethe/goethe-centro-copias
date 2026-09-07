@@ -3,8 +3,73 @@ let copiasPropiasActuales = [];
 let copiasOperativasActuales = [];
 let copiasDecisionContexto = null;
 let copiasEnviando = false;
+let solicitantesCopiasBusquedaTimer_ = null;
+
+function prepararSolicitanteCopiasUI_() {
+  google.script.run
+    .withSuccessHandler(function(data) {
+      const busqueda = document.getElementById("copias-solicitante-busqueda-wrap");
+      const nombre = document.getElementById("copias-solicitante-nombre");
+      const email = document.getElementById("copias-solicitante-email");
+      const ayuda = document.getElementById("copias-solicitante-ayuda");
+      if (!data) return;
+      if (busqueda) busqueda.classList.toggle("hidden", !data.terminal);
+      if (nombre) {
+        nombre.value = data.nombre || "";
+        nombre.readOnly = !!data.terminal;
+      }
+      if (email) email.value = data.email || "";
+      if (ayuda) ayuda.innerText = data.terminal ? "Busca y selecciona al solicitante." : (data.nombre ? `Usuario: ${data.email}` : "No se encontró tu nombre en Solicitantes.");
+    })
+    .withFailureHandler(manejarError)
+    .obtenerSolicitanteCopiasActual();
+}
+
+function buscarSolicitantesCopiasUI_(apellido) {
+  const container = document.getElementById("copias-solicitantes-sugerencias");
+  const termino = String(apellido || "").trim();
+  if (!container) return;
+  window.clearTimeout(solicitantesCopiasBusquedaTimer_);
+  if (termino.length < 2) {
+    container.innerHTML = "";
+    container.classList.add("hidden");
+    return;
+  }
+  solicitantesCopiasBusquedaTimer_ = window.setTimeout(function() {
+    google.script.run
+      .withSuccessHandler(function(resultados) {
+        if (!resultados || !resultados.length) {
+          container.innerHTML = '<span class="field-help">No se encontraron solicitantes activos.</span>';
+          container.classList.remove("hidden");
+          return;
+        }
+        container._resultados = resultados;
+        container.innerHTML = resultados.map(function(item, index) {
+          return `<button type="button" class="requester-suggestion" onclick="seleccionarSolicitanteCopiasUI_(${index})"><strong>${escapeHtml_(item.apellido)}, ${escapeHtml_(item.nombre)}</strong><small>${escapeHtml_(item.email)}</small></button>`;
+        }).join("");
+        container.classList.remove("hidden");
+      })
+      .withFailureHandler(manejarError)
+      .buscarSolicitantesCopias(termino);
+  }, 180);
+}
+
+function seleccionarSolicitanteCopiasUI_(index) {
+  const container = document.getElementById("copias-solicitantes-sugerencias");
+  const item = container && container._resultados ? container._resultados[index] : null;
+  if (!item) return;
+  const nombre = document.getElementById("copias-solicitante-nombre");
+  const email = document.getElementById("copias-solicitante-email");
+  const busqueda = document.getElementById("copias-solicitante-busqueda");
+  if (nombre) nombre.value = `${item.nombre} ${item.apellido}`;
+  if (email) email.value = item.email;
+  if (busqueda) busqueda.value = item.apellido;
+  container.innerHTML = "";
+  container.classList.add("hidden");
+}
 
 function cargarPanelCopias() {
+  prepararSolicitanteCopiasUI_();
   google.script.run
     .withSuccessHandler(function(data) {
       copiasPropiasActuales = data && data.propias ? data.propias : [];

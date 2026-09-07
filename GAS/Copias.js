@@ -8,13 +8,21 @@ const COPIAS_HEADERS = [
 ];
 
 const COPIAS_USUARIOS_HEADERS = ["Email", "Nivel", "Puede_Autorizar", "Activo"];
+const COPIAS_USUARIOS_ALTERNATIVA = "Autorizados_Copias";
 const COPIAS_LOG_HEADERS = ["Fecha", "Usuario", "ID_Solicitud", "Accion", "Detalle"];
 const COPIAS_EXTENSIONS = ["pdf", "doc", "docx", "jpg", "png", "txt", "zip"];
 
 function asegurarEstructuraCopias_(ss) {
   asegurarHojaCopias_(ss, TABS.COPIAS, COPIAS_HEADERS);
-  asegurarHojaCopias_(ss, TABS.COPIAS_USUARIOS, COPIAS_USUARIOS_HEADERS);
+  asegurarHojaUsuariosCopias_(ss);
   asegurarHojaCopias_(ss, TABS.COPIAS_LOG, COPIAS_LOG_HEADERS);
+}
+
+function asegurarHojaUsuariosCopias_(ss) {
+  const nombre = ss.getSheetByName(TABS.COPIAS_USUARIOS)
+    ? TABS.COPIAS_USUARIOS
+    : (ss.getSheetByName(COPIAS_USUARIOS_ALTERNATIVA) ? COPIAS_USUARIOS_ALTERNATIVA : TABS.COPIAS_USUARIOS);
+  return asegurarHojaCopias_(ss, nombre, COPIAS_USUARIOS_HEADERS);
 }
 
 function asegurarHojaCopias_(ss, nombre, headers) {
@@ -76,6 +84,45 @@ function validarDatosSolicitudCopias_(data) {
     color: normalizarSiNoCopias_(data.color),
     comentario: String(data.comentario || "").trim().slice(0, 500)
   };
+}
+
+function obtenerSolicitanteCopiasDesdeDirectorio_(ss, role, form) {
+  const terminal = String(role.email || "").trim().toLowerCase() === "copias@goethemail.net";
+  const emailFormulario = String(form && form.solicitanteEmail || "").trim().toLowerCase();
+  const nombreFormulario = String(form && form.solicitanteNombre || "").trim();
+  let filas = [];
+  try {
+    filas = leerSolicitantesCopias_(ss);
+  } catch (error) {
+    if (terminal) throw error;
+  }
+
+  if (terminal) {
+    const seleccionado = filas.find(function(item) {
+      return item.email === emailFormulario
+        && normalizarBusquedaSolicitante_(item.nombre + " " + item.apellido) === normalizarBusquedaSolicitante_(nombreFormulario);
+    });
+    if (!seleccionado) throw new Error("Selecciona un solicitante activo del directorio.");
+    return { email: seleccionado.email, nombre: `${seleccionado.nombre} ${seleccionado.apellido}`.trim() };
+  }
+
+  const propio = filas.find(function(item) { return item.email === String(role.email || "").trim().toLowerCase(); });
+  if (propio) return { email: propio.email, nombre: `${propio.nombre} ${propio.apellido}`.trim() };
+  if (role.isGoethe && nombreFormulario) return { email: role.email, nombre: nombreFormulario };
+  throw new Error("No se encontró tu usuario activo en la hoja Solicitantes.");
+}
+
+function obtenerSolicitanteCopiasActual() {
+  const ss = getSpreadsheet_();
+  const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
+  const terminal = String(role.email || "").trim().toLowerCase() === "copias@goethemail.net";
+  if (terminal) return { terminal: true, email: role.email, nombre: "" };
+  try {
+    const propio = leerSolicitantesCopias_(ss).find(function(item) { return item.email === String(role.email || "").trim().toLowerCase(); });
+    return { terminal: false, email: role.email, nombre: propio ? `${propio.nombre} ${propio.apellido}`.trim() : "" };
+  } catch (error) {
+    return { terminal: false, email: role.email, nombre: "" };
+  }
 }
 
 function obtenerIndicesCopias_(sheet) {
@@ -178,7 +225,7 @@ function ordenarSolicitudesCopias_(a, b) {
 
 function obtenerAutorizadoresCopias_(ss, nivel, excluirEmail) {
   asegurarEstructuraCopias_(ss);
-  const sheet = getSheetOrThrow_(ss, TABS.COPIAS_USUARIOS);
+  const sheet = asegurarHojaUsuariosCopias_(ss);
   if (sheet.getLastRow() < 2) return [];
   const rows = sheet.getDataRange().getValues();
   const headers = rows[0].map(normalizarEncabezadoAdmin_);
@@ -235,7 +282,8 @@ function registrarSolicitudCopias(form) {
     if (!role.isGoethe) throw new Error("Solo se admiten solicitudes de cuentas @goethe.edu.ar.");
     asegurarEstructuraCopias_(ss);
 
-    const data = validarDatosSolicitudCopias_(form || {});
+    const solicitante = obtenerSolicitanteCopiasDesdeDirectorio_(ss, role, form || {});
+    const data = validarDatosSolicitudCopias_(Object.assign({}, form || {}, { solicitanteNombre: solicitante.nombre }));
     const blob = form && form.archivo;
     if (!blob || typeof blob.getName !== "function") throw new Error("Selecciona un archivo para copiar.");
     const archivoNombre = String(blob.getName() || "").trim();
@@ -246,9 +294,9 @@ function registrarSolicitudCopias(form) {
     if (archivoBytes > CONFIG.COPIAS_MAX_FILE_BYTES) throw new Error("El archivo supera el maximo de 80 MB.");
 
     const requiereAutorizacion = data.nivel !== "ES";
-    const autorizadores = requiereAutorizacion ? obtenerAutorizadoresCopias_(ss, data.nivel, role.email) : [];
+    const autorizadores = requiereAutorizacion ? obtenerAutorizadoresCopias_(ss, data.nivel, solicitante.email) : [];
     if (requiereAutorizacion && !autorizadores.length) {
-      throw new Error(`No hay autorizadores activos configurados para ${data.nivel}.`);
+      throw new Error(`No hay autorizadores activos configurados para ${data.nivel}. Carga usuarios en la hoja Usuarios_Copias con Nivel ${data.nivel} (o TODOS), Puede_Autorizar = SI y Activo = SI.`);
     }
 
     const id = generarIdSolicitudCopias_();
@@ -256,14 +304,19 @@ function registrarSolicitudCopias(form) {
     const now = new Date();
     const vence = requiereAutorizacion ? new Date(now.getTime() + CONFIG.COPIAS_TOKEN_DAYS * 86400000) : "";
     const estado = requiereAutorizacion ? ESTADOS.COPIAS_SOLICITADO : ESTADOS.COPIAS_AUTORIZADO;
-    const file = guardarArchivoCopias_(blob, id, data.nivel);
+    let file;
+    try {
+      file = guardarArchivoCopias_(blob, id, data.nivel);
+    } catch (error) {
+      throw new Error(`No se pudo guardar el archivo en Drive. Verifica que la cuenta desplegadora tenga acceso a la carpeta de copias y haya autorizado Drive. Detalle: ${error.message || error}`);
+    }
     const sheet = getSheetOrThrow_(ss, TABS.COPIAS);
     const indices = obtenerIndicesCopias_(sheet);
     const row = new Array(sheet.getLastColumn()).fill("");
     const values = {
       ID_Solicitud: id,
       Fecha_Solicitud: now,
-      Solicitante_Email: role.email,
+      Solicitante_Email: solicitante.email,
       Solicitante_Nombre: data.solicitanteNombre,
       Nivel: data.nivel,
       Archivo_Nombre: archivoNombre,
@@ -291,16 +344,16 @@ function registrarSolicitudCopias(form) {
     registrarLogCopias_(ss, id, "solicitud_creada", { nivel: data.nivel, estado: estado, archivoBytes: archivoBytes, solicitanteNombre: data.solicitanteNombre });
     registrarAuditoria_(ss, "copias_solicitud_creada", { solicitudId: id, nivel: data.nivel, estado: estado, solicitanteNombre: data.solicitanteNombre });
 
-    enviarMailCopiasSeguro_(ss, id, "solicitud_recibida", [role.email], function() {
+    enviarMailCopiasSeguro_(ss, id, "solicitud_recibida", [solicitante.email], function() {
       return buildMailCopiasRecibida_(id, data, estado);
     });
     if (requiereAutorizacion) {
       enviarMailCopiasSeguro_(ss, id, "autorizacion_solicitada", autorizadores, function() {
-        return buildMailCopiasAutorizar_(id, role.email, data, token);
+        return buildMailCopiasAutorizar_(id, solicitante.email, data, token);
       });
     } else {
       enviarMailCopiasSeguro_(ss, id, "solicitud_es_autorizada", [RESPONSABLES.COPIAS], function() {
-        return buildMailCopiasOperador_(id, role.email, data);
+        return buildMailCopiasOperador_(id, solicitante.email, data);
       });
     }
     bumpDataVersion_();

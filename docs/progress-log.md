@@ -136,3 +136,11 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `92f9631` (`feat(copias): add requester directory lookup`).
 - Sincronizado con GAS de desarrollo a las 00:49 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 31 creada y deployment de desarrollo actualizado a las 00:54 UTC.
+
+## 2026-09-07 — Mejoras del módulo de copias
+
+- Las solicitudes de usuarios logueados toman nombre y email del directorio `Solicitantes`; la terminal `copias@goethemail.net` selecciona al solicitante por apellido y guarda su `EmailProfesional`.
+- La validación server-side impide registrar personas inexistentes o inactivas.
+- La hoja `Usuarios_Copias` queda documentada como fuente de autorizadores por nivel (también se admite `Autorizados_Copias`); el error de EP ahora indica las columnas y valores requeridos.
+- Los controles de doble faz y copia color se mantienen en una sola línea mediante estilos responsivos.
+- El error de Drive de ES se transforma en un mensaje operativo explícito: la cuenta desplegadora debe tener acceso a la carpeta y autorizar el scope de Drive.

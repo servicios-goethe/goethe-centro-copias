@@ -130,8 +130,14 @@
 
               <div class="copies-form-grid">
                 <div class="inline-field copies-field-wide">
-                  <label for="copias-solicitante-nombre">Nombre del solicitante</label>
-                  <input id="copias-solicitante-nombre" name="solicitanteNombre" type="text" maxlength="120" autocomplete="name" required>
+                  <label for="copias-solicitante-nombre">Solicitante</label>
+                  <div id="copias-solicitante-busqueda-wrap" class="hidden">
+                    <input id="copias-solicitante-busqueda" type="search" maxlength="80" placeholder="Buscar por apellido" autocomplete="off" oninput="buscarSolicitantesCopiasUI_(this.value)">
+                    <div id="copias-solicitantes-sugerencias" class="requester-suggestions hidden"></div>
+                  </div>
+                  <input id="copias-solicitante-nombre" name="solicitanteNombre" type="text" maxlength="120" placeholder="Se completa con tu usuario" autocomplete="name" readonly required>
+                  <input id="copias-solicitante-email" name="solicitanteEmail" type="email" autocomplete="email" readonly>
+                  <span id="copias-solicitante-ayuda" class="field-help"></span>
                 </div>
                 <div class="inline-field copies-field-wide">
                   <label for="copias-archivo">Archivo</label>

@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 32, `Desarrollo - solicitante, autorizadores y formulario de copias`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 33, `Desarrollo - verificación de autorización Drive`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -148,3 +148,6 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Sincronizado con GAS de desarrollo a las 15:48 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 32 creada y deployment de desarrollo actualizado a las 15:52 UTC.
 - Se agrega `verificarAccesoDriveCopias()`, una comprobación de solo lectura para disparar la autorización OAuth y confirmar el acceso efectivo a la carpeta configurada.
+- Commit: `1300f2b` (`fix(copias): add drive authorization check`).
+- Sincronizado con GAS de desarrollo a las 16:47 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 33 creada y deployment de desarrollo actualizado.

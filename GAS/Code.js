@@ -23,3 +23,16 @@ function verificarAccesoDriveCopias() {
     folderName: folder.getName()
   };
 }
+
+/**
+ * Comprueba el permiso de escritura requerido por el flujo de copias.
+ * Crea una carpeta temporal dentro de la carpeta configurada y la envía a
+ * la papelera inmediatamente; no deja contenido operativo.
+ */
+function verificarEscrituraDriveCopias() {
+  const parent = DriveApp.getFolderById(CONFIG.COPIAS_DRIVE_FOLDER_ID);
+  const probe = parent.createFolder(`_verificacion_copias_${new Date().getTime()}`);
+  const result = { ok: true, folderId: parent.getId(), probeId: probe.getId() };
+  probe.setTrashed(true);
+  return result;
+}

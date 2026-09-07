@@ -151,3 +151,4 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `1300f2b` (`fix(copias): add drive authorization check`).
 - Sincronizado con GAS de desarrollo a las 16:47 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 33 creada y deployment de desarrollo actualizado.
+- El error posterior en `Folder.createFolder` confirma que falta comprobar permiso de escritura; se agrega `verificarEscrituraDriveCopias()` para crear una carpeta temporal y enviarla a papelera.

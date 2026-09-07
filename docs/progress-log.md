@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 31, `Desarrollo - selector de solicitantes por apellido`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 32, `Desarrollo - solicitante, autorizadores y formulario de copias`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -144,3 +144,6 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - La hoja `Usuarios_Copias` queda documentada como fuente de autorizadores por nivel (también se admite `Autorizados_Copias`); el error de EP ahora indica las columnas y valores requeridos.
 - Los controles de doble faz y copia color se mantienen en una sola línea mediante estilos responsivos.
 - El error de Drive de ES se transforma en un mensaje operativo explícito: la cuenta desplegadora debe tener acceso a la carpeta y autorizar el scope de Drive.
+- Commit: `f07288a` (`feat(copias): resolve requester and authorization data`).
+- Sincronizado con GAS de desarrollo a las 15:48 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 32 creada y deployment de desarrollo actualizado a las 15:52 UTC.

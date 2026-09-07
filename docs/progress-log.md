@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 33, `Desarrollo - verificación de autorización Drive`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 34, `Desarrollo - prueba permiso escritura Drive`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -152,3 +152,6 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Sincronizado con GAS de desarrollo a las 16:47 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 33 creada y deployment de desarrollo actualizado.
 - El error posterior en `Folder.createFolder` confirma que falta comprobar permiso de escritura; se agrega `verificarEscrituraDriveCopias()` para crear una carpeta temporal y enviarla a papelera.
+- Commit: `9cdf0f9` (`fix(copias): probe Drive folder write access`).
+- Sincronizado con GAS de desarrollo a las 16:56 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 34 creada y deployment de desarrollo actualizado.

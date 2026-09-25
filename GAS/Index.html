@@ -276,8 +276,8 @@
         <section id="sec-compras" class="card collapsible-card redesign-card stock-entry-redesign-card admin-section admin-section-compras" data-section="admin-nueva-compra">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-nueva-compra')">
             <span>
-              <strong id="compra-section-title" class="admin-section-title">Ingreso de stock · Wareneingang</strong>
-              <span id="compra-section-copy" class="collapsible-copy">La mercadería se suma al stock al instante. · Wird sofort zum Bestand addiert.</span>
+              <strong id="compra-section-title" class="admin-section-title">Nueva reposición · Neue Nachbestellung</strong>
+              <span id="compra-section-copy" class="collapsible-copy">Seleccioná artículos para compra. · Artikel für den Einkauf auswählen.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="admin-nueva-compra">Expandir</span>
           </button>
@@ -314,7 +314,7 @@
                 <div><strong id="resumen-compra-items">0</strong><span> productos seleccionados</span></div>
                 <div><strong id="resumen-compra-unidades">0</strong><span> unidades pedidas</span></div>
               </div>
-              <button id="btn-enviar-compra" class="btn btn-success" onclick="enviarCompraMasiva()">Registrar ingreso · Eingang buchen</button>
+              <button id="btn-enviar-compra" class="btn btn-success" onclick="enviarCompraMasiva()">Solicitar compra · Einkauf anfragen</button>
             </div>
           </div>
         </section>
@@ -361,11 +361,11 @@
           </div>
         </section>
 
-        <section id="sec-recepcion" class="card collapsible-card admin-section admin-section-recepcion" data-section="admin-recepcion">
+        <section id="sec-recepcion" class="card collapsible-card redesign-card purchases-redesign-card admin-section admin-section-recepcion" data-section="admin-recepcion">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-recepcion')">
             <span>
-              <strong class="admin-section-title">Recepcionar mercaderia / Wareneingang</strong>
-              <span class="collapsible-copy">Carga cantidades y recepciona un lote completo sin procesar linea por linea.</span>
+              <strong class="admin-section-title">Recepción de compras · Wareneingang</strong>
+              <span class="collapsible-copy">Recepcioná lotes y actualizá el stock. · Lieferungen erfassen und Bestand aktualisieren.</span>
             </span>
             <span class="section-indicator-pack">
               <span id="admin-recepcion-resumen" class="status-pill status-neutral">0 lotes</span>
@@ -374,10 +374,10 @@
           </button>
           <div class="collapsible-body" data-body-for="admin-recepcion">
             <div class="section-tools">
-              <input id="filtro-recepcion-admin" type="search" placeholder="Buscar por lote, producto o fecha" oninput="actualizarFiltroComprasAdmin()">
+              <input id="filtro-recepcion-admin" type="search" placeholder="Buscar por lote, producto o fecha · Suchen" oninput="actualizarFiltroComprasAdmin()">
               <label class="toggle">
                 <input id="filtro-recepcion-pendientes" type="checkbox" checked onchange="actualizarFiltroComprasAdmin()">
-                <span>Solo con saldo</span>
+                <span>Solo con saldo · Nur mit Rest</span>
               </label>
             </div>
             <div id="lista-compras-pendientes"></div>

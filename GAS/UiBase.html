@@ -333,6 +333,77 @@
     } else {
       document.getElementById("admin-resumen").classList.add("hidden");
     }
+
+    renderNavegacionRedisenio_(role);
+  }
+
+  function obtenerConfiguracionNavegacionRedisenio_(role, modulo) {
+    const admin = !!(role && role.isAdmin && !role.isOperadorEntrega);
+    const operador = !!(role && role.isOperadorEntrega);
+    if (modulo === "copias") {
+      const tabs = [{ key: "nueva", es: "Nueva solicitud", de: "Neuer Auftrag", panels: ["user-copias"] }, { key: "mis", es: "Mis solicitudes", de: "Meine Aufträge", panels: ["user-copias"] }];
+      if (admin) tabs.push({ key: "autorizaciones", es: "Autorizaciones", de: "Freigaben", panels: ["admin-copias"] });
+      if (admin || operador) tabs.push({ key: "trabajos", es: "Trabajos", de: "Druckaufträge", panels: ["admin-copias"] });
+      return tabs;
+    }
+    const tabs = [{ key: "nuevo", es: "Nuevo pedido", de: "Neue Anfrage", panels: ["user-pedido"] }, { key: "mis", es: "Mis pedidos", de: "Meine Anfragen", panels: ["user-mis-pedidos"] }];
+    if (admin || operador) tabs.push({ key: "entregas", es: "Entregas", de: "Ausgaben", panels: ["admin-pedidos"] });
+    if (operador) tabs.push({ key: "ingreso", es: "Ingreso de stock", de: "Wareneingang", panels: ["admin-nueva-compra"] });
+    if (admin) {
+      tabs.push({ key: "compras", es: "Compras y recepción", de: "Einkauf & Eingang", panels: ["admin-nueva-compra", "admin-recepcion"] });
+      tabs.push({ key: "productos", es: "Productos y stock", de: "Produkte & Bestand", panels: ["admin-productos", "admin-actividad"] });
+    }
+    return tabs;
+  }
+
+  function renderNavegacionRedisenio_(role) {
+    const navigation = document.getElementById("redesign-navigation");
+    const tabsNode = document.getElementById("redesign-tabs");
+    if (!navigation || !tabsNode) return;
+    navigation.classList.remove("hidden");
+    try {
+      moduloActivo = sessionStorage.getItem("pedidos-grafica-modulo") || "materiales";
+      solapaActivaPorModulo.materiales = sessionStorage.getItem("pedidos-grafica-solapa-materiales") || "nuevo";
+      solapaActivaPorModulo.copias = sessionStorage.getItem("pedidos-grafica-solapa-copias") || "nueva";
+    } catch (error) {}
+    const modulos = ["materiales", "copias"];
+    modulos.forEach(function(modulo) {
+      const button = document.getElementById(`module-${modulo}`);
+      if (button) {
+        button.classList.toggle("is-active", moduloActivo === modulo);
+        button.setAttribute("aria-selected", moduloActivo === modulo ? "true" : "false");
+      }
+    });
+    let tabs = obtenerConfiguracionNavegacionRedisenio_(role, moduloActivo);
+    if (!tabs.some(function(tab) { return tab.key === solapaActivaPorModulo[moduloActivo]; })) solapaActivaPorModulo[moduloActivo] = tabs[0].key;
+    const activa = solapaActivaPorModulo[moduloActivo];
+    tabsNode.innerHTML = tabs.map(function(tab) {
+      const selected = tab.key === activa;
+      return `<button class="redesign-tab${selected ? " is-active" : ""}" type="button" role="tab" aria-selected="${selected}" onclick="seleccionarSolapaRedisenio_('${moduloActivo}', '${tab.key}')"><strong>${tab.es}</strong><small>${tab.de}</small></button>`;
+    }).join("");
+    const paneles = new Set();
+    tabs.forEach(function(tab) { tab.panels.forEach(function(panel) { paneles.add(panel); }); });
+    document.querySelectorAll("[data-section]").forEach(function(node) {
+      if (!paneles.has(node.getAttribute("data-section"))) return;
+      node.classList.add("redesign-panel-hidden");
+    });
+    const tabSeleccionada = tabs.find(function(tab) { return tab.key === activa; });
+    if (tabSeleccionada) tabSeleccionada.panels.forEach(function(panel) {
+      const node = document.querySelector(`[data-section="${panel}"]`);
+      if (node && !node.classList.contains("hidden")) node.classList.remove("redesign-panel-hidden");
+    });
+  }
+
+  function seleccionarModuloRedisenio_(modulo) {
+    moduloActivo = modulo === "copias" ? "copias" : "materiales";
+    try { sessionStorage.setItem("pedidos-grafica-modulo", moduloActivo); } catch (error) {}
+    renderNavegacionRedisenio_(rolActual);
+  }
+
+  function seleccionarSolapaRedisenio_(modulo, solapa) {
+    solapaActivaPorModulo[modulo] = solapa;
+    try { sessionStorage.setItem(`pedidos-grafica-solapa-${modulo}`, solapa); } catch (error) {}
+    renderNavegacionRedisenio_(rolActual);
   }
 
   function ordenarSeccionesUsuario_(role) {

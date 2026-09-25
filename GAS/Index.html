@@ -22,6 +22,22 @@
     </div>
     <? } ?>
 
+    <div id="redesign-navigation" class="redesign-navigation hidden">
+      <div class="module-switcher" role="tablist" aria-label="Módulos">
+        <button id="module-materiales" class="module-tile" type="button" role="tab" onclick="seleccionarModuloRedisenio_('materiales')">
+          <span class="module-icon" aria-hidden="true">▦</span>
+          <span><strong>Solicitud de Materiales</strong><small>Materialanfrage</small></span>
+          <span id="badge-materiales" class="module-badge hidden">0</span>
+        </button>
+        <button id="module-copias" class="module-tile" type="button" role="tab" onclick="seleccionarModuloRedisenio_('copias')">
+          <span class="module-icon" aria-hidden="true">▤</span>
+          <span><strong>Solicitud de Copias</strong><small>Kopierauftrag</small></span>
+          <span id="badge-copias" class="module-badge hidden">0</span>
+        </button>
+      </div>
+      <div id="redesign-tabs" class="redesign-tabs" role="tablist" aria-label="Secciones"></div>
+    </div>
+
     <div class="container">
       <div id="view-user" class="hidden">
         <section class="card card-grid collapsible-card admin-section admin-section-compras" data-section="user-pedido">

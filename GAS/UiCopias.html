@@ -4,6 +4,8 @@ let copiasOperativasActuales = [];
 let copiasDecisionContexto = null;
 let copiasEnviando = false;
 let solicitantesCopiasBusquedaTimer_ = null;
+let copiasRefreshTimer_ = null;
+let copiasCargaEnCurso_ = false;
 
 function prepararSolicitanteCopiasUI_() {
   google.script.run
@@ -68,16 +70,28 @@ function seleccionarSolicitanteCopiasUI_(index) {
   container.classList.add("hidden");
 }
 
-function cargarPanelCopias() {
-  prepararSolicitanteCopiasUI_();
+function programarActualizacionCopias_() {
+  if (copiasRefreshTimer_ || !rolActual || !rolActual.isAdmin) return;
+  copiasRefreshTimer_ = window.setInterval(function() {
+    if (document.visibilityState === "visible") cargarPanelCopias(true);
+  }, 300000);
+}
+
+function cargarPanelCopias(silencioso) {
+  programarActualizacionCopias_();
+  if (copiasCargaEnCurso_) return;
+  copiasCargaEnCurso_ = true;
+  if (!silencioso) prepararSolicitanteCopiasUI_();
   google.script.run
     .withSuccessHandler(function(data) {
+      copiasCargaEnCurso_ = false;
       copiasPropiasActuales = data && data.propias ? data.propias : [];
       copiasOperativasActuales = data && data.operativas ? data.operativas : [];
       renderizarCopiasPropias_();
       renderizarCopiasOperativas_();
     })
     .withFailureHandler(function(error) {
+      copiasCargaEnCurso_ = false;
       const propias = document.getElementById("lista-copias-propias");
       const operativas = document.getElementById("lista-copias-operativas");
       if (propias) propias.innerHTML = `<div class="empty-state">${escapeHtml_(normalizarMensaje_(error.message || error))}</div>`;

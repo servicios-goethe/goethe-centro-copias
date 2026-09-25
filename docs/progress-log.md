@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 37, `Desarrollo - remitente l.aristu y modales internos`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 38, `Desarrollo - filtro de copias autorizadas por defecto`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -184,3 +184,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `08bf426` (`feat(mail-ui): centralize sender and replace native dialogs`).
 - Sincronizado con GAS de desarrollo a las 16:54 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 37 creada y deployment de desarrollo actualizado.
+
+## 2026-09-25 — Filtro operativo de copias autorizado por defecto
+
+- La vista administrativa/operativa de copias inicia filtrada en estado `AUTORIZADO`.
+- Los demás estados continúan disponibles desde el selector, sin alterar la consulta ni los datos almacenados.
+- Commit: `e2c9612` (`fix(copias): default operator filter to authorized`).
+- Sincronizado con GAS de desarrollo y publicado como versión 38.

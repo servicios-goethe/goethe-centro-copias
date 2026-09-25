@@ -273,24 +273,24 @@
           </div>
         </section>
 
-        <section id="sec-compras" class="card collapsible-card admin-section admin-section-compras" data-section="admin-nueva-compra">
+        <section id="sec-compras" class="card collapsible-card redesign-card stock-entry-redesign-card admin-section admin-section-compras" data-section="admin-nueva-compra">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-nueva-compra')">
             <span>
-              <strong id="compra-section-title" class="admin-section-title">Nueva reposicion / Neue Bestellung</strong>
-              <span id="compra-section-copy" class="collapsible-copy">Seleccion rapida de articulos para compra, con el mismo formato agil del pedido.</span>
+              <strong id="compra-section-title" class="admin-section-title">Ingreso de stock · Wareneingang</strong>
+              <span id="compra-section-copy" class="collapsible-copy">La mercadería se suma al stock al instante. · Wird sofort zum Bestand addiert.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="admin-nueva-compra">Expandir</span>
           </button>
           <div class="collapsible-body" data-body-for="admin-nueva-compra">
             <div class="toolbar">
-              <input id="buscador-compra" type="search" placeholder="Buscar producto para reposicion" oninput="actualizarVistaCompras()">
+              <input id="buscador-compra" type="search" placeholder="Buscar producto o ID · Produkt suchen" oninput="actualizarVistaCompras()">
               <label class="toggle">
                 <input id="filtro-compra-stock" type="checkbox" onchange="actualizarVistaCompras()">
-                <span>Solo con stock / Nur mit Bestand</span>
+                <span>Solo con stock · Nur mit Bestand</span>
               </label>
               <label class="toggle">
                 <input id="filtro-compra-seleccionados" type="checkbox" onchange="actualizarVistaCompras()">
-                <span>Solo seleccionados / Nur ausgewaehlte</span>
+                <span>Solo seleccionados · Nur ausgewählte</span>
               </label>
             </div>
 
@@ -314,7 +314,7 @@
                 <div><strong id="resumen-compra-items">0</strong><span> productos seleccionados</span></div>
                 <div><strong id="resumen-compra-unidades">0</strong><span> unidades pedidas</span></div>
               </div>
-              <button id="btn-enviar-compra" class="btn btn-success" onclick="enviarCompraMasiva()">Solicitar compra / Einkauf anfragen</button>
+              <button id="btn-enviar-compra" class="btn btn-success" onclick="enviarCompraMasiva()">Registrar ingreso · Eingang buchen</button>
             </div>
           </div>
         </section>

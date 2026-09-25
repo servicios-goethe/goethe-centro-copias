@@ -210,6 +210,14 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 4
+
+- La vista de operador `Ingreso de stock · Wareneingang` adopta la grilla, filtros, campos y barra de acción del nuevo lenguaje visual.
+- Se mantienen referencias, selección de cantidades, resumen y registro inmediato mediante `registrarCompraMasiva`.
+- Commit: `87523bb` (`feat(rediseno): style stock entry workspace`).
+- GAS de desarrollo: versión 42, `Rediseno Hito 4 - ingreso de stock`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 3
 
 - La solapa `Entregas · Ausgaben` adopta tarjetas operativas, buscador bilingüe, filtro de faltantes y jerarquía visual de solicitante, estado y líneas.

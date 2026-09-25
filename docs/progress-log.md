@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 36, `Desarrollo - refresco automatico de copias cada 5 minutos`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 37, `Desarrollo - remitente l.aristu y modales internos`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -175,3 +175,12 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `4a6b067` (`feat(copias): refresh operator queue automatically`).
 - Sincronizado con GAS de desarrollo a las 15:51 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 36 creada y deployment de desarrollo actualizado a las 15:51 UTC.
+
+## 2026-09-25 — Remitente central y modales internos
+
+- Los correos de pedidos, compras y copias se centralizan en `GmailApp` usando el alias autorizado `l.aristu@goethe.edu.ar`.
+- La confirmación de finalización de copias y el ingreso del motivo para deshacer preparación dejaron de usar diálogos nativos del navegador; ambos usan el modal visual de la aplicación.
+- No quedan llamadas a `alert`, `confirm` ni `prompt` en el código GAS.
+- Commit: `08bf426` (`feat(mail-ui): centralize sender and replace native dialogs`).
+- Sincronizado con GAS de desarrollo a las 16:54 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 37 creada y deployment de desarrollo actualizado.

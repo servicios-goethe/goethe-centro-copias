@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/modernist-735e5792-6d6f-4f29-9cd2-15b9ae8736c1/styles.css">
+<script src="_ds/modernist-735e5792-6d6f-4f29-9cd2-15b9ae8736c1/_ds_bundle.js"></script>
+<style>body{margin:0;background:#ece7da;font-family:var(--font-body)}a{color:#0a6334}a:hover{color:#06421f}input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #b08d45;outline-offset:2px}</style>
+</helmet>
+<div style="--color-bg:#faf8f3;--color-surface:#f3efe4;--color-text:#13261b;--color-divider:#e3dccb;--color-neutral-700:#56655b;--color-accent:#0a6334;--color-accent-100:#e6f1ea;--color-accent-200:#c9e2d2;--color-accent-300:#9ccbac;--color-accent-400:#5fa77a;--color-accent-500:#1f7a45;--color-accent-600:#08532b;--color-accent-700:#06421f;--color-accent-800:#053419;--color-accent-900:#032312;--color-accent-2:#b08d45;--color-accent-2-100:#f6efdf;--color-accent-2-200:#ead9b3;--color-accent-2-300:#dcc48e;--color-accent-2-500:#b08d45;--color-accent-2-700:#7a5f25;--color-accent-2-800:#5e481b;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;padding:48px;display:flex;flex-direction:column;gap:24px;color:var(--color-text);font-family:var(--font-body)">
+
+<div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center">
+<span style="background:var(--color-text);color:#fff;font-weight:800;padding:4px 12px;border-radius:999px;font-size:15px">2a</span>
+<strong style="font-size:18px">Pedidos Gráfica · basado en 1a</strong>
+<span style="flex:1"></span>
+<span style="font-size:13px;font-weight:700;color:var(--color-neutral-700)">Ver como / Ansicht als</span>
+<div style="display:flex;gap:4px;background:#fff;border-radius:999px;padding:4px;border:1px solid var(--color-divider)"><sc-for list="{{ roleOpts }}" as="o" hint-placeholder-count="3"><button type="button" onClick="{{ o.pick }}" style="border:0;border-radius:999px;padding:8px 16px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div>
+<div style="display:flex;gap:4px;background:#fff;border-radius:999px;padding:4px;border:1px solid var(--color-divider)"><sc-for list="{{ viewOpts }}" as="o" hint-placeholder-count="2"><button type="button" onClick="{{ o.pick }}" style="border:0;border-radius:999px;padding:8px 16px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div>
+</div>
+
+<div id="2a" style="width:{{ frameW }};background:var(--color-bg);border-radius:24px;border:1px solid var(--color-divider);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(19,38,27,.08)">
+
+<header style="display:flex;align-items:center;gap:16px;padding:16px 24px;background:#fff;border-bottom:1px solid var(--color-divider)">
+<img src="assets/goethe-logo.png" alt="Goethe-Schule" style="height:{{ logoH }};display:block">
+<div style="width:1px;align-self:stretch;background:var(--color-divider)"></div>
+<div style="display:flex;flex-direction:column;flex:1;min-width:0"><strong style="font-size:20px;font-weight:800;line-height:1.1">Pedidos Gráfica</strong><span style="font-size:13px;font-weight:600;color:var(--color-accent-2-700)">Grafik-Bestellungen</span></div>
+<sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+<button class="btn btn-ghost" type="button" style="border-radius:999px">Instructivo · Anleitung</button>
+<div style="display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;background:var(--color-bg);border:1px solid var(--color-divider)"><span style="width:34px;height:34px;border-radius:999px;background:var(--color-accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:13px">MP</span><span style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:700">m.perez@goethe.edu.ar</span><span style="font-size:12px;color:var(--color-accent-2-700);font-weight:600">{{ roleLabel }}</span></span></div>
+</sc-if>
+<sc-if value="{{ mob }}" hint-placeholder-val="{{ false }}"><span style="width:40px;height:40px;border-radius:999px;background:var(--color-accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px">MP</span></sc-if>
+</header>
+
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:20px 24px 0">
+<sc-for list="{{ mods }}" as="m" hint-placeholder-count="2">
+<button type="button" onClick="{{ m.pick }}" style="position:relative;min-width:0;display:flex;align-items:center;gap:{{ modGap }};padding:{{ modPad }};border-radius:18px;border:1.5px solid {{ m.bd }};background:{{ m.bg }};color:{{ m.fg }};font:inherit;text-align:left;cursor:pointer">
+<span style="width:{{ iconS }};height:{{ iconS }};flex:none;border-radius:14px;display:{{ iconD }};place-items:center;background:{{ m.iconBg }};color:{{ m.iconFg }}">
+<sc-if value="{{ m.isMat }}" hint-placeholder-val="{{ true }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><path d="m3.3 7 8.7 5 8.7-5"></path></svg></sc-if>
+<sc-if value="{{ m.isCop }}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg></sc-if>
+</span>
+<span style="display:flex;flex-direction:column;flex:1;min-width:0"><strong style="font-size:{{ modFs }};font-weight:800;line-height:1.15">{{ m.es }}</strong><span style="font-size:13px;opacity:.85">{{ m.de }}</span></span>
+<sc-if value="{{ m.hasCount }}" hint-placeholder-val="{{ false }}"><span style="position:{{ badgePos }};top:8px;right:8px;flex:none;min-width:28px;height:28px;padding:0 8px;box-sizing:border-box;border-radius:999px;background:var(--color-accent-2);color:#fff;font-weight:800;font-size:13px;display:grid;place-items:center">{{ m.count }}</span></sc-if>
+</button>
+</sc-for>
+</div>
+
+<nav style="display:flex;gap:8px;padding:16px 24px;overflow-x:auto;border-bottom:1px solid var(--color-divider)">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+<button type="button" onClick="{{ t.pick }}" style="flex:none;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:14px;border:1.5px solid {{ t.bd }};background:{{ t.bg }};color:var(--color-text);font:inherit;text-align:left;cursor:pointer">
+<span style="display:flex;flex-direction:column"><span style="font-size:14px;font-weight:{{ t.fw }}">{{ t.es }}</span><span style="font-size:12px;color:var(--color-accent-2-700)">{{ t.de }}</span></span>
+<sc-if value="{{ t.hasCount }}" hint-placeholder-val="{{ false }}"><span style="min-width:22px;height:22px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:var(--color-accent);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center">{{ t.count }}</span></sc-if>
+</button>
+</sc-for>
+</nav>
+
+<main style="padding:24px;display:flex;flex-direction:column;gap:20px;min-height:560px">
+<sc-if value="{{ hasMsg }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;background:var(--color-accent-100);color:var(--color-accent-700);font-size:14px;font-weight:700"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg><span style="flex:1">{{ msg }}</span><button type="button" onClick="{{ closeMsg }}" style="border:0;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer">Cerrar · Schließen</button></div></sc-if>
+
+<sc-if value="{{ show.nuevo }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800;line-height:1.1">Nuevo pedido <span style="font-weight:500;color:var(--color-accent-2-700)">· Neue Anfrage</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">Buscá productos y cargá cantidades. · Produkte suchen und Mengen eintragen.</span></div>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+<div style="flex:1;min-width:220px;display:flex;align-items:center;gap:10px;border:1.5px solid var(--color-divider);border-radius:14px;padding:0 14px;background:#fff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><input value="{{ search }}" onChange="{{ onSearch }}" placeholder="Buscar por nombre o ID · Produkt suchen" style="flex:1;border:0;outline:0;font:inherit;font-size:15px;padding:13px 0;background:transparent;min-width:0"></div>
+<label style="display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer;padding:10px 14px;border-radius:14px;background:#fff;border:1.5px solid var(--color-divider)"><input type="checkbox" checked="{{ onlySel }}" onChange="{{ toggleOnlySel }}" style="width:18px;height:18px;accent-color:var(--color-accent)">Solo seleccionados · Nur ausgewählte</label>
+</div>
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;overflow:hidden;display:flex;flex-direction:column">
+<div style="display:grid;grid-template-columns:{{ rowCols }};gap:16px;padding:12px 20px;font-size:12px;font-weight:700;color:var(--color-neutral-700);background:var(--color-surface)"><span>Producto · Produkt</span><sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}"><span>ID</span></sc-if><sc-if value="{{ showStock }}" hint-placeholder-val="{{ false }}"><span>Disponible · Verfügbar</span></sc-if><span>Cantidad · Menge</span></div>
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="4">
+<div onClick="{{ c.toggle }}" style="display:flex;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid var(--color-divider);cursor:pointer" style-hover="background:var(--color-accent-2-100)">
+<span style="width:28px;height:28px;border-radius:999px;background:var(--color-accent-100);color:var(--color-accent);display:grid;place-items:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="transform:{{ c.rot }};transition:transform .15s"><path d="m9 18 6-6-6-6"></path></svg></span>
+<span style="flex:1;display:flex;flex-direction:column"><strong style="font-size:16px">{{ c.es }}</strong><span style="font-size:12px;color:var(--color-accent-2-700)">{{ c.de }}</span></span>
+<sc-if value="{{ c.hasSel }}" hint-placeholder-val="{{ false }}"><span style="padding:4px 10px;border-radius:999px;background:var(--color-accent);color:#fff;font-size:12px;font-weight:700">{{ c.selCount }} ✓</span></sc-if>
+<span style="font-size:12px;color:var(--color-neutral-700)">{{ c.countLabel }}</span>
+</div>
+<sc-for list="{{ c.items }}" as="it" hint-placeholder-count="0">
+<div style="display:grid;grid-template-columns:{{ rowCols }};gap:16px;align-items:center;padding:10px 20px 10px 60px;border-top:1px solid var(--color-divider);background:{{ it.bg }}">
+<span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:15px;font-weight:{{ it.fw }}">{{ it.es }}</span><span style="font-size:12px;color:var(--color-neutral-700)">{{ it.de }}</span></span>
+<sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}"><span style="font-size:13px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ it.id }}</span></sc-if>
+<sc-if value="{{ showStock }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;font-variant-numeric:tabular-nums">{{ it.stock }}</span></sc-if>
+<span style="display:flex;align-items:center;gap:4px;padding:3px;border-radius:999px;border:1.5px solid var(--color-divider);background:#fff;justify-self:start"><button type="button" onClick="{{ it.dec }}" style="width:{{ stepS }};height:{{ stepS }};border-radius:999px;border:0;background:var(--color-surface);cursor:pointer;display:grid;place-items:center;color:var(--color-text)" style-hover="background:var(--color-accent-2-200)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14"></path></svg></button><input value="{{ it.qtyStr }}" onChange="{{ it.onQty }}" inputmode="numeric" placeholder="0" style="width:40px;border:0;outline:0;text-align:center;font:inherit;font-weight:800;font-size:15px;background:transparent"><button type="button" onClick="{{ it.inc }}" style="width:{{ stepS }};height:{{ stepS }};border-radius:999px;border:0;background:var(--color-accent);cursor:pointer;display:grid;place-items:center;color:#fff" style-hover="background:var(--color-accent-600)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button></span>
+</div>
+</sc-for>
+</sc-for>
+</div>
+<div style="position:sticky;bottom:16px;display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:14px 16px 14px 24px;border-radius:18px;background:var(--color-text);color:#fff;box-shadow:0 10px 30px rgba(19,38,27,.25)">
+<span style="font-size:14px;flex:1;min-width:160px"><strong style="font-size:22px">{{ nItems }}</strong> artículos · Artikel &#160; <strong style="font-size:22px">{{ nUnits }}</strong> unidades · Stück</span>
+<button type="button" onClick="{{ clear }}" style="border:1.5px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:12px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer">Vaciar · Leeren</button>
+<button type="button" onClick="{{ send }}" style="border:0;background:var(--color-accent-2);color:#fff;border-radius:12px;padding:12px 20px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-2-700)">Enviar pedido · Anfrage senden</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.mis }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Mis pedidos <span style="font-weight:500;color:var(--color-accent-2-700)">· Meine Anfragen</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">Podés editar un ítem mientras no esté preparado. · Bearbeitbar, solange nicht vorbereitet.</span></div>
+<sc-for list="{{ myOrders }}" as="o" hint-placeholder-count="2">
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px 20px;background:var(--color-surface)"><strong style="font-size:16px;font-variant-numeric:tabular-nums">{{ o.id }}</strong><span style="font-size:13px;color:var(--color-neutral-700)">{{ o.fecha }}</span></div>
+<sc-for list="{{ o.lines }}" as="l" hint-placeholder-count="2">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:12px 20px;border-top:1px solid var(--color-divider)">
+<span style="flex:1;min-width:180px;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">{{ l.es }}</span><span style="font-size:12px;color:var(--color-neutral-700)">{{ l.de }}</span></span>
+<span style="font-size:13px;color:var(--color-neutral-700)">Pedido · Bestellt <strong style="color:var(--color-text)">{{ l.sol }}</strong></span>
+<span style="font-size:13px;color:var(--color-neutral-700)">Retirado · Abgeholt <strong style="color:var(--color-text)">{{ l.ret }}</strong></span>
+<span style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;background:{{ l.st.bg }};color:{{ l.st.fg }};border:1.5px solid {{ l.st.bd }}">{{ l.st.es }} · {{ l.st.de }}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</sc-if>
+
+<sc-if value="{{ show.entregas }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Entregas <span style="font-weight:500;color:var(--color-accent-2-700)">· Ausgaben</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">Prepará y entregá pedidos. · Anfragen vorbereiten und ausgeben.</span></div>
+<sc-for list="{{ orders }}" as="o" hint-placeholder-count="3">
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px 20px">
+<span style="width:40px;height:40px;border-radius:999px;background:var(--color-accent-2-100);color:var(--color-accent-2-800);display:grid;place-items:center;font-weight:800;font-size:13px">{{ o.ini }}</span>
+<span style="flex:1;min-width:160px;display:flex;flex-direction:column"><strong style="font-size:16px">{{ o.who }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ o.id }} · {{ o.fecha }}</span></span>
+<span style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;background:{{ o.st.bg }};color:{{ o.st.fg }};border:1.5px solid {{ o.st.bd }}">{{ o.st.es }} · {{ o.st.de }}</span>
+</div>
+<sc-for list="{{ o.lines }}" as="l" hint-placeholder-count="2">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:10px 20px 10px 72px;border-top:1px solid var(--color-divider)"><span style="flex:1;min-width:160px;font-size:15px">{{ l.p }}</span><span style="font-size:14px"><strong>{{ l.q }}</strong> u. · Stock {{ l.stock }}</span><sc-if value="{{ l.short }}" hint-placeholder-val="{{ false }}"><span style="padding:4px 10px;border-radius:999px;background:var(--color-accent-2-200);color:var(--color-accent-2-800);font-size:12px;font-weight:700">Faltan {{ l.falta }} · Fehlen {{ l.falta }}</span></sc-if></div>
+</sc-for>
+<div style="display:flex;flex-wrap:wrap;gap:8px;padding:14px 20px;border-top:1px solid var(--color-divider);background:var(--color-bg)">
+<sc-if value="{{ o.canReady }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ o.ready }}" class="btn btn-primary" style="border-radius:12px">Marcar listo · Bereitstellen</button></sc-if>
+<sc-if value="{{ o.canDeliver }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ o.deliver }}" class="btn btn-primary" style="border-radius:12px">Entregar · Ausgeben</button></sc-if>
+<sc-if value="{{ o.open }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ o.cancel }}" class="btn btn-ghost" style="border-radius:12px">Cancelar saldo · Rest stornieren</button></sc-if>
+</div>
+</div>
+</sc-for>
+</sc-if>
+
+<sc-if value="{{ show.ingreso }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Ingreso de stock <span style="font-weight:500;color:var(--color-accent-2-700)">· Wareneingang</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">La mercadería que registrás se suma al stock al instante. · Wird sofort zum Bestand addiert.</span></div>
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;padding:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:760px">
+<div class="field" style="grid-column:1/-1"><label>Producto · Produkt</label><select class="input" style="border-radius:12px"><sc-for list="{{ prodOpts }}" as="p" hint-placeholder-count="3"><option>{{ p }}</option></sc-for></select></div>
+<div class="field"><label>Cantidad · Menge</label><input class="input" type="number" min="1" placeholder="0" style="border-radius:12px"></div>
+<div class="field"><label>Referencia · Referenz</label><input class="input" placeholder="Remito, proveedor · Lieferschein" style="border-radius:12px"></div>
+<div style="grid-column:1/-1"><button type="button" onClick="{{ doIngreso }}" class="btn btn-primary" style="border-radius:12px">Registrar ingreso · Eingang buchen</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.compras }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Compras y recepción <span style="font-weight:500;color:var(--color-accent-2-700)">· Einkauf &amp; Eingang</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">Recepcioná lotes completos o por línea. · Chargen ganz oder zeilenweise einbuchen.</span></div>
+<sc-for list="{{ batches }}" as="b" hint-placeholder-count="2">
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;overflow:hidden">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px 20px;background:var(--color-surface)"><strong style="font-size:16px;flex:1">{{ b.id }} <span style="font-weight:400;font-size:13px;color:var(--color-neutral-700)">· {{ b.fecha }}</span></strong><span style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;background:{{ b.st.bg }};color:{{ b.st.fg }};border:1.5px solid {{ b.st.bd }}">{{ b.st.es }} · {{ b.st.de }}</span></div>
+<sc-for list="{{ b.lines }}" as="l" hint-placeholder-count="2"><div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:12px 20px;border-top:1px solid var(--color-divider)"><span style="flex:1;min-width:160px;font-size:15px;font-weight:700">{{ l.p }}</span><span style="font-size:13px;color:var(--color-neutral-700)">Pedido · Bestellt <strong style="color:var(--color-text)">{{ l.ped }}</strong></span><span style="font-size:13px;color:var(--color-neutral-700)">Recibido · Erhalten <strong style="color:var(--color-text)">{{ l.rec }}</strong></span><span style="font-size:13px;color:var(--color-neutral-700)">Saldo · Rest <strong style="color:var(--color-text)">{{ l.saldo }}</strong></span></div></sc-for>
+<sc-if value="{{ b.open }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 20px;border-top:1px solid var(--color-divider);background:var(--color-bg)"><button type="button" onClick="{{ b.receive }}" class="btn btn-primary" style="border-radius:12px">Recepcionar saldo · Rest einbuchen</button></div></sc-if>
+</div>
+</sc-for>
+</sc-if>
+
+<sc-if value="{{ show.productos }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Productos y stock <span style="font-weight:500;color:var(--color-accent-2-700)">· Produkte &amp; Bestand</span></h2></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start">
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<strong style="grid-column:1/-1;font-size:18px">Alta de producto · Neues Produkt</strong>
+<div class="field"><label>Categoría · Kategorie</label><input class="input" placeholder="Papel" style="border-radius:12px"></div>
+<div class="field"><label>Unidad · Einheit</label><input class="input" value="unidad" style="border-radius:12px"></div>
+<div class="field"><label>Nombre ES</label><input class="input" style="border-radius:12px"></div>
+<div class="field"><label>Name DE</label><input class="input" style="border-radius:12px"></div>
+<div class="field"><label>Stock mínimo · Mindestbestand</label><input class="input" type="number" value="0" style="border-radius:12px"></div>
+<div class="field"><label>Stock inicial · Anfangsbestand</label><input class="input" type="number" value="0" style="border-radius:12px"></div>
+<span style="grid-column:1/-1;font-size:12px;color:var(--color-neutral-700)">El ID se genera desde la categoría. · Die ID wird aus der Kategorie erzeugt.</span>
+<div style="grid-column:1/-1"><button type="button" onClick="{{ doAlta }}" class="btn btn-primary" style="border-radius:12px">Crear producto · Produkt anlegen</button></div>
+</div>
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;overflow:hidden">
+<div style="padding:20px 20px 12px;display:flex;flex-direction:column"><strong style="font-size:18px">Stock bajo · Niedriger Bestand</strong><span style="font-size:13px;color:var(--color-neutral-700)">Debajo del mínimo · Unter Mindestbestand</span></div>
+<sc-for list="{{ lowStock }}" as="p" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid var(--color-divider)"><span style="flex:1;display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">{{ p.es }}</span><span style="font-size:12px;color:var(--color-neutral-700)">{{ p.id }} · mín. {{ p.min }}</span></span><span style="padding:4px 10px;border-radius:999px;background:var(--color-accent-2-200);color:var(--color-accent-2-800);font-size:13px;font-weight:800">{{ p.stock }}</span><button type="button" onClick="{{ p.adjust }}" class="btn btn-ghost" style="border-radius:12px">Ajustar · Anpassen</button></div></sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.nueva }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Nueva solicitud <span style="font-weight:500;color:var(--color-accent-2-700)">· Neuer Auftrag</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">Un archivo por solicitud, hasta 80 MB. · Eine Datei pro Auftrag, max. 80 MB.</span></div>
+<div style="display:grid;grid-template-columns:{{ copyCols }};gap:20px;align-items:start">
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:20px">
+<label style="display:flex;align-items:center;gap:16px;padding:20px;border-radius:16px;border:1.5px solid {{ fileBd }};background:{{ fileBg }};cursor:pointer">
+<span style="width:48px;height:48px;border-radius:14px;background:var(--color-accent);color:#fff;display:grid;place-items:center;flex:none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m17 8-5-5-5 5"></path><path d="M12 3v12"></path></svg></span>
+<span style="display:flex;flex-direction:column;flex:1;min-width:0"><strong style="font-size:15px;overflow:hidden;text-overflow:ellipsis">{{ fileLabel }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">PDF, DOC, DOCX, JPG, PNG, TXT, ZIP · máx. 80 MB</span></span>
+<input type="file" onChange="{{ onFile }}" accept=".pdf,.doc,.docx,.jpg,.png,.txt,.zip" style="display:none">
+</label>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:700">Nivel · Stufe</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ segNivel }}" as="o" hint-placeholder-count="3"><button type="button" onClick="{{ o.pick }}" style="border-radius:12px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};padding:10px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left">{{ o.es }}<span style="font-weight:400;opacity:.8"> {{ o.de }}</span></button></sc-for></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+<div class="field"><label>Páginas del original · Seiten</label><input class="input" type="number" min="1" value="{{ f.pag }}" onChange="{{ onPag }}" placeholder="0" style="border-radius:12px"></div>
+<div class="field"><label>Cantidad de copias · Kopien</label><input class="input" type="number" min="1" value="{{ f.cant }}" onChange="{{ onCant }}" placeholder="0" style="border-radius:12px"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:700">Tamaño · Format</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ segTam }}" as="o" hint-placeholder-count="3"><button type="button" onClick="{{ o.pick }}" style="border-radius:12px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};padding:10px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left">{{ o.es }}<span style="font-weight:400;opacity:.8"> {{ o.de }}</span></button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:700">Modalidad · Art</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ segMod }}" as="o" hint-placeholder-count="2"><button type="button" onClick="{{ o.pick }}" style="border-radius:12px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};padding:10px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left">{{ o.es }}<span style="font-weight:400;opacity:.8"> · {{ o.de }}</span></button></sc-for></div></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:700">Doble faz · Beidseitig</span><div style="display:flex;gap:8px"><sc-for list="{{ segFaz }}" as="o" hint-placeholder-count="2"><button type="button" onClick="{{ o.pick }}" style="border-radius:12px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};padding:10px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left">{{ o.es }}<span style="font-weight:400;opacity:.8"> · {{ o.de }}</span></button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:700">Color · Farbe</span><div style="display:flex;gap:8px"><sc-for list="{{ segColor }}" as="o" hint-placeholder-count="2"><button type="button" onClick="{{ o.pick }}" style="border-radius:12px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};padding:10px 18px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left">{{ o.es }}<span style="font-weight:400;opacity:.8"> · {{ o.de }}</span></button></sc-for></div></div>
+</div>
+<div class="field"><label>Comentario · Kommentar</label><textarea class="input" rows="3" maxlength="500" placeholder="Indicaciones adicionales · Zusätzliche Hinweise" style="border-radius:12px;resize:vertical"></textarea></div>
+</div>
+<div style="background:var(--color-text);color:#fff;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:16px;position:sticky;top:16px">
+<span style="font-size:13px;font-weight:700;color:var(--color-accent-2-300)">Resumen · Übersicht</span>
+<div style="display:flex;flex-direction:column"><strong style="font-size:44px;font-weight:800;line-height:1">{{ totalPag }}</strong><span style="font-size:14px">páginas impresas · gedruckte Seiten</span></div>
+<span style="font-size:14px;line-height:1.5">{{ specLine }}</span>
+<div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.08);font-size:13px;line-height:1.45">{{ authNote }}</div>
+<button type="button" onClick="{{ sendCopy }}" style="border:0;background:var(--color-accent-2);color:#fff;border-radius:12px;padding:14px 18px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;text-align:left" style-hover="background:var(--color-accent-2-700)">Enviar solicitud · Auftrag senden</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.miscop }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Mis solicitudes <span style="font-weight:500;color:var(--color-accent-2-700)">· Meine Aufträge</span></h2></div>
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;overflow:hidden">
+<sc-for list="{{ myCopies }}" as="c" hint-placeholder-count="3">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:16px 20px;border-top:1px solid var(--color-divider)">
+<span style="width:44px;height:44px;border-radius:12px;background:var(--color-accent-100);color:var(--color-accent-700);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none">{{ c.nivel }}</span>
+<span style="flex:1;min-width:180px;display:flex;flex-direction:column"><strong style="font-size:15px">{{ c.file }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ c.id }} · {{ c.spec }}</span></span>
+<span style="padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700;background:{{ c.st.bg }};color:{{ c.st.fg }};border:1.5px solid {{ c.st.bd }}">{{ c.st.es }} · {{ c.st.de }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.autorizar }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Autorizaciones <span style="font-weight:500;color:var(--color-accent-2-700)">· Freigaben</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">Solicitudes de KG y EP. · Aufträge aus KG und EP.</span></div>
+<sc-if value="{{ noAuth }}" hint-placeholder-val="{{ false }}"><div style="padding:24px;border-radius:18px;background:#fff;border:1px solid var(--color-divider);font-size:15px">No hay solicitudes pendientes. · Keine offenen Aufträge.</div></sc-if>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+<sc-for list="{{ authList }}" as="c" hint-placeholder-count="2">
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;gap:12px;align-items:center"><span style="width:44px;height:44px;border-radius:12px;background:var(--color-accent-2-100);color:var(--color-accent-2-800);display:grid;place-items:center;font-weight:800;font-size:13px">{{ c.nivel }}</span><span style="display:flex;flex-direction:column;flex:1"><strong style="font-size:15px">{{ c.who }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ c.id }}</span></span></div>
+<span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:700">{{ c.file }}</span><span style="font-size:13px;color:var(--color-neutral-700)">{{ c.spec }}</span></span>
+<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" onClick="{{ c.approve }}" class="btn btn-primary" style="border-radius:12px">Autorizar · Freigeben</button><button type="button" onClick="{{ c.reject }}" class="btn btn-ghost" style="border-radius:12px">Rechazar · Ablehnen</button></div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ show.trabajos }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:4px"><h2 style="margin:0;font-size:30px;font-weight:800">Trabajos <span style="font-weight:500;color:var(--color-accent-2-700)">· Druckaufträge</span></h2><span style="font-size:14px;color:var(--color-neutral-700)">Autorizados, listos para imprimir. · Freigegeben, bereit zum Drucken.</span></div>
+<div style="background:#fff;border:1px solid var(--color-divider);border-radius:18px;overflow:hidden">
+<sc-if value="{{ noJobs }}" hint-placeholder-val="{{ false }}"><div style="padding:24px;font-size:15px">No hay trabajos en cola. · Keine Aufträge in der Warteschlange.</div></sc-if>
+<sc-for list="{{ jobs }}" as="c" hint-placeholder-count="2">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:16px 20px;border-top:1px solid var(--color-divider)">
+<span style="width:44px;height:44px;border-radius:12px;background:var(--color-accent-100);color:var(--color-accent-700);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none">{{ c.nivel }}</span>
+<span style="flex:1;min-width:200px;display:flex;flex-direction:column"><strong style="font-size:15px">{{ c.file }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ c.who }} · {{ c.spec }}</span></span>
+<button type="button" class="btn btn-ghost" style="border-radius:12px">Abrir archivo · Datei öffnen</button>
+<button type="button" onClick="{{ c.finish }}" class="btn btn-primary" style="border-radius:12px">Listo para retirar · Abholbereit</button>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;rol&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;usuario&quot;,&quot;operador&quot;,&quot;admin&quot;],&quot;default&quot;:&quot;usuario&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const CATS = [
+  { key: 'PAPE', es: 'Papel', de: 'Papier', items: [['PAPE001','Resma A4 75 g','Ries A4 75 g',142,40],['PAPE002','Resma A3 80 g','Ries A3 80 g',18,20],['PAPE003','Resma oficio','Ries Legal',9,20],['PAPE004','Papel color A4 pastel','Farbpapier A4 Pastell',26,10]] },
+  { key: 'CART', es: 'Cartulina', de: 'Karton', items: [['CART001','Cartulina blanca 50×70','Weißer Karton 50×70',60,20],['CART002','Cartulina color surtida','Farbkarton sortiert',34,20],['CART003','Papel afiche','Plakatpapier',75,20]] },
+  { key: 'LIBR', es: 'Librería', de: 'Schreibwaren', items: [['LIBR001','Marcador pizarra negro','Whiteboard-Marker schwarz',48,20],['LIBR002','Marcador permanente','Permanentmarker',30,10],['LIBR003','Cinta adhesiva 18 mm','Klebeband 18 mm',22,10],['LIBR004','Broches 24/6 ×1000','Heftklammern 24/6 ×1000',15,5],['LIBR005','Plasticola 250 g','Bastelkleber 250 g',11,15]] },
+  { key: 'ARTE', es: 'Arte y plástica', de: 'Kunst', items: [['ARTE001','Témpera 250 ml surtida','Temperafarbe 250 ml',40,10],['ARTE002','Pinceles set ×6','Pinselset ×6',12,15],['ARTE003','Crayones ×12','Wachsmalstifte ×12',25,10]] }
+];
+const PROD = {}; CATS.forEach(c => c.items.forEach(([id, es, de, stock, min]) => { PROD[id] = { id, es, de, stock, min }; }));
+const ROLES = { usuario: 'Usuario · Benutzer', operador: 'Operador · Operator', admin: 'Administrador · Administrator' };
+const TABS = {
+  mat: { usuario: ['nuevo','mis'], operador: ['nuevo','mis','entregas','ingreso'], admin: ['nuevo','mis','entregas','compras','productos'] },
+  cop: { usuario: ['nueva','miscop'], operador: ['nueva','miscop','trabajos'], admin: ['nueva','miscop','autorizar','trabajos'] }
+};
+const TL = { nuevo: ['Nuevo pedido','Neue Anfrage'], mis: ['Mis pedidos','Meine Anfragen'], entregas: ['Entregas','Ausgaben'], ingreso: ['Ingreso de stock','Wareneingang'], compras: ['Compras y recepción','Einkauf & Eingang'], productos: ['Productos y stock','Produkte & Bestand'], nueva: ['Nueva solicitud','Neuer Auftrag'], miscop: ['Mis solicitudes','Meine Aufträge'], autorizar: ['Autorizaciones','Freigaben'], trabajos: ['Trabajos','Druckaufträge'] };
+const G = 'var(--color-accent)', G1 = 'var(--color-accent-100)', G7 = 'var(--color-accent-700)', A1 = 'var(--color-accent-2-100)', A2 = 'var(--color-accent-2-200)', A8 = 'var(--color-accent-2-800)', LN = 'var(--color-divider)';
+const ST = {
+  pend: ['Pendiente','Offen',A1,A8,A2], listo: ['Listo para retirar','Abholbereit',G1,G7,'var(--color-accent-200)'], ret: ['Retirado','Abgeholt',G,'#fff',G],
+  parcial: ['Retirado parcial','Teilw. abgeholt',A2,A8,A2], cancel: ['Cancelado','Storniert','#fff','var(--color-neutral-700)',LN],
+  recibido: ['Recibido','Erhalten',G,'#fff',G], parcialRec: ['Recibido parcial','Teilw. erhalten',A1,A8,A2],
+  SOLICITADO: ['Solicitado','Beantragt',A1,A8,A2], AUTORIZADO: ['Autorizado','Freigegeben',G1,G7,'var(--color-accent-200)'], FINALIZADO: ['Listo para retirar','Abholbereit',G,'#fff',G], RECHAZADO: ['Rechazado','Abgelehnt','#fff','var(--color-neutral-700)',LN]
+};
+const st = k => { const s = ST[k]; return { es: s[0], de: s[1], bg: s[2], fg: s[3], bd: s[4] }; };
+
+class Component extends DCLogic {
+  state = {
+    role: null, view: 'desk', mod: 'mat', tab: { mat: 'nuevo', cop: 'nueva' }, msg: '',
+    q: { PAPE001: 2, LIBR001: 4, CART002: 1 }, open: { PAPE: true }, search: '', onlySel: false,
+    myOrders: [
+      { id: 'RET-590178', fecha: '24/09/2026', lines: [{ id: 'CART002', sol: 20, ret: 0, st: 'listo' }, { id: 'LIBR005', sol: 12, ret: 0, st: 'listo' }] },
+      { id: 'RET-589960', fecha: '18/09/2026', lines: [{ id: 'PAPE001', sol: 5, ret: 5, st: 'ret' }, { id: 'LIBR003', sol: 4, ret: 2, st: 'parcial' }] }
+    ],
+    orders: [
+      { id: 'RET-590211', who: 'Laura Schmidt', fecha: '25/09 09:12', st: 'pend', lines: [['PAPE001', 10], ['LIBR001', 6]] },
+      { id: 'RET-590178', who: 'Martín Pérez', fecha: '24/09 15:40', st: 'listo', lines: [['CART002', 20], ['LIBR005', 12]] },
+      { id: 'RET-590102', who: 'Sofía Becker', fecha: '24/09 11:05', st: 'pend', lines: [['PAPE002', 25]] }
+    ],
+    batches: [
+      { id: 'COM-588120', fecha: '20/09/2026', lines: [{ id: 'PAPE001', ped: 50, rec: 20 }, { id: 'PAPE003', ped: 10, rec: 0 }] },
+      { id: 'COM-587744', fecha: '15/09/2026', lines: [{ id: 'ARTE001', ped: 24, rec: 0 }] }
+    ],
+    copies: [
+      { id: 'COP-20260925-0014', who: 'Laura Schmidt', mine: false, file: 'Arbeitsblatt_Photosynthese.pdf', nivel: 'EP', pag: 4, cant: 28, tam: 'A4', mod: 'ARMADAS', faz: 'SI', color: 'NO', st: 'SOLICITADO' },
+      { id: 'COP-20260925-0012', who: 'Martín Pérez', mine: true, file: 'Evaluacion_Historia_3B.docx', nivel: 'ES', pag: 3, cant: 32, tam: 'A4', mod: 'ARMADAS', faz: 'SI', color: 'NO', st: 'AUTORIZADO' },
+      { id: 'COP-20260924-0031', who: 'Sofía Becker', mine: false, file: 'Liederbuch_Herbst.pdf', nivel: 'KG', pag: 12, cant: 20, tam: 'A4', mod: 'ARMADAS', faz: 'NO', color: 'SI', st: 'SOLICITADO' },
+      { id: 'COP-20260923-0008', who: 'Martín Pérez', mine: true, file: 'Mapa_Europa_A3.png', nivel: 'ES', pag: 1, cant: 30, tam: 'A3', mod: 'APILADAS', faz: 'NO', color: 'SI', st: 'FINALIZADO' },
+      { id: 'COP-20260922-0019', who: 'Ana Weber', mine: false, file: 'Klassenarbeit_Mathe.pdf', nivel: 'ES', pag: 2, cant: 26, tam: 'A4', mod: 'ARMADAS', faz: 'SI', color: 'NO', st: 'AUTORIZADO' }
+    ],
+    f: { file: '', nivel: '', pag: '', cant: '', tam: 'A4', mod: 'ARMADAS', faz: 'SI', color: 'NO' }
+  };
+
+  setQty(id, v) { const n = Math.max(0, parseInt(v, 10) || 0); this.setState(s => { const q = { ...s.q }; if (n) q[id] = n; else delete q[id]; return { q }; }); }
+  setF(k, v) { this.setState(s => ({ f: { ...s.f, [k]: v } })); }
+  flash(msg) { this.setState({ msg }); }
+  spec(c) { return `${c.tam} · ${c.pag} pág. × ${c.cant} · ${c.faz === 'SI' ? 'doble faz' : 'simple faz'}${c.color === 'SI' ? ' · color' : ''}`; }
+  setCopy(id, stv, msg) { this.setState(s => ({ copies: s.copies.map(c => c.id === id ? { ...c, st: stv } : c), msg })); }
+
+  renderVals() {
+    const S = this.state;
+    const role = S.role ?? this.props.rol ?? 'usuario';
+    const desk = S.view === 'desk';
+    const showStock = role !== 'usuario';
+    const allowed = TABS[S.mod][role];
+    const cur = allowed.includes(S.tab[S.mod]) ? S.tab[S.mod] : allowed[0];
+    const term = S.search.trim().toLowerCase();
+
+    const cats = CATS.map(c => {
+      const all = c.items.map(([id, es, de, stock]) => {
+        const qty = S.q[id] || 0;
+        return { id, es, de, stock, qty, qtyStr: qty ? String(qty) : '', bg: qty ? 'var(--color-accent-100)' : 'transparent', fw: qty ? 700 : 400,
+          inc: () => this.setQty(id, qty + 1), dec: () => this.setQty(id, qty - 1), onQty: e => this.setQty(id, e.target.value) };
+      }).filter(it => (!term || (it.es + ' ' + it.de + ' ' + it.id).toLowerCase().includes(term)) && (!S.onlySel || it.qty));
+      const isOpen = !!S.open[c.key] || !!term || S.onlySel;
+      const selCount = all.filter(i => i.qty).length;
+      return { es: c.es, de: c.de, items: isOpen ? all : [], all, rot: isOpen ? 'rotate(90deg)' : 'none', hasSel: selCount > 0, selCount,
+        countLabel: all.length + ' productos · Produkte', toggle: () => this.setState(s => ({ open: { ...s.open, [c.key]: !s.open[c.key] } })) };
+    }).filter(c => c.all.length);
+    const sel = Object.keys(S.q);
+    const nUnits = sel.reduce((a, id) => a + S.q[id], 0);
+    const cols = ['minmax(0,1fr)']; if (desk) cols.push('100px'); if (showStock) cols.push('130px'); cols.push('150px');
+
+    const myOrders = S.myOrders.map(o => ({ ...o, lines: o.lines.map(l => ({ ...l, es: PROD[l.id].es, de: PROD[l.id].de, st: st(l.st) })) }));
+    const orders = S.orders.map(o => {
+      const lines = o.lines.map(([id, q]) => ({ p: PROD[id].es, q, stock: PROD[id].stock, short: q > PROD[id].stock, falta: Math.max(q - PROD[id].stock, 0) }));
+      const upd = (stv, msg) => this.setState(s => ({ orders: s.orders.map(x => x.id === o.id ? { ...x, st: stv } : x), msg }));
+      return { ...o, lines, ini: o.who.split(' ').map(w => w[0]).join(''), st: st(o.st), open: o.st === 'pend' || o.st === 'listo',
+        canReady: o.st === 'pend', canDeliver: o.st === 'listo',
+        ready: () => upd('listo', `${o.id} listo para retirar. · Abholbereit.`), deliver: () => upd('ret', `${o.id} entregado. · Ausgegeben.`), cancel: () => upd('cancel', `Saldo de ${o.id} cancelado. · Rest storniert.`) };
+    });
+    const batches = S.batches.map(b => {
+      const lines = b.lines.map(l => ({ p: PROD[l.id].es, ped: l.ped, rec: l.rec, saldo: Math.max(l.ped - l.rec, 0) }));
+      const open = lines.some(l => l.saldo > 0);
+      return { id: b.id, fecha: b.fecha, lines, open, st: st(open ? (lines.some(l => l.rec > 0) ? 'parcialRec' : 'pend') : 'recibido'),
+        receive: () => this.setState(s => ({ batches: s.batches.map(x => x.id === b.id ? { ...x, lines: x.lines.map(l => ({ ...l, rec: l.ped })) } : x), msg: `${b.id} recepcionado. · Eingebucht.` })) };
+    });
+    const lowStock = Object.values(PROD).filter(p => p.stock < p.min).map(p => ({ ...p, adjust: () => this.flash(`Ajuste de ${p.es} registrado. · Anpassung gespeichert.`) }));
+
+    const cp = c => ({ ...c, spec: this.spec(c), st: st(c.st) });
+    const myCopies = S.copies.filter(c => c.mine).map(cp);
+    const authList = S.copies.filter(c => c.st === 'SOLICITADO' && !c.mine).map(c => ({ ...cp(c),
+      approve: () => this.setCopy(c.id, 'AUTORIZADO', `${c.id} autorizada. · Freigegeben.`), reject: () => this.setCopy(c.id, 'RECHAZADO', `${c.id} rechazada. · Abgelehnt.`) }));
+    const jobs = S.copies.filter(c => c.st === 'AUTORIZADO').map(c => ({ ...cp(c), finish: () => this.setCopy(c.id, 'FINALIZADO', `${c.id} lista para retirar. Se avisó por mail. · Abholbereit, E-Mail gesendet.`) }));
+
+    const counts = {
+      mis: S.myOrders.filter(o => o.lines.some(l => l.st === 'pend' || l.st === 'listo')).length,
+      entregas: S.orders.filter(o => o.st === 'pend' || o.st === 'listo').length,
+      compras: batches.filter(b => b.open).length, miscop: myCopies.filter(c => c.st.es !== 'Listo para retirar' && c.st.es !== 'Rechazado').length,
+      autorizar: authList.length, trabajos: jobs.length
+    };
+    const modCount = m => TABS[m][role].filter(t => t !== 'mis' && t !== 'miscop' || role === 'usuario').reduce((a, t) => a + (counts[t] || 0), 0);
+    const tabs = allowed.map(t => ({ es: TL[t][0], de: TL[t][1], count: counts[t] || 0, hasCount: !!counts[t],
+      bg: t === cur ? 'var(--color-accent-2-100)' : '#fff', bd: t === cur ? 'var(--color-accent-2)' : 'var(--color-divider)', fw: t === cur ? 800 : 600,
+      pick: () => this.setState(s => ({ tab: { ...s.tab, [s.mod]: t }, msg: '' })) }));
+    const mods = [['mat', 'Solicitud de Materiales', 'Materialanfrage'], ['cop', 'Solicitud de Copias', 'Kopierauftrag']].map(([k, es, de]) => {
+      const on = S.mod === k; const n = modCount(k);
+      return { es, de, isMat: k === 'mat', isCop: k === 'cop', count: n, hasCount: n > 0, bg: on ? G : '#fff', fg: on ? '#fff' : 'var(--color-text)', bd: on ? G : LN,
+        iconBg: on ? 'var(--color-accent-2)' : G1, iconFg: on ? '#fff' : G, pick: () => this.setState({ mod: k, msg: '' }) };
+    });
+    const show = {}; Object.keys(TL).forEach(k => { show[k] = k === cur; });
+
+    const f = S.f;
+    const seg = (k, opts) => opts.map(([v, es, de]) => { const on = f[k] === v; return { es, de, bg: on ? G : '#fff', fg: on ? '#fff' : 'var(--color-text)', bd: on ? G : LN, pick: () => this.setF(k, v) }; });
+    const pag = parseInt(f.pag, 10) || 0, cant = parseInt(f.cant, 10) || 0;
+    const pill = (opts, v, set) => opts.map(([k, l]) => ({ label: l, bg: v === k ? 'var(--color-text)' : 'transparent', fg: v === k ? '#fff' : 'var(--color-text)', pick: () => this.setState(set(k)) }));
+
+    return {
+      roleOpts: pill([['usuario', 'Usuario'], ['operador', 'Operador'], ['admin', 'Admin']], role, k => ({ role: k, msg: '' })),
+      viewOpts: pill([['desk', 'Escritorio'], ['mob', 'Móvil']], S.view, k => ({ view: k })),
+      frameW: desk ? '1280px' : '390px', desk, mob: !desk, logoH: desk ? '40px' : '30px', modFs: desk ? '18px' : '14px', modGap: desk ? '14px' : '8px', modPad: desk ? '16px' : '14px 40px 14px 14px', iconS: desk ? '44px' : '0', iconD: desk ? 'grid' : 'none', badgePos: desk ? 'static' : 'absolute', stepS: desk ? '32px' : '40px',
+      copyCols: desk ? 'minmax(0,1fr) 320px' : '1fr',
+      roleLabel: ROLES[role], mods, tabs, show, msg: S.msg, hasMsg: !!S.msg, closeMsg: () => this.setState({ msg: '' }),
+      cats, rowCols: cols.join(' '), showStock, nItems: sel.length, nUnits, search: S.search,
+      onSearch: e => this.setState({ search: e.target.value }), onlySel: S.onlySel, toggleOnlySel: () => this.setState(s => ({ onlySel: !s.onlySel })),
+      clear: () => this.setState({ q: {} }),
+      send: () => {
+        if (!sel.length) return this.flash('Cargá al menos un producto. · Bitte mindestens ein Produkt wählen.');
+        const id = 'RET-' + String(Date.now()).slice(-6);
+        this.setState(s => ({ q: {}, myOrders: [{ id, fecha: 'Hoy · Heute', lines: sel.map(pid => ({ id: pid, sol: s.q[pid], ret: 0, st: 'pend' })) }, ...s.myOrders], msg: `Pedido ${id} registrado. · Anfrage gespeichert.` }));
+      },
+      myOrders, orders, batches, lowStock, prodOpts: Object.values(PROD).map(p => p.id + ' · ' + p.es),
+      doIngreso: () => this.flash('Ingreso registrado y sumado al stock. · Eingang gebucht.'),
+      doAlta: () => this.flash('Producto creado. · Produkt angelegt.'),
+      f, onPag: e => this.setF('pag', e.target.value), onCant: e => this.setF('cant', e.target.value),
+      onFile: e => this.setF('file', (e.target.files[0] || {}).name || ''),
+      fileLabel: f.file || 'Elegí un archivo · Datei wählen', fileBg: f.file ? 'var(--color-accent-100)' : 'var(--color-bg)', fileBd: f.file ? G : LN,
+      segNivel: seg('nivel', [['KG', 'KG', 'Kindergarten'], ['EP', 'EP', 'Primaria'], ['ES', 'ES', 'Secundaria']]),
+      segTam: seg('tam', [['A4', 'A4', ''], ['A3', 'A3', ''], ['OFICIO', 'Oficio', 'Legal']]),
+      segMod: seg('mod', [['ARMADAS', 'Armadas', 'Geheftet'], ['APILADAS', 'Apiladas', 'Gestapelt']]),
+      segFaz: seg('faz', [['SI', 'Sí', 'Ja'], ['NO', 'No', 'Nein']]), segColor: seg('color', [['SI', 'Sí', 'Ja'], ['NO', 'No', 'Nein']]),
+      totalPag: pag * cant, specLine: this.spec({ ...f, pag: pag || '—', cant: cant || '—' }),
+      authNote: f.nivel === 'ES' ? 'ES ingresa autorizada directamente. · ES wird automatisch freigegeben.' : f.nivel ? `${f.nivel} requiere autorización antes de imprimir. · ${f.nivel} muss vorher freigegeben werden.` : 'KG y EP requieren autorización; ES ingresa autorizada. · KG/EP brauchen Freigabe, ES nicht.',
+      sendCopy: () => {
+        if (!f.file || !f.nivel || !pag || !cant) return this.flash('Completá archivo, nivel, páginas y copias. · Bitte Datei, Stufe, Seiten und Kopien angeben.');
+        const id = 'COP-20260925-' + String(Math.floor(Math.random() * 9000) + 1000);
+        this.setState(s => ({ copies: [{ id, who: 'Martín Pérez', mine: true, ...f, pag, cant, st: f.nivel === 'ES' ? 'AUTORIZADO' : 'SOLICITADO' }, ...s.copies],
+          f: { file: '', nivel: '', pag: '', cant: '', tam: 'A4', mod: 'ARMADAS', faz: 'SI', color: 'NO' }, tab: { ...s.tab, cop: 'miscop' }, msg: `Solicitud ${id} enviada. · Auftrag gesendet.` }));
+      },
+      myCopies, authList, noAuth: !authList.length, jobs, noJobs: !jobs.length
+    };
+  }
+}
+</script>
+</body>
+</html>

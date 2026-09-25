@@ -210,6 +210,15 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 5
+
+- `Compras y recepción · Einkauf & Eingang` adopta tarjetas de lote, filtros bilingües y jerarquía visual para solicitado, recibido y saldo.
+- Se conservan recepción parcial/completa, selección de producto recibido, cancelación de saldo con motivo y actualización de stock.
+- La sección de nueva reposición mantiene el flujo de compra para administración y el modo ingreso para operador.
+- Commit: `3625135` (`feat(rediseno): style purchases and receiving`).
+- GAS de desarrollo: versión 43, `Rediseno Hito 5 - compras y recepcion`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 4
 
 - La vista de operador `Ingreso de stock · Wareneingang` adopta la grilla, filtros, campos y barra de acción del nuevo lenguaje visual.

@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 38, `Desarrollo - filtro de copias autorizadas por defecto`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente para la rama funcional es la versión 38, `Desarrollo - filtro de copias autorizadas por defecto`; el rediseño se prueba por separado en la versión 39.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -191,3 +191,12 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Los demás estados continúan disponibles desde el selector, sin alterar la consulta ni los datos almacenados.
 - Commit: `e2c9612` (`fix(copias): default operator filter to authorized`).
 - Sincronizado con GAS de desarrollo y publicado como versión 38.
+
+## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 1
+
+- Se incorporó el paquete de diseño en `docs/Rediseno` y se publicó exclusivamente en la rama `rediseno-pedidos-grafica`.
+- Se agregó el shell visual inicial: módulos Materiales/Copias, solapas según rol y persistencia de selección en `sessionStorage`.
+- Las secciones existentes se reutilizan sin modificar endpoints ni código de servidor; la navegación solo controla su visibilidad.
+- Commit del paquete: `c48e44a`; commit del Hito 1: `bb3d409`.
+- GAS de desarrollo: versión 39, `Rediseno Hito 1 - shell y navegacion por rol`.
+- Producción y `main` no fueron modificadas.

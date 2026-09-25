@@ -250,11 +250,11 @@
           </div>
         </div>
 
-        <section id="sec-pedidos" class="card collapsible-card admin-section admin-section-pedidos" data-section="admin-pedidos">
+        <section id="sec-pedidos" class="card collapsible-card redesign-card delivery-redesign-card admin-section admin-section-pedidos" data-section="admin-pedidos">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-pedidos')">
             <span>
-              <strong class="admin-section-title">Solicitudes de materiales de libreria / Materialanfragen</strong>
-              <span class="collapsible-copy">Gestiona pedidos de materiales, preparacion, retiro y saldos pendientes.</span>
+              <strong class="admin-section-title">Entregas · Ausgaben</strong>
+              <span class="collapsible-copy">Prepará, entregá y controlá faltantes. · Bestellungen vorbereiten und ausgeben.</span>
             </span>
             <span class="section-indicator-pack">
               <span id="admin-pedidos-resumen" class="status-pill status-neutral">0 pedidos</span>
@@ -263,10 +263,10 @@
           </button>
           <div class="collapsible-body" data-body-for="admin-pedidos">
             <div class="section-tools">
-              <input id="filtro-pedidos-admin" type="search" placeholder="Buscar por pedido, solicitante o mail" oninput="actualizarFiltroPedidosAdmin()">
+              <input id="filtro-pedidos-admin" type="search" placeholder="Buscar por pedido, solicitante o mail · Suchen" oninput="actualizarFiltroPedidosAdmin()">
               <label class="toggle">
                 <input id="filtro-pedidos-faltantes" type="checkbox" onchange="actualizarFiltroPedidosAdmin()">
-                <span>Solo con faltantes</span>
+                <span>Solo con faltantes · Nur mit Fehlmengen</span>
               </label>
             </div>
             <div id="lista-pedidos-admin"></div>

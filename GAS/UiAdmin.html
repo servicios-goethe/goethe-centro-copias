@@ -490,29 +490,28 @@ function entregarPedidoParcialAdmin(idPedido) {
 }
 
 function deshacerPreparacionPedidoAdmin(idPedido, productoId) {
-  const motivo = window.prompt("Motivo para deshacer la preparacion:");
-  if (!motivo) return;
-
-  mostrarLoading("Deshaciendo preparacion...");
-  google.script.run
-    .withSuccessHandler(function(respuesta) {
-      ocultarLoading();
-      mostrarAviso("success", respuesta.mensaje || "Preparacion deshecha.");
-      if (respuesta && "pedido" in respuesta) {
-        const index = pedidosAdminActuales.findIndex(function(item) { return item.id === idPedido; });
-        if (respuesta.pedido && index >= 0) {
-          pedidosAdminActuales[index] = respuesta.pedido;
-        } else if (respuesta.pedido) {
-          pedidosAdminActuales.unshift(respuesta.pedido);
+  mostrarEntradaModal_("Indicá el motivo para deshacer la preparación.", function(motivo) {
+    mostrarLoading("Deshaciendo preparacion...");
+    google.script.run
+      .withSuccessHandler(function(respuesta) {
+        ocultarLoading();
+        mostrarAviso("success", respuesta.mensaje || "Preparacion deshecha.");
+        if (respuesta && "pedido" in respuesta) {
+          const index = pedidosAdminActuales.findIndex(function(item) { return item.id === idPedido; });
+          if (respuesta.pedido && index >= 0) {
+            pedidosAdminActuales[index] = respuesta.pedido;
+          } else if (respuesta.pedido) {
+            pedidosAdminActuales.unshift(respuesta.pedido);
+          }
+          renderizarPedidosAdmin_();
+          actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+        } else {
+          cargarDashboardAdmin();
         }
-        renderizarPedidosAdmin_();
-        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
-      } else {
-        cargarDashboardAdmin();
-      }
-    })
-    .withFailureHandler(manejarError)
-    .deshacerPreparacionItemPedido(idPedido, productoId, motivo);
+      })
+      .withFailureHandler(manejarError)
+      .deshacerPreparacionItemPedido(idPedido, productoId, motivo);
+  }, "Deshacer preparación", "Motivo");
 }
 
 function abrirAjusteStockPedido(idPedido, productoId) {

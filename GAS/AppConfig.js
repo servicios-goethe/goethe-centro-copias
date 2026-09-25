@@ -38,6 +38,9 @@ const RESPONSABLES = {
   ADMINISTRACION: "administracion@goethe.edu.ar"
 };
 
+// Alias autorizado en la cuenta desplegadora para centralizar el remitente.
+const MAIL_SENDER = "l.aristu@goethe.edu.ar";
+
 const MAIL_BRAND = {
   PRIMARY: "#006225",
   ACCENT: "#9A8348"
@@ -231,6 +234,20 @@ function ejecutarEnvioMailSeguro_(descripcion, callback) {
 
     return ` Operacion guardada, pero no se pudo enviar el mail: ${descripcion}.`;
   }
+}
+
+function enviarMailHtml_(to, subject, htmlBody, name) {
+  const plainBody = String(htmlBody || "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+\n/g, "\n")
+    .trim();
+  GmailApp.sendEmail(to, subject, plainBody || subject, {
+    htmlBody: htmlBody,
+    from: MAIL_SENDER,
+    name: name || "Goethe Schule Inventario"
+  });
 }
 
 function agregarAdvertenciaMail_(mensaje, advertencia) {

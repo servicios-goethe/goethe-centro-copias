@@ -1101,11 +1101,6 @@ function enviarMailRetiroListo_(to, pedidoId, items, tienePendiente) {
   if (!to) return "";
 
   return ejecutarEnvioMailSeguro_(`pedido listo ${pedidoId}`, function() {
-    MailApp.sendEmail({
-      to: to,
-      subject: `Pedido listo para retirar - ${pedidoId}`,
-      htmlBody: buildMailPedidoListo_(pedidoId, items, tienePendiente),
-      name: "Goethe Schule Inventario"
-    });
+    enviarMailHtml_(to, `Pedido listo para retirar - ${pedidoId}`, buildMailPedidoListo_(pedidoId, items, tienePendiente));
   });
 }

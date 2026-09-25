@@ -76,12 +76,7 @@ function registrarCompraMasiva(listaCompras) {
     bumpDataVersion_();
 
     const mailWarning = ejecutarEnvioMailSeguro_(`solicitud de compra ${idCompra}`, function() {
-      MailApp.sendEmail({
-        to: RESPONSABLES.COMPRAS,
-        subject: `Solicitud de compra - ${idCompra}`,
-        htmlBody: buildMailCompraRegistrada_(idCompra, admin.email, itemsMail),
-        name: "Goethe Schule Inventario"
-      });
+      enviarMailHtml_(RESPONSABLES.COMPRAS, `Solicitud de compra - ${idCompra}`, buildMailCompraRegistrada_(idCompra, admin.email, itemsMail));
     });
 
     return agregarAdvertenciaMail_("Solicitud registrada.", mailWarning);

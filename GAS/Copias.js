@@ -476,11 +476,7 @@ function enviarMailCopiasSeguro_(ss, solicitudId, etapa, destinatarios, buildBod
   const to = (destinatarios || []).filter(Boolean).join(",");
   if (!to) return;
   try {
-    MailApp.sendEmail({
-      to: to,
-      subject: `Copias Goethe - ${solicitudId}`,
-      htmlBody: buildBody()
-    });
+    enviarMailHtml_(to, `Copias Goethe - ${solicitudId}`, buildBody());
     registrarLogCopias_(ss, solicitudId, "mail_enviado", { etapa: etapa, destinatarios: destinatarios });
   } catch (error) {
     registrarLogCopias_(ss, solicitudId, "mail_error", { etapa: etapa, destinatarios: destinatarios, error: error.message || String(error) });

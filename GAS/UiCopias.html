@@ -260,16 +260,17 @@ function renderizarCopiasOperativas_() {
 }
 
 function finalizarSolicitudCopiasUI_(id) {
-  if (!window.confirm(`Marcar ${id} como finalizada y avisar al solicitante?`)) return;
-  mostrarLoading("Finalizando solicitud...");
-  google.script.run
-    .withSuccessHandler(function(result) {
-      ocultarLoading();
-      mostrarAviso("success", result.message);
-      cargarPanelCopias();
-    })
-    .withFailureHandler(manejarError)
-    .finalizarSolicitudCopias(id);
+  mostrarConfirmacionModal_(`Marcar ${id} como finalizada y avisar al solicitante?`, function() {
+    mostrarLoading("Finalizando solicitud...");
+    google.script.run
+      .withSuccessHandler(function(result) {
+        ocultarLoading();
+        mostrarAviso("success", result.message);
+        cargarPanelCopias();
+      })
+      .withFailureHandler(manejarError)
+      .finalizarSolicitudCopias(id);
+  }, "Finalizar solicitud");
 }
 
 function procesarAccionCopiasDesdeUrl_() {

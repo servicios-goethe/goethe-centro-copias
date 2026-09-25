@@ -222,6 +222,63 @@
       toast.className = "toast-global hidden";
     }, 3400);
   }
+
+  function cerrarModalAccion_() {
+    const backdrop = document.getElementById("accion-modal-backdrop");
+    const modal = document.getElementById("accion-modal");
+    if (backdrop) backdrop.classList.add("hidden");
+    if (modal) modal.classList.add("hidden");
+    modalAccionPendiente_ = null;
+  }
+
+  function mostrarConfirmacionModal_(mensaje, onConfirm, titulo) {
+    const title = document.getElementById("accion-modal-title");
+    const copy = document.getElementById("accion-modal-copy");
+    const input = document.getElementById("accion-modal-input");
+    const inputWrap = document.getElementById("accion-modal-input-wrap");
+    const confirm = document.getElementById("accion-modal-confirm");
+    const backdrop = document.getElementById("accion-modal-backdrop");
+    const modal = document.getElementById("accion-modal");
+    if (!title || !copy || !confirm || !backdrop || !modal) return;
+    title.innerText = titulo || "Confirmar acción";
+    copy.innerText = mensaje || "¿Querés continuar?";
+    if (inputWrap) inputWrap.classList.add("hidden");
+    if (input) input.value = "";
+    confirm.innerText = "Confirmar";
+    modalAccionPendiente_ = function() { cerrarModalAccion_(); onConfirm(); };
+    backdrop.classList.remove("hidden");
+    modal.classList.remove("hidden");
+  }
+
+  function mostrarEntradaModal_(mensaje, onSubmit, titulo, placeholder) {
+    const title = document.getElementById("accion-modal-title");
+    const copy = document.getElementById("accion-modal-copy");
+    const input = document.getElementById("accion-modal-input");
+    const inputWrap = document.getElementById("accion-modal-input-wrap");
+    const confirm = document.getElementById("accion-modal-confirm");
+    const backdrop = document.getElementById("accion-modal-backdrop");
+    const modal = document.getElementById("accion-modal");
+    if (!title || !copy || !input || !inputWrap || !confirm || !backdrop || !modal) return;
+    title.innerText = titulo || "Ingresar datos";
+    copy.innerText = mensaje || "Completá el dato solicitado.";
+    input.value = "";
+    input.placeholder = placeholder || "";
+    inputWrap.classList.remove("hidden");
+    confirm.innerText = "Continuar";
+    modalAccionPendiente_ = function() {
+      const value = String(input.value || "").trim();
+      if (!value) { input.focus(); return; }
+      cerrarModalAccion_();
+      onSubmit(value);
+    };
+    backdrop.classList.remove("hidden");
+    modal.classList.remove("hidden");
+    window.setTimeout(function() { input.focus(); }, 0);
+  }
+
+  function confirmarModalAccion_() {
+    if (typeof modalAccionPendiente_ === "function") modalAccionPendiente_();
+  }
   
   function actualizarStockGlobal() {
     google.script.run

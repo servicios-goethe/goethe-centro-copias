@@ -468,5 +468,26 @@
         <button id="copias-confirmar-decision" class="btn btn-primary" type="button" onclick="confirmarDecisionCopias_()">Confirmar</button>
       </div>
     </div>
+
+    <div id="accion-modal-backdrop" class="modal-backdrop hidden" onclick="cerrarModalAccion_()"></div>
+    <div id="accion-modal" class="modal-card hidden" role="dialog" aria-modal="true" aria-labelledby="accion-modal-title">
+      <div class="modal-header">
+        <div>
+          <strong id="accion-modal-title">Confirmar acción</strong>
+          <div id="accion-modal-copy" class="modal-copy"></div>
+        </div>
+        <button class="btn btn-light btn-small modal-close" type="button" onclick="cerrarModalAccion_()">Cerrar</button>
+      </div>
+      <div class="modal-body">
+        <div id="accion-modal-input-wrap" class="inline-field hidden">
+          <label for="accion-modal-input">Detalle</label>
+          <input id="accion-modal-input" type="text" maxlength="500">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" type="button" onclick="cerrarModalAccion_()">Cancelar</button>
+        <button id="accion-modal-confirm" class="btn btn-primary" type="button" onclick="confirmarModalAccion_()">Confirmar</button>
+      </div>
+    </div>
   </body>
 </html>

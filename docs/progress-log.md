@@ -44,7 +44,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Producción resuelve `copias@goethemail.net` como cuenta general; desarrollo la resuelve como usuario sin perfil. La diferencia está en los datos de `Usuarios_Admin` del Spreadsheet de desarrollo, no en el código desplegado.
 - Corrección requerida en desarrollo: agregar o corregir la fila con `Email = copias@goethemail.net` y `Perfil = general`. También se aceptan los alias `terminal` o `cuenta general`.
 - El rol se mantiene en caché hasta 300 segundos. Después de corregir la fila, esperar hasta cinco minutos y recargar la aplicación.
-- El deployment de desarrollo vigente es la versión 35, `Desarrollo - copias agrupadas por nivel y solo PDF`; usar ese deployment y no un enlace anterior.
+- El deployment de desarrollo vigente es la versión 36, `Desarrollo - refresco automatico de copias cada 5 minutos`; usar ese deployment y no un enlace anterior.
 - La ejecución remota administrativa no está disponible para la cuenta actual, por lo que esta modificación de datos requiere acceso directo al Spreadsheet de desarrollo o habilitar la ejecución de Apps Script para la cuenta técnica.
 
 ### Hito 2 — Material no listado
@@ -166,3 +166,12 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `9cdf0f9` (`fix(copias): probe Drive folder write access`).
 - Sincronizado con GAS de desarrollo a las 16:56 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 34 creada y deployment de desarrollo actualizado.
+
+## 2026-09-25 — Refresco automático de copias pendientes
+
+- Las ventanas de administración y operación consultan silenciosamente las copias pendientes cada cinco minutos mientras permanecen visibles.
+- El refresco no reinicia los campos del formulario ni muestra un indicador intrusivo; se evita otra consulta si ya hay una carga en curso.
+- La ventana que registra una nueva solicitud continúa actualizando su propia lista inmediatamente después del alta; las demás ventanas la incorporan en el siguiente ciclo.
+- Commit: `4a6b067` (`feat(copias): refresh operator queue automatically`).
+- Sincronizado con GAS de desarrollo a las 15:51 UTC, preservando `AppConfig.js` de desarrollo.
+- Versión GAS 36 creada y deployment de desarrollo actualizado a las 15:51 UTC.

@@ -319,22 +319,22 @@
           </div>
         </section>
 
-        <section id="sec-productos" class="card collapsible-card admin-section" data-section="admin-productos">
+        <section id="sec-productos" class="card collapsible-card redesign-card products-redesign-card admin-section" data-section="admin-productos">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-productos')">
             <span>
-              <strong class="admin-section-title">Alta de producto</strong>
-              <span class="collapsible-copy">Crea el producto y su stock inicial sin editar las hojas a mano.</span>
+              <strong class="admin-section-title">Alta de producto · Neues Produkt</strong>
+              <span class="collapsible-copy">Creá el producto y su stock inicial. · Produkt und Anfangsbestand anlegen.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="admin-productos">Expandir</span>
           </button>
           <div class="collapsible-body" data-body-for="admin-productos">
             <div class="inline-field-grid">
               <div class="inline-field">
-                <label for="producto-categoria">Categoria</label>
-                <input id="producto-categoria" type="text" placeholder="Ej.: Papel, Cartulina, Libreria">
+                <label for="producto-categoria">Categoría · Kategorie</label>
+                <input id="producto-categoria" type="text" placeholder="Ej.: Papel, Cartulina, Librería">
               </div>
               <div class="inline-field">
-                <label for="producto-unidad">Unidad</label>
+                <label for="producto-unidad">Unidad · Einheit</label>
                 <input id="producto-unidad" type="text" value="unidad">
               </div>
               <div class="inline-field">
@@ -342,21 +342,21 @@
                 <input id="producto-nombre-es" type="text" placeholder="Nombre en castellano">
               </div>
               <div class="inline-field">
-                <label for="producto-nombre-de">Nombre DE</label>
+                <label for="producto-nombre-de">Name DE</label>
                 <input id="producto-nombre-de" type="text" placeholder="Nombre en aleman">
               </div>
               <div class="inline-field">
-                <label for="producto-stock-minimo">Stock minimo</label>
+                <label for="producto-stock-minimo">Stock mínimo · Mindestbestand</label>
                 <input id="producto-stock-minimo" type="number" min="0" step="1" value="0">
               </div>
               <div class="inline-field">
-                <label for="producto-stock-inicial">Stock inicial</label>
+                <label for="producto-stock-inicial">Stock inicial · Anfangsbestand</label>
                 <input id="producto-stock-inicial" type="number" min="0" step="1" value="0">
               </div>
             </div>
             <div class="pedido-footer">
-              <div class="section-note">El ID se genera automaticamente desde la categoria.</div>
-              <button class="btn btn-primary" type="button" onclick="crearProductoDesdeAdmin()">Crear producto</button>
+              <div class="section-note">El ID se genera desde la categoría. · Die ID wird aus der Kategorie erzeugt.</div>
+              <button class="btn btn-primary" type="button" onclick="crearProductoDesdeAdmin()">Crear producto · Produkt anlegen</button>
             </div>
           </div>
         </section>
@@ -411,11 +411,11 @@
           </div>
         </section>
 
-        <section id="sec-actividad" class="card collapsible-card" data-section="admin-actividad">
+        <section id="sec-actividad" class="card collapsible-card redesign-card products-redesign-card" data-section="admin-actividad">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-actividad')">
             <span>
-              <strong>Actividad reciente / Letzte Aktivitaet</strong>
-              <span class="collapsible-copy">Resumen de acciones administrativas y cambios recientes del sistema.</span>
+              <strong>Actividad reciente · Letzte Aktivität</strong>
+              <span class="collapsible-copy">Resumen de acciones administrativas. · Zusammenfassung der letzten Aktionen.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="admin-actividad">Expandir</span>
           </button>

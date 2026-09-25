@@ -293,7 +293,12 @@
   }
   
   function setupUI(role) {
-    document.getElementById("user-info").innerText = role.email;
+    const userInfo = document.getElementById("user-info");
+    if (userInfo) userInfo.innerText = role.email;
+    const avatar = document.getElementById("user-avatar");
+    if (avatar) avatar.innerText = obtenerInicialesUsuario_(role.email);
+    const roleInfo = document.getElementById("user-role-info");
+    if (roleInfo) roleInfo.innerText = obtenerEtiquetaRolRedisenio_(role);
     document.getElementById("view-user").classList.remove("hidden");
     ordenarSeccionesUsuario_(role);
   
@@ -335,6 +340,18 @@
     }
 
     renderNavegacionRedisenio_(role);
+  }
+
+  function obtenerInicialesUsuario_(email) {
+    const local = String(email || "?").split("@")[0].replace(/[._-]+/g, " ").trim();
+    const partes = local.split(/\s+/).filter(Boolean);
+    return (partes.slice(0, 2).map(function(parte) { return parte.charAt(0); }).join("" ) || "?").toUpperCase();
+  }
+
+  function obtenerEtiquetaRolRedisenio_(role) {
+    if (role && role.isOperadorEntrega) return "Operador · Operator";
+    if (role && role.isAdmin) return "Administrador · Administrator";
+    return "Usuario · Benutzer";
   }
 
   function obtenerConfiguracionNavegacionRedisenio_(role, modulo) {

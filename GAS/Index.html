@@ -6,12 +6,18 @@
   </head>
   <body>
     <div id="loading"><h3 style="color: var(--primary)">Iniciando sistema... / System wird gestartet...</h3></div>
-    <nav class="navbar">
-      <strong>INVENTARIO GOETHE / GOETHE INVENTAR</strong>
+    <nav class="navbar redesign-header">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">G</span>
+        <span class="brand-copy"><strong>Pedidos Gráfica</strong><small>Grafik-Bestellungen</small></span>
+      </div>
       <div class="nav-tools">
         <span id="app-version-info" class="app-version-pill">Version GAS: cargando...</span>
-        <button class="btn btn-light btn-small" type="button" onclick="toggleInstructivo(true)">Instructivo</button>
-        <span id="user-info" style="font-size: 0.8rem;"></span>
+        <button class="btn btn-light btn-small instructivo-button" type="button" onclick="toggleInstructivo(true)">Instructivo · Anleitung</button>
+        <span id="user-chip" class="user-chip">
+          <span id="user-avatar" class="user-avatar" aria-hidden="true">?</span>
+          <span class="user-chip-copy"><strong id="user-info"></strong><small id="user-role-info">Usuario · Benutzer</small></span>
+        </span>
       </div>
     </nav>
 
@@ -224,7 +230,7 @@
       </div>
 
       <div id="view-admin" class="hidden">
-        <div class="card">
+        <div class="card legacy-admin-summary">
           <div class="section-header">
             <div>
               <h2 id="admin-title">Admin</h2>

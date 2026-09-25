@@ -1193,6 +1193,56 @@
     padding: 20px 24px 0;
   }
 
+  .redesign-header {
+    min-height: 68px;
+    padding: 12px 24px;
+    background: #fff;
+    border-bottom: 1px solid #e3dccb;
+    color: #13261b;
+  }
+  .brand-lockup { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .brand-mark {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #0a6334;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+  .brand-copy { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-copy strong { font-size: 1.15rem; font-weight: 800; }
+  .brand-copy small { margin-top: 3px; color: #7a5f25; font-size: .76rem; font-weight: 600; }
+  .redesign-header .nav-tools { gap: 12px; }
+  .redesign-header .app-version-pill { display: none; }
+  .instructivo-button { border-radius: 999px; }
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px 5px 5px;
+    border: 1px solid #e3dccb;
+    border-radius: 999px;
+    background: #faf8f3;
+  }
+  .user-avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0a6334;
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 800;
+  }
+  .user-chip-copy { display: flex; flex-direction: column; min-width: 0; line-height: 1.1; }
+  .user-chip-copy strong { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
+  .user-chip-copy small { margin-top: 3px; color: #7a5f25; font-size: .68rem; font-weight: 600; }
+  .legacy-admin-summary { display: none !important; }
+
   .module-switcher {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1359,6 +1409,13 @@
   .products-redesign-card .activity-item:last-child { border-bottom: 0; }
 
   @media (max-width: 640px) {
+    .redesign-header { padding: 10px 14px; }
+    .brand-mark { width: 32px; height: 32px; font-size: 1rem; }
+    .brand-copy strong { font-size: .9rem; }
+    .brand-copy small { font-size: .62rem; }
+    .instructivo-button, .user-chip-copy { display: none; }
+    .user-chip { padding: 0; border: 0; background: transparent; }
+    .user-avatar { width: 36px; height: 36px; }
     .redesign-navigation { padding: 14px 14px 0; }
     .module-switcher { gap: 8px; }
     .module-tile { padding: 12px; }

@@ -10,7 +10,7 @@ const COPIAS_HEADERS = [
 const COPIAS_USUARIOS_HEADERS = ["Email", "Nivel", "Puede_Autorizar", "Activo"];
 const COPIAS_USUARIOS_ALTERNATIVA = "Autorizados_Copias";
 const COPIAS_LOG_HEADERS = ["Fecha", "Usuario", "ID_Solicitud", "Accion", "Detalle"];
-const COPIAS_EXTENSIONS = ["pdf", "doc", "docx", "jpg", "png", "txt", "zip"];
+const COPIAS_EXTENSIONS = ["pdf"];
 
 function asegurarEstructuraCopias_(ss) {
   asegurarHojaCopias_(ss, TABS.COPIAS, COPIAS_HEADERS);
@@ -288,7 +288,7 @@ function registrarSolicitudCopias(form) {
     if (!blob || typeof blob.getName !== "function") throw new Error("Selecciona un archivo para copiar.");
     const archivoNombre = String(blob.getName() || "").trim();
     const extension = extensionArchivoCopias_(archivoNombre);
-    if (!COPIAS_EXTENSIONS.includes(extension)) throw new Error("Formato no admitido. Usa PDF, DOC, DOCX, JPG, PNG, TXT o ZIP.");
+    if (!COPIAS_EXTENSIONS.includes(extension)) throw new Error("Formato no admitido. Solo se aceptan archivos PDF.");
     const archivoBytes = blob.getBytes().length;
     if (archivoBytes < 1) throw new Error("El archivo esta vacio.");
     if (archivoBytes > CONFIG.COPIAS_MAX_FILE_BYTES) throw new Error("El archivo supera el maximo de 80 MB.");

@@ -95,17 +95,23 @@ function validarArchivoCopiasCliente_(input) {
   }
   const maxBytes = 80 * 1024 * 1024;
   const extension = String(file.name || "").split(".").pop().toLowerCase();
-  const permitidas = ["pdf", "doc", "docx", "jpg", "png", "txt", "zip"];
+  const permitidas = ["pdf"];
   if (!permitidas.includes(extension)) {
     input.value = "";
     if (info) info.innerText = "Formato no admitido.";
-    mostrarAviso("error", "Formato no admitido. Usa PDF, DOC, DOCX, JPG, PNG, TXT o ZIP.");
+    mostrarAviso("error", "Formato no admitido. Solo se aceptan archivos PDF.");
     return false;
   }
   if (file.size > maxBytes) {
     input.value = "";
     if (info) info.innerText = "El archivo supera los 80 MB.";
     mostrarAviso("error", "El archivo supera el maximo de 80 MB.");
+    return false;
+  }
+  if (String(file.type || "").toLowerCase() && String(file.type || "").toLowerCase() !== "application/pdf") {
+    input.value = "";
+    if (info) info.innerText = "El archivo debe ser PDF.";
+    mostrarAviso("error", "El archivo debe ser PDF.");
     return false;
   }
   if (info) info.innerText = `${file.name} - ${(file.size / 1024 / 1024).toFixed(1)} MB`;
@@ -158,6 +164,15 @@ function claseEstadoCopias_(estado) {
   return "status-warning";
 }
 
+function metaNivelCopias_(nivel) {
+  const claves = {
+    KG: { titulo: "Jardín", clase: "copies-group-kinder" },
+    EP: { titulo: "Primaria", clase: "copies-group-primary" },
+    ES: { titulo: "Secundaria", clase: "copies-group-secondary" }
+  };
+  return claves[String(nivel || "").toUpperCase()] || { titulo: "Otros", clase: "copies-group-other" };
+}
+
 function renderizarTarjetaCopias_(item, operativa) {
   const finalizar = operativa && item.estado === "AUTORIZADO"
     ? `<button class="btn btn-primary btn-small" type="button" onclick="finalizarSolicitudCopiasUI_('${escapeHtml_(item.id)}')">Marcar finalizado</button>`
@@ -166,16 +181,15 @@ function renderizarTarjetaCopias_(item, operativa) {
     ? `<div class="copies-note"><strong>Motivo:</strong> ${escapeHtml_(item.motivoRechazo)}</div>`
     : "";
   const nombreSolicitante = item.solicitanteNombre || item.solicitante || "-";
-  return `<article class="copies-item">
+  const grupo = metaNivelCopias_(item.nivel);
+  return `<article class="copies-item ${grupo.clase}">
     <div class="copies-item-main">
       <div>
         <div class="admin-title-row">
-          <strong>${escapeHtml_(item.id)}</strong>
           <span class="status-pill ${claseEstadoCopias_(item.estado)}">${escapeHtml_(item.estado)}</span>
-          <span class="status-pill status-neutral">${escapeHtml_(item.nivel)}</span>
         </div>
         <div class="admin-meta">
-          <span><strong>Solicitante:</strong> ${escapeHtml_(nombreSolicitante)}</span>
+          <span class="copies-requester-name">${escapeHtml_(nombreSolicitante)}</span>
           <span><strong>Fecha/Hora:</strong> ${escapeHtml_(item.fecha)}</span>
           <span>${escapeHtml_(item.cantidadCopias)} copia(s) · ${escapeHtml_(item.paginasOriginal)} pagina(s) · ${escapeHtml_(item.tamano)} · ${escapeHtml_(item.modalidad)} · Doble faz ${escapeHtml_(item.dobleFaz)} · Color ${escapeHtml_(item.color)}</span>
         </div>
@@ -216,8 +230,18 @@ function renderizarCopiasOperativas_() {
   });
   const resumen = document.getElementById("admin-copias-resumen");
   if (resumen) resumen.innerText = `${filtradas.length} solicitud(es)`;
+  const ordenNivel = ["KG", "EP", "ES", "OTROS"];
+  const grupos = {};
+  filtradas.forEach(function(item) {
+    const nivel = ["KG", "EP", "ES"].includes(String(item.nivel || "").toUpperCase()) ? String(item.nivel).toUpperCase() : "OTROS";
+    if (!grupos[nivel]) grupos[nivel] = [];
+    grupos[nivel].push(item);
+  });
   container.innerHTML = filtradas.length
-    ? filtradas.map(function(item) { return renderizarTarjetaCopias_(item, true); }).join("")
+    ? ordenNivel.filter(function(nivel) { return grupos[nivel] && grupos[nivel].length; }).map(function(nivel) {
+        const meta = metaNivelCopias_(nivel);
+        return `<section class="copies-group ${meta.clase}"><div class="copies-group-header"><h3>${escapeHtml_(meta.titulo)}</h3><span>${grupos[nivel].length} solicitud(es)</span></div><div class="copies-group-list">${grupos[nivel].map(function(item) { return renderizarTarjetaCopias_(item, true); }).join("")}</div></section>`;
+      }).join("")
     : '<div class="empty-state">No hay solicitudes para el filtro actual.</div>';
 }
 

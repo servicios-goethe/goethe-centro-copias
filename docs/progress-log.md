@@ -147,6 +147,14 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `f07288a` (`feat(copias): resolve requester and authorization data`).
 - Sincronizado con GAS de desarrollo a las 15:48 UTC, preservando `AppConfig.js` de desarrollo.
 - Versión GAS 32 creada y deployment de desarrollo actualizado a las 15:52 UTC.
+
+## 2026-09-25 — Organización visual y PDF en copias
+
+- Las tarjetas operativas ya no muestran el código interno `COP-...`.
+- El nombre del solicitante se muestra destacado, sin la etiqueta redundante “Solicitante”.
+- Las solicitudes administrativas se agrupan por Jardín (`KG`), Primaria (`EP`) y Secundaria (`ES`), con tratamiento cromático diferenciado.
+- Las secciones administrativas se identifican explícitamente como solicitudes de materiales de librería y solicitudes de copias.
+- La carga de archivos de copias queda restringida a PDF en cliente y servidor.
 - Se agrega `verificarAccesoDriveCopias()`, una comprobación de solo lectura para disparar la autorización OAuth y confirmar el acceso efectivo a la carpeta configurada.
 - Commit: `1300f2b` (`fix(copias): add drive authorization check`).
 - Sincronizado con GAS de desarrollo a las 16:47 UTC, preservando `AppConfig.js` de desarrollo.

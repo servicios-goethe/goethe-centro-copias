@@ -125,7 +125,7 @@
                   <h2>Solicitud de copias</h2>
                   <p class="section-copy">Completa los datos del trabajo. Maximo 80 MB.</p>
                 </div>
-                <span class="section-note">PDF, DOC, DOCX, JPG, PNG, TXT o ZIP</span>
+                <span class="section-note">Solo PDF · Maximo 80 MB</span>
               </div>
 
               <div class="copies-form-grid">
@@ -141,7 +141,7 @@
                 </div>
                 <div class="inline-field copies-field-wide">
                   <label for="copias-archivo">Archivo</label>
-                  <input id="copias-archivo" name="archivo" type="file" accept=".pdf,.doc,.docx,.jpg,.png,.txt,.zip" required onchange="validarArchivoCopiasCliente_(this)">
+                  <input id="copias-archivo" name="archivo" type="file" accept=".pdf,application/pdf" required onchange="validarArchivoCopiasCliente_(this)">
                   <span id="copias-archivo-info" class="field-help">Selecciona un archivo de hasta 80 MB.</span>
                 </div>
                 <div class="inline-field">
@@ -237,8 +237,8 @@
         <section id="sec-pedidos" class="card collapsible-card admin-section admin-section-pedidos" data-section="admin-pedidos">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-pedidos')">
             <span>
-              <strong class="admin-section-title">Gestion de pedidos / Anfragen verwalten</strong>
-              <span class="collapsible-copy">Procesa lineas por pedido en un solo paso: listo, retiro y cancelacion de saldos.</span>
+              <strong class="admin-section-title">Solicitudes de materiales de libreria / Materialanfragen</strong>
+              <span class="collapsible-copy">Gestiona pedidos de materiales, preparacion, retiro y saldos pendientes.</span>
             </span>
             <span class="section-indicator-pack">
               <span id="admin-pedidos-resumen" class="status-pill status-neutral">0 pedidos</span>
@@ -371,8 +371,8 @@
         <section id="sec-copias" class="card collapsible-card admin-section copies-section" data-section="admin-copias">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('admin-copias')">
             <span>
-              <strong class="admin-section-title">Gestion de copias</strong>
-              <span class="collapsible-copy">Consulta trabajos autorizados y marcalos listos para retirar.</span>
+              <strong class="admin-section-title">Solicitudes de copias / Kopieranfragen</strong>
+              <span class="collapsible-copy">Consulta trabajos por nivel, autorización y estado de retiro.</span>
             </span>
             <span class="section-indicator-pack">
               <span id="admin-copias-resumen" class="status-pill status-neutral">0 solicitudes</span>

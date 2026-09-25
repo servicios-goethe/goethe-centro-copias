@@ -153,7 +153,7 @@ La última igualdad puede dejar de cumplirse después de una cancelación de sal
 - Modalidades admitidas: `ARMADAS`, `APILADAS`.
 - Doble faz y color se normalizan a `SI` o `NO`.
 - El comentario se recorta a 500 caracteres.
-- Extensiones admitidas: PDF, DOC, DOCX, JPG, PNG, TXT y ZIP.
+- Extensión admitida: únicamente PDF.
 - El archivo debe contener al menos un byte y no superar 80 MB.
 - El archivo se guarda en Drive bajo `<año>/<nivel>/<ID solicitud>/` y se renombra anteponiendo el ID.
 - El ID usa `COP-<yyyyMMdd>-<secuencia de cuatro dígitos>`; la secuencia diaria se mantiene en Script Properties y la creación está protegida por lock.

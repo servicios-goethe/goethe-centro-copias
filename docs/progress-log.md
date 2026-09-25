@@ -210,6 +210,15 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 6
+
+- `Productos y stock · Produkte & Bestand` adopta tarjetas, campos bilingües y barra de acción para alta de productos.
+- `Actividad reciente · Letzte Aktivität` adopta la misma superficie visual y conserva su listado actual.
+- Se mantienen `crearProductoDesdeAdmin()`, el ajuste de stock existente y la carga de actividad desde el dashboard.
+- Commit: `194ee0b` (`feat(rediseno): style products and activity`).
+- GAS de desarrollo: versión 44, `Rediseno Hito 6 - productos y actividad`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 5
 
 - `Compras y recepción · Einkauf & Eingang` adopta tarjetas de lote, filtros bilingües y jerarquía visual para solicitado, recibido y saldo.

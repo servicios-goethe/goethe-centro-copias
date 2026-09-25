@@ -40,11 +40,11 @@
 
     <div class="container">
       <div id="view-user" class="hidden">
-        <section class="card card-grid collapsible-card admin-section admin-section-compras" data-section="user-pedido">
+        <section class="card card-grid collapsible-card redesign-card admin-section admin-section-compras" data-section="user-pedido">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('user-pedido')">
             <span>
-              <strong class="admin-section-title">Nuevo pedido / Neue Anfrage</strong>
-              <span class="collapsible-copy">Selecciona articulos y carga las cantidades para tu pedido.</span>
+              <strong class="admin-section-title">Nuevo pedido · Neue Anfrage</strong>
+              <span class="collapsible-copy">Seleccioná artículos y cargá las cantidades. · Produkte und Mengen auswählen.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="user-pedido">Ocultar</span>
           </button>
@@ -54,7 +54,7 @@
             </div>
 
             <div class="toolbar">
-              <input id="buscador-productos" type="search" placeholder="Buscar producto / Produkt suchen" oninput="actualizarVistaProductos()">
+              <input id="buscador-productos" type="search" placeholder="Buscar por nombre o ID · Produkt suchen" oninput="actualizarVistaProductos()">
               <label class="toggle">
                 <input id="filtro-seleccionados" type="checkbox" onchange="actualizarVistaProductos()">
                 <span>Solo seleccionados / Nur ausgewaehlte</span>
@@ -110,11 +110,11 @@
           </div>
         </section>
 
-        <section id="user-mis-pedidos-section" class="card collapsible-card" data-section="user-mis-pedidos">
+        <section id="user-mis-pedidos-section" class="card collapsible-card redesign-card" data-section="user-mis-pedidos">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('user-mis-pedidos')">
             <span>
-              <strong>Mis pedidos / Meine Anfragen</strong>
-              <span class="collapsible-copy">Edita o elimina items propios mientras no hayan sido preparados.</span>
+              <strong>Mis pedidos · Meine Anfragen</strong>
+              <span class="collapsible-copy">Editá o eliminá tus pedidos mientras no hayan sido preparados. · Eigene Anfragen bearbeiten.</span>
             </span>
             <span class="collapsible-indicator" data-indicator-for="user-mis-pedidos">Expandir</span>
           </button>
@@ -126,7 +126,7 @@
           </div>
         </section>
 
-        <section class="card collapsible-card admin-section admin-section-recepcion copies-section" data-section="user-copias">
+        <section class="card collapsible-card redesign-card admin-section admin-section-recepcion copies-section" data-section="user-copias">
           <button class="collapsible-toggle" type="button" onclick="toggleSection('user-copias')">
             <span>
               <strong class="admin-section-title">Solicitud de copias / Fotokopierantrag</strong>

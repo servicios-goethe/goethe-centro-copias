@@ -390,7 +390,11 @@
     const tabSeleccionada = tabs.find(function(tab) { return tab.key === activa; });
     if (tabSeleccionada) tabSeleccionada.panels.forEach(function(panel) {
       const node = document.querySelector(`[data-section="${panel}"]`);
-      if (node && !node.classList.contains("hidden")) node.classList.remove("redesign-panel-hidden");
+      if (node && !node.classList.contains("hidden")) {
+        node.classList.remove("redesign-panel-hidden", "is-collapsed");
+        const body = node.querySelector(`[data-body-for="${panel}"]`);
+        if (body) body.style.display = "";
+      }
     });
   }
 

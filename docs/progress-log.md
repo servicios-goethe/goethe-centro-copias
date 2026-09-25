@@ -209,3 +209,11 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `1ed722f` (`feat(rediseno): style material request and own orders`).
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
+
+## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 3
+
+- La solapa `Entregas · Ausgaben` adopta tarjetas operativas, buscador bilingüe, filtro de faltantes y jerarquía visual de solicitante, estado y líneas.
+- Se conservaron las acciones actuales de preparar, procesar, entregar completa/parcial, cancelar saldo, deshacer preparación, corregir cantidades y ajustar stock.
+- Commit: `c85209f` (`feat(rediseno): style deliveries workspace`).
+- GAS de desarrollo: versión 41, `Rediseno Hito 3 - entregas operativas`.
+- Producción, `main` y la rama funcional no fueron modificadas.

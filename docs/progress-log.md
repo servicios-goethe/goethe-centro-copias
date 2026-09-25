@@ -200,3 +200,12 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit del paquete: `c48e44a`; commit del Hito 1: `bb3d409`.
 - GAS de desarrollo: versión 39, `Rediseno Hito 1 - shell y navegacion por rol`.
 - Producción y `main` no fueron modificadas.
+
+## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 2
+
+- `Nuevo pedido` y `Mis pedidos` adoptan tarjetas, encabezados, buscador, resumen y barra de envío con el lenguaje visual del rediseño.
+- La navegación deja visible una sola solapa de materiales por vez y fuerza la apertura del contenido activo sin alterar sus funciones existentes.
+- Se conservaron los contratos actuales de carga de productos, selección de cantidades, pedidos no listados, edición y eliminación de pedidos propios.
+- Commit: `1ed722f` (`feat(rediseno): style material request and own orders`).
+- GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
+- Producción, `main` y la rama funcional no fueron modificadas.

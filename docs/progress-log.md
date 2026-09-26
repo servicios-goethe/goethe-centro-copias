@@ -210,6 +210,15 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-26 — Rediseño Pedidos Gráfica: Hito 8 y cierre visual
+
+- Se ajustó el responsive para 390 px y escritorio: header compacto, grillas de una columna, tablas sin stock en móvil y barra de envío sticky.
+- Los avisos temporales se ubican como toast superior y se unificó el fondo cálido del nuevo shell.
+- El título de la web app pasa a `Pedidos Gráfica`.
+- Commit: `651f8d9` (`feat(rediseno): polish responsive shell and branding`).
+- GAS de desarrollo: versión 51, `Rediseno Hito 8 - responsive y cierre visual`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-26 — Rediseño Pedidos Gráfica: Hito 7
 
 - La pantalla `Nueva solicitud · Neuer Auftrag` de copias incorpora resumen dinámico de páginas, cantidad, especificación y autorización.

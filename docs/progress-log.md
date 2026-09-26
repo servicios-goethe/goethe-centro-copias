@@ -210,6 +210,14 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-26 — Logo oficial en el header del rediseño
+
+- El header usa el logo oficial Goethe Schule desde `https://goethe.edu.ar/wp-content/uploads/2020/03/goethe-schule.svg`.
+- Se agregó un fallback visual con la inicial `G` si el recurso externo no estuviera disponible.
+- Commit: `8f0c9c9` (`style(rediseno): use official Goethe logo`).
+- GAS de desarrollo: versión 48, `Rediseno - logo oficial Goethe`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-26 — Corrección de solapas de copias
 
 - `Nueva solicitud · Neuer Auftrag` ahora muestra solamente el formulario de carga.

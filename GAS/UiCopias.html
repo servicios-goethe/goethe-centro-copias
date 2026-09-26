@@ -7,6 +7,27 @@ let solicitantesCopiasBusquedaTimer_ = null;
 let copiasRefreshTimer_ = null;
 let copiasCargaEnCurso_ = false;
 
+function actualizarResumenCopiasUI_() {
+  const paginas = Number((document.getElementById("copias-paginas") || {}).value || 0);
+  const cantidad = Number((document.getElementById("copias-cantidad") || {}).value || 0);
+  const total = paginas > 0 && cantidad > 0 ? paginas * cantidad : 0;
+  const nivel = String((document.getElementById("copias-nivel") || {}).value || "");
+  const tamano = String((document.getElementById("copias-tamano") || {}).value || "A4");
+  const modalidad = String((document.getElementById("copias-modalidad") || {}).value || "");
+  const dobleFaz = document.querySelector('input[name="dobleFaz"]:checked');
+  const color = document.querySelector('input[name="color"]:checked');
+  const totalNode = document.getElementById("copias-resumen-total");
+  const detalleNode = document.getElementById("copias-resumen-detalle");
+  const autorizacionNode = document.getElementById("copias-resumen-autorizacion");
+  if (totalNode) totalNode.innerText = String(total);
+  if (detalleNode) detalleNode.innerText = `${tamano} · ${paginas || 0} pág. × ${cantidad || 0} · ${modalidad || "modalidad"} · Doble faz ${dobleFaz ? dobleFaz.value : "-"} · Color ${color ? color.value : "-"}`;
+  if (autorizacionNode) autorizacionNode.innerText = nivel === "ES"
+    ? "ES ingresa autorizada directamente. · ES wird automatisch freigegeben."
+    : nivel === "KG" || nivel === "EP"
+      ? `${nivel} requiere autorización antes de imprimir. · ${nivel} muss vorher freigegeben werden.`
+      : "KG y EP requieren autorización; ES ingresa autorizada. · KG/EP brauchen Freigabe, ES nicht.";
+}
+
 function prepararSolicitanteCopiasUI_() {
   google.script.run
     .withSuccessHandler(function(data) {
@@ -155,6 +176,7 @@ function enviarSolicitudCopias(form, event) {
         button.innerText = "Enviar solicitud";
       }
       form.reset();
+      actualizarResumenCopiasUI_();
       const info = document.getElementById("copias-archivo-info");
       if (info) info.innerText = "Selecciona un archivo de hasta 80 MB.";
       mostrarAviso("success", result.message || "Solicitud registrada.");

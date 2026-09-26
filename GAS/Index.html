@@ -145,8 +145,8 @@
               <form id="copias-form" onsubmit="enviarSolicitudCopias(this, event)">
               <div class="section-header">
                 <div>
-                  <h2>Solicitud de copias</h2>
-                  <p class="section-copy">Completa los datos del trabajo. Maximo 80 MB.</p>
+                  <h2>Nueva solicitud <span>· Neuer Auftrag</span></h2>
+                  <p class="section-copy">Cargá el archivo y los detalles del trabajo. · Datei und Auftragsdetails eingeben.</p>
                 </div>
                 <span class="section-note">Solo PDF · Maximo 80 MB</span>
               </div>
@@ -169,7 +169,7 @@
                 </div>
                 <div class="inline-field">
                   <label for="copias-nivel">Nivel</label>
-                  <select id="copias-nivel" name="nivel" required>
+                  <select id="copias-nivel" name="nivel" required onchange="actualizarResumenCopiasUI_()">
                     <option value="">Seleccionar</option>
                     <option value="KG">KG</option>
                     <option value="EP">EP</option>
@@ -178,15 +178,15 @@
                 </div>
                 <div class="inline-field">
                   <label for="copias-paginas">Paginas del original</label>
-                  <input id="copias-paginas" name="paginasOriginal" type="number" min="1" step="1" required>
+                  <input id="copias-paginas" name="paginasOriginal" type="number" min="1" step="1" required oninput="actualizarResumenCopiasUI_()">
                 </div>
                 <div class="inline-field">
                   <label for="copias-cantidad">Cantidad de copias</label>
-                  <input id="copias-cantidad" name="cantidadCopias" type="number" min="1" step="1" required>
+                  <input id="copias-cantidad" name="cantidadCopias" type="number" min="1" step="1" required oninput="actualizarResumenCopiasUI_()">
                 </div>
                 <div class="inline-field">
                   <label for="copias-tamano">Tamano</label>
-                  <select id="copias-tamano" name="tamano" required>
+                  <select id="copias-tamano" name="tamano" required onchange="actualizarResumenCopiasUI_()">
                     <option value="A4">A4</option>
                     <option value="A3">A3</option>
                     <option value="OFICIO">Oficio / Legal</option>
@@ -194,26 +194,34 @@
                 </div>
                 <div class="inline-field">
                   <label for="copias-modalidad">Modalidad</label>
-                  <select id="copias-modalidad" name="modalidad" required>
+                  <select id="copias-modalidad" name="modalidad" required onchange="actualizarResumenCopiasUI_()">
                     <option value="ARMADAS">Armadas / Geheftet</option>
                     <option value="APILADAS">Apiladas / Gestapelt</option>
                   </select>
                 </div>
                 <fieldset class="copies-choice-group">
                   <legend>Doble faz</legend>
-                  <label><input type="radio" name="dobleFaz" value="SI" required> Si / Ja</label>
-                  <label><input type="radio" name="dobleFaz" value="NO" required> No / Nein</label>
+                  <label><input type="radio" name="dobleFaz" value="SI" required onchange="actualizarResumenCopiasUI_()"> Si / Ja</label>
+                  <label><input type="radio" name="dobleFaz" value="NO" required onchange="actualizarResumenCopiasUI_()"> No / Nein</label>
                 </fieldset>
                 <fieldset class="copies-choice-group">
                   <legend>Copia color</legend>
-                  <label><input type="radio" name="color" value="SI" required> Si / Ja</label>
-                  <label><input type="radio" name="color" value="NO" required> No / Nein</label>
+                  <label><input type="radio" name="color" value="SI" required onchange="actualizarResumenCopiasUI_()"> Si / Ja</label>
+                  <label><input type="radio" name="color" value="NO" required onchange="actualizarResumenCopiasUI_()"> No / Nein</label>
                 </fieldset>
                 <div class="inline-field copies-field-wide">
                   <label for="copias-comentario">Comentario</label>
                   <textarea id="copias-comentario" name="comentario" maxlength="500" rows="4" placeholder="Indicaciones adicionales para el trabajo"></textarea>
                 </div>
               </div>
+
+              <aside class="copies-summary-card" aria-live="polite">
+                <span class="copies-summary-label">Resumen · Übersicht</span>
+                <strong id="copias-resumen-total">0</strong>
+                <span>páginas impresas · gedruckte Seiten</span>
+                <span id="copias-resumen-detalle" class="copies-summary-detail">Completá páginas y copias. · Seiten und Kopien eingeben.</span>
+                <span id="copias-resumen-autorizacion" class="copies-summary-note">KG y EP requieren autorización; ES ingresa autorizada.</span>
+              </aside>
 
               <div class="pedido-footer">
                 <span class="section-note">KG y EP requieren autorizacion. ES ingresa autorizado.</span>

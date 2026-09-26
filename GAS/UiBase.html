@@ -110,14 +110,19 @@
       "arte y plástica": "Kunst",
       "arte y plastica": "Kunst",
       "acrílicos": "Acrylfarben",
-      "acrilicos": "Acrylfarben"
+      "acrilicos": "Acrylfarben",
+      "adhesivo": "Klebstoff",
+      "bibliorato": "Ordner",
+      "aros metálicos": "Metallringe"
     };
     const clave = original.toLocaleLowerCase("es");
     const traduccion = traducciones[clave] ||
       (clave.includes("acrílic") || clave.includes("acrilic") ? "Acrylfarben" :
       clave.includes("papel") ? "Papier" :
       clave.includes("cartulin") ? "Karton" :
-      clave.includes("librer") ? "Schreibwaren" : "Kategorie");
+      clave.includes("librer") ? "Schreibwaren" :
+      clave.includes("adhesiv") ? "Klebstoff" :
+      clave.includes("bibliorat") ? "Ordner" : "Kategorie");
     return original + " / " + traduccion;
   }
 

@@ -1410,7 +1410,7 @@
   .redesign-card .category-toggle-btn {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
     padding: 12px 20px;
     border: 0;
@@ -1420,6 +1420,7 @@
     font-weight: 700;
     text-align: left;
   }
+  .redesign-card .category-toggle-btn .category-meta { margin-left: auto; }
   .redesign-card .category-toggle-btn::before {
     content: "›";
     display: inline-grid;
@@ -1443,8 +1444,12 @@
   .redesign-card .grid-table tbody tr:not(.category-row) td { padding-top: 10px; padding-bottom: 10px; border-color: #e3dccb; }
   .redesign-card .grid-table .producto-cell { padding-left: 42px; font-weight: 700; }
   .redesign-card .grid-table .cantidad-input {
-    width: 54px;
-    min-width: 54px;
+    flex: 0 0 66px;
+    width: 66px;
+    min-width: 66px;
+    max-width: 66px;
+    padding-left: 2px;
+    padding-right: 2px;
     border: 1.5px solid #e3dccb;
     border-radius: 999px;
     background: #fff;
@@ -1597,7 +1602,12 @@
     .redesign-card .grid-table .producto-cell { padding-left: 18px; }
     .redesign-card .grid-table .col-id,
     .redesign-card .grid-table .producto-id { display: none; }
-    .redesign-card .grid-table .cantidad-input { width: 54px; min-width: 54px; }
+    .redesign-card .grid-table .cantidad-input {
+      flex-basis: 66px;
+      width: 66px;
+      min-width: 66px;
+      max-width: 66px;
+    }
     .redesign-card .grid-table .quantity-stepper { min-width: 126px; }
     #view-user .redesign-card .category-toggle-btn,
     #view-user .redesign-card .producto-cell { font-size: .9rem; }

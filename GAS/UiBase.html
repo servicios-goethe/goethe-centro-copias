@@ -401,7 +401,6 @@
     const paneles = new Set();
     tabs.forEach(function(tab) { tab.panels.forEach(function(panel) { paneles.add(panel); }); });
     document.querySelectorAll("[data-section]").forEach(function(node) {
-      if (!paneles.has(node.getAttribute("data-section"))) return;
       node.classList.add("redesign-panel-hidden");
     });
     const tabSeleccionada = tabs.find(function(tab) { return tab.key === activa; });

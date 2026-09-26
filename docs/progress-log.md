@@ -19,6 +19,16 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 53, `Rediseno usuario - grilla nuevo pedido`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-26 — Ajuste final de grilla de usuario y móvil
+
+- ID, disponibilidad y detalle de stock quedan reservados para perfiles administrativos.
+- Se corrigió el fallback de stock para evitar valores `undefined` en vistas operativas.
+- Categorías y productos usan una escala tipográfica uniforme y las categorías agregan etiqueta bilingüe.
+- El control de cantidad admite tres dígitos y la grilla se adapta mejor a pantallas angostas.
+- Commit: `f1b23f1` (`fix(rediseno): refine user order mobile grid`).
+- GAS de desarrollo: versión 54, `Rediseno usuario - móvil y etiquetas`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

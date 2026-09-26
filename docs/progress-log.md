@@ -210,6 +210,16 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-26 — Corrección de solapas de copias
+
+- `Nueva solicitud · Neuer Auftrag` ahora muestra solamente el formulario de carga.
+- `Mis solicitudes · Meine Aufträge` ahora muestra solamente el listado propio y su actualización.
+- Se mantuvo una única fuente de datos y los contratos actuales de envío y consulta.
+- El paquete conserva las 9 capturas disponibles; `Screenshot 2026-09-25 145657.png` no está incluido en la carpeta local.
+- Commit: `bfac2c3` (`fix(rediseno): separate copy request tabs`).
+- GAS de desarrollo: versión 47, `Rediseno copias - nuevas y mis solicitudes separadas`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-26 — Corrección de pantalla Nuevo pedido
 
 - Se corrigió la navegación para ocultar todos los paneles no pertenecientes al módulo/solapa activa; `Solicitud de copias` ya no aparece dentro de Materiales.

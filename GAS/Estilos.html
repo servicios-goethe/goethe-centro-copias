@@ -1497,6 +1497,9 @@
   .copies-summary-card > span:not(.copies-summary-label):not(.copies-summary-detail):not(.copies-summary-note) { font-size: .82rem; }
   .copies-summary-detail { font-size: .88rem; line-height: 1.45; }
   .copies-summary-note { padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.08); font-size: .78rem; line-height: 1.4; }
+  .toast-global { top: 88px; right: 24px; bottom: auto; border-radius: 14px; }
+  .redesign-card, .module-tile, .redesign-tab, .copies-item, .admin-block { box-sizing: border-box; }
+  body { background: #faf8f3; }
 
   @media (max-width: 640px) {
     .redesign-header { padding: 10px 14px; }
@@ -1513,6 +1516,22 @@
     .module-tile strong { font-size: .82rem; }
     .module-tile small { font-size: .68rem; }
     .module-badge { position: absolute; margin: -24px 0 0 0; }
+    .container { padding: 14px; }
+    .redesign-card .collapsible-toggle { padding: 14px; }
+    .redesign-card .collapsible-body { padding: 14px; }
+    .redesign-card .grid-table { min-width: 0; }
+    .redesign-card .grid-table th,
+    .redesign-card .grid-table td { padding-left: 10px; padding-right: 10px; }
+    .redesign-card .grid-table .producto-cell { padding-left: 18px; }
+    .redesign-card .grid-table .col-stock { display: none; }
+    .redesign-card .grid-table .cantidad-input { width: 62px; }
+    .redesign-card .pedido-footer { position: sticky; bottom: 12px; z-index: 5; flex-wrap: wrap; }
+    .copies-summary-card { margin-top: 16px; }
+    .copies-section .copies-form-grid { grid-template-columns: 1fr; }
+    .copies-section .copies-field-wide { grid-column: auto; }
+    .copies-section .copies-choice-group { gap: 6px; }
+    .copies-section .copies-choice-group label { flex: 1 1 130px; }
+    .toast-global { top: 72px; right: 14px; left: 14px; min-width: 0; max-width: none; }
   }
 
   .copies-section {

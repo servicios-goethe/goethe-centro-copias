@@ -1,6 +1,6 @@
 function doGet() {
   return HtmlService.createTemplateFromFile("Index").evaluate()
-    .setTitle("Inventario Goethe")
+    .setTitle("Pedidos Gráfica")
     .addMetaTag("viewport", "width=device-width, initial-scale=1")
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }

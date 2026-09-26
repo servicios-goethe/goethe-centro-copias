@@ -49,6 +49,16 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 56, `Rediseno copias - formulario compacto`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-26 — Controles seleccionables bilingües en copias
+
+- Nivel, tamaño y modalidad ahora se presentan como botones seleccionables, no como combos visibles.
+- Doble faz y copia color mantienen opciones tipo botón con estado activo claramente visible.
+- Se agregaron textos bilingües completos para Kindergarten/Primaria/Secundaria, formatos y modalidades.
+- Los selects nativos permanecen ocultos como respaldo para conservar el contrato de envío.
+- Commit: `0c6c98b` (`fix(rediseno): replace copy selects with segmented controls`).
+- GAS de desarrollo: versión 57, `Rediseno copias - controles bilingües`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

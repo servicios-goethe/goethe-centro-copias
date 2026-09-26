@@ -234,7 +234,9 @@ function renderizarCopiasOperativas_() {
     return;
   }
   const termino = String((document.getElementById("filtro-copias-admin") || {}).value || "").trim().toLowerCase();
-  const estado = String((document.getElementById("estado-copias-admin") || {}).value || "AUTORIZADO");
+  const solapa = moduloActivo === "copias" && solapaActivaPorModulo ? solapaActivaPorModulo.copias : "";
+  const estadoForzado = solapa === "autorizaciones" ? "SOLICITADO" : solapa === "trabajos" ? "AUTORIZADO" : "";
+  const estado = estadoForzado || String((document.getElementById("estado-copias-admin") || {}).value || "AUTORIZADO");
   const filtradas = copiasOperativasActuales.filter(function(item) {
     const coincideEstado = estado === "TODAS"
       || (estado === "PENDIENTES" && ["SOLICITADO", "AUTORIZADO"].includes(item.estado))

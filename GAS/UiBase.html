@@ -367,7 +367,8 @@
     if (admin || operador) tabs.push({ key: "entregas", es: "Entregas", de: "Ausgaben", panels: ["admin-pedidos"] });
     if (operador) tabs.push({ key: "ingreso", es: "Ingreso de stock", de: "Wareneingang", panels: ["admin-nueva-compra"] });
     if (admin) {
-      tabs.push({ key: "compras", es: "Compras y recepción", de: "Einkauf & Eingang", panels: ["admin-nueva-compra", "admin-recepcion"] });
+      tabs.push({ key: "compras", es: "Compras", de: "Einkauf", panels: ["admin-nueva-compra"] });
+      tabs.push({ key: "recepcion", es: "Recepción", de: "Wareneingang", panels: ["admin-recepcion"] });
       tabs.push({ key: "productos", es: "Productos y stock", de: "Produkte & Bestand", panels: ["admin-productos", "admin-actividad"] });
     }
     return tabs;
@@ -413,6 +414,7 @@
       }
     });
     actualizarSubpanelesCopiasRedisenio_(moduloActivo, activa);
+    actualizarFiltroCopiasPorSolapaRedisenio_(moduloActivo, activa);
   }
 
   function actualizarSubpanelesCopiasRedisenio_(modulo, solapa) {
@@ -422,6 +424,15 @@
     const visible = modulo === "copias";
     nueva.classList.toggle("redesign-panel-hidden", !visible || solapa !== "nueva");
     propias.classList.toggle("redesign-panel-hidden", !visible || solapa !== "mis");
+  }
+
+  function actualizarFiltroCopiasPorSolapaRedisenio_(modulo, solapa) {
+    const selector = document.getElementById("estado-copias-admin");
+    if (!selector) return;
+    const estadoForzado = solapa === "autorizaciones" ? "SOLICITADO" : solapa === "trabajos" ? "AUTORIZADO" : "";
+    selector.disabled = !!estadoForzado;
+    if (estadoForzado) selector.value = estadoForzado;
+    if (modulo === "copias" && estadoForzado && typeof renderizarCopiasOperativas_ === "function") renderizarCopiasOperativas_();
   }
 
   function seleccionarModuloRedisenio_(modulo) {

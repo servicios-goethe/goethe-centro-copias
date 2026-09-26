@@ -210,6 +210,15 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-26 — Corrección de pantalla Nuevo pedido
+
+- Se corrigió la navegación para ocultar todos los paneles no pertenecientes al módulo/solapa activa; `Solicitud de copias` ya no aparece dentro de Materiales.
+- La grilla de `Nuevo pedido` se ajustó con encabezado, categorías, filas seleccionadas, inputs de cantidad y espaciado del diseño de referencia.
+- La captura `Screenshot 2026-09-25 145657.png` no está incluida en el paquete local actual; se tomó como referencia la pantalla equivalente disponible.
+- Commit: `8aa4db1` (`fix(rediseno): isolate active panel and refine new order`).
+- GAS de desarrollo: versión 46, `Rediseno pantalla nuevo pedido - paneles aislados`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-25 — Ajuste transversal del rediseño
 
 - Se reemplazó el navbar heredado por el header de `Pedidos Gráfica · Grafik-Bestellungen`, con marca, avatar, correo, rol e instructivo.

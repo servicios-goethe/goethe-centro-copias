@@ -38,6 +38,17 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 55, `Rediseno usuario - cantidades y alineación`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-26 — Rediseño de Solicitud de Copias
+
+- La solicitud de copias adopta una tarjeta compacta centrada, alineada con la captura de referencia.
+- Se reorganizó el formulario en una columna principal y un resumen lateral en escritorio.
+- La carga de PDF queda destacada y se conserva la validación de tipo y tamaño.
+- En pantallas angostas el formulario pasa a una sola columna y mantiene el resumen y el envío accesibles.
+- Se conservaron los IDs, nombres de campos y flujo de envío existentes.
+- Commit: `83d8b0c` (`feat(rediseno): redesign copy request form`).
+- GAS de desarrollo: versión 56, `Rediseno copias - formulario compacto`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

@@ -210,6 +210,15 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-26 — Separación de módulos administrativos
+
+- Materiales separa `Compras · Einkauf` y `Recepción · Wareneingang` en solapas independientes.
+- Copias diferencia `Autorizaciones · Freigaben` (estado `SOLICITADO`) de `Trabajos · Druckaufträge` (estado `AUTORIZADO`).
+- El selector de estado de copias se bloquea en esas solapas para evitar que ambas vistas vuelvan a mostrar el mismo conjunto.
+- Commit: `1bcbe73` (`fix(rediseno): split admin materials and copy tabs`).
+- GAS de desarrollo: versión 49, `Rediseno admin - compras recepcion y copias separadas`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-26 — Logo oficial en el header del rediseño
 
 - El header usa el logo oficial Goethe Schule desde `https://goethe.edu.ar/wp-content/uploads/2020/03/goethe-schule.svg`.

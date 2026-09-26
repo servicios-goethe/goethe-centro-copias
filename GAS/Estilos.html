@@ -1209,6 +1209,17 @@
     border-radius: 10px;
     background: #0a6334;
     color: #fff;
+    overflow: hidden;
+  }
+  .brand-mark img {
+    display: block;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+  .brand-mark-fallback::after {
+    content: "G";
+    color: #fff;
     font-size: 1.25rem;
     font-weight: 800;
   }

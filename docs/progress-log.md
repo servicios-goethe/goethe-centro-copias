@@ -10,6 +10,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 52, `Rediseno - escudo local Goethe`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-26 — Nuevo pedido: grilla de productos para usuario común
+
+- La pantalla de materiales incorpora la grilla de referencia con columnas de producto, ID, disponibilidad y cantidad.
+- Las categorías ahora tienen indicador visual de expansión y las filas de productos ofrecen control rápido menos/más junto al campo numérico.
+- Se ajustaron tipografía, densidad de filas y jerarquía visual para mejorar la carga en escritorio y móvil.
+- Commit: `207a6db` (`feat(rediseno): improve user materials order grid`).
+- GAS de desarrollo: versión 53, `Rediseno usuario - grilla nuevo pedido`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

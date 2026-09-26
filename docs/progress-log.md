@@ -210,6 +210,15 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-25 — Ajuste transversal del rediseño
+
+- Se reemplazó el navbar heredado por el header de `Pedidos Gráfica · Grafik-Bestellungen`, con marca, avatar, correo, rol e instructivo.
+- Se ocultó el bloque administrativo heredado con navegación y KPI duplicados; se conservaron sus IDs para no romper funciones existentes.
+- Se ajustó la presentación responsive del header para móvil.
+- Commit: `ecdf186` (`feat(rediseno): align header and remove legacy navigation`).
+- GAS de desarrollo: versión 45, `Rediseno ajuste transversal - header y limpieza`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-25 — Rediseño Pedidos Gráfica: Hito 6
 
 - `Productos y stock · Produkte & Bestand` adopta tarjetas, campos bilingües y barra de acción para alta de productos.

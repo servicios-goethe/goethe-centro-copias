@@ -14,7 +14,7 @@ function obtenerProductosFiltrados() {
 }
 
 function mostrarStockEnPedidoUsuario_() {
-  return !!(rolActual && rolActual.isAdmin);
+  return true;
 }
 
 function actualizarVisibilidadStockPedido_() {
@@ -49,7 +49,7 @@ function actualizarVistaProductos() {
 }
 
 function renderizarFilasPedidoPorCategoria_(productos, mostrarStock) {
-  const colspan = mostrarStock ? 3 : 2;
+  const colspan = mostrarStock ? 4 : 3;
   const termino = (document.getElementById("buscador-productos") || { value: "" }).value.trim();
   const soloSeleccionados = document.getElementById("filtro-seleccionados") ? document.getElementById("filtro-seleccionados").checked : false;
   const grupos = {};
@@ -95,17 +95,32 @@ function renderizarFilaProductoPedido_(producto, mostrarStock) {
           ${mostrarStock ? `<span class="producto-subcopy">${detalleStock}</span>` : ""}
           ${faltante > 0 ? `<span class="faltante-copy">Faltan ${faltante}</span>` : ""}
         </td>
+        <td class="producto-id">${escapeHtml_(producto.id)}</td>
         ${mostrarStock ? `<td class="col-stock">${producto.stock}</td>` : ""}
         <td class="col-cantidad">
-          <input
-            type="number"
-            min="0"
-            class="cantidad-input ${faltante > 0 ? "input-error" : ""}"
-            value="${cantidad}"
-            oninput="actualizarCantidadProducto('${escapeHtml_(producto.id)}', this)"
-          >
+          <div class="quantity-stepper">
+            <button type="button" class="quantity-stepper-btn" aria-label="Reducir cantidad" onclick="ajustarCantidadProductoPaso_('${escapeHtml_(producto.id)}', -1, event)">−</button>
+            <input
+              type="number"
+              min="0"
+              class="cantidad-input ${faltante > 0 ? "input-error" : ""}"
+              value="${cantidad}"
+              aria-label="Cantidad de ${escapeHtml_(obtenerEtiquetaProducto(producto))}"
+              oninput="actualizarCantidadProducto('${escapeHtml_(producto.id)}', this)"
+            >
+            <button type="button" class="quantity-stepper-btn quantity-stepper-plus" aria-label="Aumentar cantidad" onclick="ajustarCantidadProductoPaso_('${escapeHtml_(producto.id)}', 1, event)">+</button>
+          </div>
         </td>
       </tr>`;
+}
+
+function ajustarCantidadProductoPaso_(id, delta, event) {
+  if (event && event.stopPropagation) event.stopPropagation();
+  const input = document.querySelector('input[oninput*="actualizarCantidadProducto(\'' + id + '\'"]');
+  if (!input) return;
+  const siguiente = Math.max(0, Number(input.value || 0) + Number(delta || 0));
+  input.value = siguiente ? String(siguiente) : "";
+  actualizarCantidadProducto(id, input);
 }
 
 function toggleCategoriaPedido(claveCategoria) {

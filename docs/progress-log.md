@@ -68,6 +68,14 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 58, `Rediseno copias - ancho completo y radios`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-26 — Doble faz y copia color como botones
+
+- Doble faz y copia color vuelven a usar botones segmentados, igual que nivel, tamaño y modalidad.
+- La opción activa se destaca en verde y conserva las etiquetas bilingües Sí / Ja y No / Nein.
+- Commit: `72a7a4e` (`fix(rediseno): style copy options as segmented buttons`).
+- GAS de desarrollo: versión 59, `Rediseno copias - botones de opciones`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

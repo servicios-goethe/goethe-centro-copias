@@ -99,6 +99,28 @@
     return categoria || "Sin categoria";
   }
 
+  function obtenerEtiquetaCategoria_(categoria) {
+    const original = String(categoria || "Sin categoria").trim();
+    if (original.includes("/")) return original;
+    const traducciones = {
+      "papel": "Papier",
+      "cartulina": "Karton",
+      "librería": "Schreibwaren",
+      "libreria": "Schreibwaren",
+      "arte y plástica": "Kunst",
+      "arte y plastica": "Kunst",
+      "acrílicos": "Acrylfarben",
+      "acrilicos": "Acrylfarben"
+    };
+    const clave = original.toLocaleLowerCase("es");
+    const traduccion = traducciones[clave] ||
+      (clave.includes("acrílic") || clave.includes("acrilic") ? "Acrylfarben" :
+      clave.includes("papel") ? "Papier" :
+      clave.includes("cartulin") ? "Karton" :
+      clave.includes("librer") ? "Schreibwaren" : "Kategorie");
+    return original + " / " + traduccion;
+  }
+
   function ordenarProductosPorCategoria(productos) {
     return [...(productos || [])].sort((a, b) => {
       const categoriaA = obtenerCategoriaProducto_(a).toLocaleLowerCase("es");

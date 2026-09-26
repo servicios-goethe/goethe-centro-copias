@@ -14,15 +14,19 @@ function obtenerProductosFiltrados() {
 }
 
 function mostrarStockEnPedidoUsuario_() {
-  return true;
+  return !!(rolActual && rolActual.isAdmin);
 }
 
 function actualizarVisibilidadStockPedido_() {
   const header = document.getElementById("pedido-stock-header");
+  const idHeader = document.getElementById("pedido-id-header");
   const mostrarStock = mostrarStockEnPedidoUsuario_();
 
   if (header) {
     header.classList.toggle("hidden", !mostrarStock);
+  }
+  if (idHeader) {
+    idHeader.classList.toggle("hidden", !mostrarStock);
   }
 }
 
@@ -49,7 +53,7 @@ function actualizarVistaProductos() {
 }
 
 function renderizarFilasPedidoPorCategoria_(productos, mostrarStock) {
-  const colspan = mostrarStock ? 4 : 3;
+  const colspan = mostrarStock ? 4 : 2;
   const termino = (document.getElementById("buscador-productos") || { value: "" }).value.trim();
   const soloSeleccionados = document.getElementById("filtro-seleccionados") ? document.getElementById("filtro-seleccionados").checked : false;
   const grupos = {};
@@ -73,7 +77,7 @@ function renderizarFilasPedidoPorCategoria_(productos, mostrarStock) {
       <tr class="category-row category-row-toggle ${expandida ? "is-open" : ""}" onclick="toggleCategoriaPedido('${claveCategoria}')">
         <td colspan="${colspan}">
           <button type="button" class="category-toggle-btn">
-            <span>${escapeHtml_(categoria)}</span>
+          <span>${escapeHtml_(obtenerEtiquetaCategoria_(categoria))}</span>
             <span class="category-meta">${grupos[categoria].length} producto(s)${seleccionados ? ` | ${seleccionados} seleccionado(s)` : ""} | ${expandida ? "Ocultar" : "Expandir"}</span>
           </button>
         </td>
@@ -85,9 +89,11 @@ function renderizarFilasPedidoPorCategoria_(productos, mostrarStock) {
 function renderizarFilaProductoPedido_(producto, mostrarStock) {
     const cantidad = cantidadesPedido[producto.id] || "";
     const faltante = mostrarStock ? Math.max((cantidadesPedido[producto.id] || 0) - Number(producto.stock || 0), 0) : 0;
-    const detalleStock = Number(producto.stockComprometido || 0) > 0
-      ? `Fisico: ${producto.stockFisico} | Comprometido: ${producto.stockComprometido}`
-      : `Fisico: ${producto.stockFisico}`;
+    const stockFisico = Number(producto.stockFisico || producto.stock || 0);
+    const stockComprometido = Number(producto.stockComprometido || 0);
+    const detalleStock = stockComprometido > 0
+      ? `Fisico: ${stockFisico} | Comprometido: ${stockComprometido}`
+      : `Fisico: ${stockFisico}`;
     return `
       <tr class="${cantidad ? "row-selected" : ""}">
         <td class="producto-cell">
@@ -95,7 +101,7 @@ function renderizarFilaProductoPedido_(producto, mostrarStock) {
           ${mostrarStock ? `<span class="producto-subcopy">${detalleStock}</span>` : ""}
           ${faltante > 0 ? `<span class="faltante-copy">Faltan ${faltante}</span>` : ""}
         </td>
-        <td class="producto-id">${escapeHtml_(producto.id)}</td>
+        ${mostrarStock ? `<td class="producto-id">${escapeHtml_(producto.id)}</td>` : ""}
         ${mostrarStock ? `<td class="col-stock">${producto.stock}</td>` : ""}
         <td class="col-cantidad">
           <div class="quantity-stepper">

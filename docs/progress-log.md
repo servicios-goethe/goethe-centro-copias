@@ -29,6 +29,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 54, `Rediseno usuario - móvil y etiquetas`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-26 — Corrección de ancho y alineación de cantidades
+
+- El campo de cantidad queda fijo en 66 px para mostrar tres dígitos sin recorte.
+- El título de cada categoría se alinea a la izquierda, igual que los productos; el contador permanece a la derecha.
+- Se ampliaron traducciones de categorías frecuentes (adhesivo, bibliorato y aros metálicos).
+- Commit: `16c4f09` (`fix(rediseno): align categories and fit three digit quantities`).
+- GAS de desarrollo: versión 55, `Rediseno usuario - cantidades y alineación`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

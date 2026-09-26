@@ -59,6 +59,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 57, `Rediseno copias - controles bilingües`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-26 — Ancho completo y radios simples en copias
+
+- La sección de Solicitud de Copias ocupa ahora todo el ancho disponible.
+- Doble faz y copia color dejaron la apariencia de botón y se muestran como radios simples con Sí / Ja y No / Nein.
+- Nivel, tamaño y modalidad conservan los botones seleccionables del rediseño.
+- Commit: `e1f82a1` (`fix(rediseno): expand copy section and simplify radio options`).
+- GAS de desarrollo: versión 58, `Rediseno copias - ancho completo y radios`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

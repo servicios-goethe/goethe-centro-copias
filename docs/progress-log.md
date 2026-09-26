@@ -2,6 +2,14 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-09-26 — Escudo local en el header
+
+- El header del rediseño usa `docs/Rediseno/escudo.png` embebido como PNG inline en GAS.
+- Se eliminó la dependencia de carga del SVG externo para la marca visual.
+- Commit: `92ce74d` (`style(rediseno): use local Goethe shield logo`).
+- GAS de desarrollo: versión 52, `Rediseno - escudo local Goethe`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

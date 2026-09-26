@@ -210,6 +210,15 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 40, `Rediseno Hito 2 - nuevo pedido y mis pedidos`.
 - Producción, `main` y la rama funcional no fueron modificadas.
 
+## 2026-09-26 — Rediseño Pedidos Gráfica: Hito 7
+
+- La pantalla `Nueva solicitud · Neuer Auftrag` de copias incorpora resumen dinámico de páginas, cantidad, especificación y autorización.
+- Doble faz y color adoptan controles segmentados visuales sin modificar los nombres de formulario ni el contrato de envío.
+- Se mantienen PDF, validaciones, solicitante, niveles, modalidades, comentarios y carga existente.
+- Commit: `92e99a4` (`feat(rediseno): redesign copy request form`).
+- GAS de desarrollo: versión 50, `Rediseno Hito 7 - solicitud de copias`.
+- Producción, `main` y la rama funcional no fueron modificadas.
+
 ## 2026-09-26 — Separación de módulos administrativos
 
 - Materiales separa `Compras · Einkauf` y `Recepción · Wareneingang` en solapas independientes.

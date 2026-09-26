@@ -1577,7 +1577,8 @@
 
   /* Vista compacta del formulario de copias según el rediseño */
   #view-user .copies-section {
-    width: min(100%, 560px);
+    width: 100%;
+    max-width: none;
     margin-left: auto;
     margin-right: auto;
   }
@@ -2072,8 +2073,24 @@
     box-sizing: border-box;
   }
   #view-user .copies-section .copies-choice-group label:has(input:checked) {
-    border-color: #0a6334;
-    background: #0a6334;
-    color: #fff;
+    border-color: transparent;
+    background: transparent;
+    color: #13261b;
+  }
+  #view-user .copies-section .copies-choice-group label {
+    justify-content: flex-start;
+    min-height: 0;
+    padding: 3px 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: .72rem;
+    font-weight: 600;
+  }
+  #view-user .copies-section .copies-choice-group input {
+    width: auto;
+    min-height: 0;
+    margin: 0 4px 0 0;
+    accent-color: #0a6334;
   }
 </style>

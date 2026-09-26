@@ -2022,4 +2022,58 @@
       align-items: stretch;
     }
   }
+  #view-user .copies-section .copies-native-select {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  #view-user .copies-section .copies-segmented {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  #view-user .copies-section .copies-segmented button {
+    flex: 1 1 auto;
+    min-height: 30px;
+    padding: 6px 8px;
+    border: 1px solid #e3dccb;
+    border-radius: 8px;
+    background: #fff;
+    color: #13261b;
+    font: inherit;
+    font-size: .68rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  #view-user .copies-section .copies-segmented button small {
+    display: block;
+    color: #7a827d;
+    font-size: .56rem;
+    font-weight: 500;
+  }
+  #view-user .copies-section .copies-segmented button.is-selected {
+    border-color: #0a6334;
+    background: #0a6334;
+    color: #fff;
+  }
+  #view-user .copies-section .copies-segmented button.is-selected small { color: #e8f2eb; }
+  #view-user .copies-section .copies-choice-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+  #view-user .copies-section .copies-choice-group label {
+    min-height: 30px;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  #view-user .copies-section .copies-choice-group label:has(input:checked) {
+    border-color: #0a6334;
+    background: #0a6334;
+    color: #fff;
+  }
 </style>

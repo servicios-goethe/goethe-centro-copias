@@ -7,6 +7,34 @@ let solicitantesCopiasBusquedaTimer_ = null;
 let copiasRefreshTimer_ = null;
 let copiasCargaEnCurso_ = false;
 
+function seleccionarOpcionCopiasUI_(selectId, value, button) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  select.value = value;
+  const grupo = button && button.parentElement;
+  if (grupo) {
+    grupo.querySelectorAll("button").forEach(function(item) {
+      const activo = item === button;
+      item.classList.toggle("is-selected", activo);
+      item.setAttribute("aria-pressed", activo ? "true" : "false");
+    });
+  }
+  actualizarResumenCopiasUI_();
+}
+
+function sincronizarOpcionesCopiasUI_() {
+  document.querySelectorAll(".copies-segmented").forEach(function(grupo) {
+    const select = grupo.previousElementSibling;
+    if (!select) return;
+    const valor = select.value;
+    grupo.querySelectorAll("button").forEach(function(button) {
+      const activo = button.dataset.value === valor;
+      button.classList.toggle("is-selected", activo);
+      button.setAttribute("aria-pressed", activo ? "true" : "false");
+    });
+  });
+}
+
 function actualizarResumenCopiasUI_() {
   const paginas = Number((document.getElementById("copias-paginas") || {}).value || 0);
   const cantidad = Number((document.getElementById("copias-cantidad") || {}).value || 0);
@@ -26,6 +54,7 @@ function actualizarResumenCopiasUI_() {
     : nivel === "KG" || nivel === "EP"
       ? `${nivel} requiere autorización antes de imprimir. · ${nivel} muss vorher freigegeben werden.`
       : "KG y EP requieren autorización; ES ingresa autorizada. · KG/EP brauchen Freigabe, ES nicht.";
+  sincronizarOpcionesCopiasUI_();
 }
 
 function prepararSolicitanteCopiasUI_() {

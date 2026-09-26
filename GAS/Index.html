@@ -170,12 +170,17 @@
                 </div>
                 <div class="inline-field">
                   <label for="copias-nivel">Nivel</label>
-                  <select id="copias-nivel" name="nivel" required onchange="actualizarResumenCopiasUI_()">
+                  <select id="copias-nivel" class="copies-native-select" name="nivel" required onchange="actualizarResumenCopiasUI_()">
                     <option value="">Seleccionar</option>
                     <option value="KG">KG</option>
                     <option value="EP">EP</option>
                     <option value="ES">ES</option>
                   </select>
+                  <div class="copies-segmented" role="group" aria-label="Nivel">
+                    <button type="button" data-value="KG" onclick="seleccionarOpcionCopiasUI_('copias-nivel', 'KG', this)">KG <small>Kindergarten</small></button>
+                    <button type="button" data-value="EP" onclick="seleccionarOpcionCopiasUI_('copias-nivel', 'EP', this)">EP <small>Primaria</small></button>
+                    <button type="button" data-value="ES" onclick="seleccionarOpcionCopiasUI_('copias-nivel', 'ES', this)">ES <small>Secundaria</small></button>
+                  </div>
                 </div>
                 <div class="inline-field">
                   <label for="copias-paginas">Paginas del original</label>
@@ -187,18 +192,27 @@
                 </div>
                 <div class="inline-field">
                   <label for="copias-tamano">Tamano</label>
-                  <select id="copias-tamano" name="tamano" required onchange="actualizarResumenCopiasUI_()">
+                  <select id="copias-tamano" class="copies-native-select" name="tamano" required onchange="actualizarResumenCopiasUI_()">
                     <option value="A4">A4</option>
                     <option value="A3">A3</option>
                     <option value="OFICIO">Oficio / Legal</option>
                   </select>
+                  <div class="copies-segmented" role="group" aria-label="Tamaño">
+                    <button type="button" data-value="A4" onclick="seleccionarOpcionCopiasUI_('copias-tamano', 'A4', this)">A4</button>
+                    <button type="button" data-value="A3" onclick="seleccionarOpcionCopiasUI_('copias-tamano', 'A3', this)">A3</button>
+                    <button type="button" data-value="OFICIO" onclick="seleccionarOpcionCopiasUI_('copias-tamano', 'OFICIO', this)">Oficio <small>Legal</small></button>
+                  </div>
                 </div>
                 <div class="inline-field">
                   <label for="copias-modalidad">Modalidad</label>
-                  <select id="copias-modalidad" name="modalidad" required onchange="actualizarResumenCopiasUI_()">
+                  <select id="copias-modalidad" class="copies-native-select" name="modalidad" required onchange="actualizarResumenCopiasUI_()">
                     <option value="ARMADAS">Armadas / Geheftet</option>
                     <option value="APILADAS">Apiladas / Gestapelt</option>
                   </select>
+                  <div class="copies-segmented" role="group" aria-label="Modalidad">
+                    <button type="button" data-value="ARMADAS" onclick="seleccionarOpcionCopiasUI_('copias-modalidad', 'ARMADAS', this)">Armadas <small>Geheftet</small></button>
+                    <button type="button" data-value="APILADAS" onclick="seleccionarOpcionCopiasUI_('copias-modalidad', 'APILADAS', this)">Apiladas <small>Gestapelt</small></button>
+                  </div>
                 </div>
                 <fieldset class="copies-choice-group">
                   <legend>Doble faz</legend>

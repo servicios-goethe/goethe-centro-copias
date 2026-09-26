@@ -141,7 +141,8 @@
             <span class="collapsible-indicator" data-indicator-for="user-copias">Expandir</span>
           </button>
           <div class="collapsible-body" data-body-for="user-copias">
-            <form id="copias-form" onsubmit="enviarSolicitudCopias(this, event)">
+            <div id="copias-nueva-panel" class="copias-subpanel">
+              <form id="copias-form" onsubmit="enviarSolicitudCopias(this, event)">
               <div class="section-header">
                 <div>
                   <h2>Solicitud de copias</h2>
@@ -218,13 +219,16 @@
                 <span class="section-note">KG y EP requieren autorizacion. ES ingresa autorizado.</span>
                 <button id="copias-enviar-btn" class="btn btn-primary" type="submit">Enviar solicitud</button>
               </div>
-            </form>
-
-            <div class="copies-list-header">
-              <h3>Mis solicitudes</h3>
-              <button class="btn btn-outline btn-small" type="button" onclick="cargarPanelCopias()">Actualizar</button>
+              </form>
             </div>
-            <div id="lista-copias-propias" class="copies-list"><div class="empty-state">Cargando solicitudes...</div></div>
+
+            <div id="copias-mis-panel" class="copias-subpanel">
+              <div class="copies-list-header">
+                <h3>Mis solicitudes · Meine Aufträge</h3>
+                <button class="btn btn-outline btn-small" type="button" onclick="cargarPanelCopias()">Actualizar</button>
+              </div>
+              <div id="lista-copias-propias" class="copies-list"><div class="empty-state">Cargando solicitudes...</div></div>
+            </div>
           </div>
         </section>
       </div>

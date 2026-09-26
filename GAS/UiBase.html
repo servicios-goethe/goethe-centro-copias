@@ -412,6 +412,16 @@
         if (body) body.style.display = "";
       }
     });
+    actualizarSubpanelesCopiasRedisenio_(moduloActivo, activa);
+  }
+
+  function actualizarSubpanelesCopiasRedisenio_(modulo, solapa) {
+    const nueva = document.getElementById("copias-nueva-panel");
+    const propias = document.getElementById("copias-mis-panel");
+    if (!nueva || !propias) return;
+    const visible = modulo === "copias";
+    nueva.classList.toggle("redesign-panel-hidden", !visible || solapa !== "nueva");
+    propias.classList.toggle("redesign-panel-hidden", !visible || solapa !== "mis");
   }
 
   function seleccionarModuloRedisenio_(modulo) {

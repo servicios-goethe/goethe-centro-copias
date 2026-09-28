@@ -85,6 +85,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 60, `Rediseno copias - botones y tipografia finales`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-28 — Resumen y envío unificados en copias
+
+- Se unificaron los dos cuadros oscuros en un único resumen.
+- El botón Enviar solicitud ahora está dentro del cuadro de resumen.
+- Se eliminó la frase fija de autorización del pie del formulario.
+- Commit: `2cb912d` (`fix(rediseno): merge copy summary and submit action`).
+- GAS de desarrollo: versión 61, `Rediseno copias - resumen unificado`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

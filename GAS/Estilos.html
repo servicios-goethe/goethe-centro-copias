@@ -1593,28 +1593,32 @@
     grid-template-columns: minmax(0, 1fr) 142px;
     gap: 14px;
     align-items: start;
+    padding: 14px;
+    border: 1px solid #e3dccb;
+    border-radius: 16px;
+    background: #fff;
   }
   #view-user .copies-section .section-header {
     grid-column: 1 / -1;
     margin: 0;
   }
   #view-user .copies-section .section-header h2 { font-size: 1rem; }
-  #view-user .copies-section .section-copy { font-size: .72rem; }
-  #view-user .copies-section .section-note { font-size: .66rem; }
+  #view-user .copies-section .section-copy { font-size: clamp(.8rem, 1.2vw, .95rem); }
+  #view-user .copies-section .section-note { font-size: clamp(.72rem, 1vw, .82rem); }
   #view-user .copies-section .copies-form-grid {
     grid-column: 1;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 9px 10px;
     padding: 12px;
-    border: 1px solid #e3dccb;
-    border-radius: 12px;
-    background: #fff;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
   }
   #view-user .copies-section .inline-field { margin-bottom: 0; }
   #view-user .copies-section .inline-field label,
   #view-user .copies-section .copies-choice-group legend {
-    font-size: .64rem;
+    font-size: clamp(.74rem, 1.1vw, .86rem);
     margin-bottom: 3px;
   }
   #view-user .copies-section .copies-form-grid input,
@@ -1622,7 +1626,7 @@
   #view-user .copies-section .copies-form-grid textarea {
     min-height: 30px;
     padding: 6px 8px;
-    font-size: .72rem;
+    font-size: clamp(.8rem, 1.1vw, .95rem);
     border-radius: 8px;
   }
   #view-user .copies-section .copies-upload-card {
@@ -1636,7 +1640,7 @@
     padding: 4px;
     background: #fff;
   }
-  #view-user .copies-section .field-help { font-size: .62rem; }
+  #view-user .copies-section .field-help { font-size: clamp(.7rem, 1vw, .8rem); }
   #view-user .copies-section .copies-choice-group {
     padding: 0;
     gap: 5px;
@@ -2046,7 +2050,7 @@
     background: #fff;
     color: #13261b;
     font: inherit;
-    font-size: .68rem;
+    font-size: clamp(.78rem, 1vw, .9rem);
     font-weight: 700;
     cursor: pointer;
   }
@@ -2088,10 +2092,9 @@
     font-weight: 700;
   }
   #view-user .copies-section .copies-choice-group input {
-    width: auto;
-    min-height: 0;
-    margin: 0 4px 0 0;
-    accent-color: #0a6334;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
   }
   #view-user .copies-section .copies-choice-group label:has(input:checked) {
     border-color: #0a6334;

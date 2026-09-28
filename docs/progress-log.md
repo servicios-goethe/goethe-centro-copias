@@ -76,6 +76,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 59, `Rediseno copias - botones de opciones`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-28 — Ajuste final del formulario de copias
+
+- Doble faz y copia color usan exactamente el mismo patrón visual de botones que tamaño y modalidad, sin círculos visibles.
+- Se aumentó la tipografía con valores adaptables al ancho de pantalla.
+- El formulario completo, resumen y envío quedan contenidos dentro del mismo cuadro visual.
+- Commit: `7b77c6c` (`fix(rediseno): match copy option buttons and contain submit`).
+- GAS de desarrollo: versión 60, `Rediseno copias - botones y tipografia finales`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

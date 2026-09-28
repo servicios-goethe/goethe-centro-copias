@@ -1667,15 +1667,14 @@
   #view-user .copies-section .copies-summary-card > span:not(.copies-summary-label):not(.copies-summary-detail):not(.copies-summary-note),
   #view-user .copies-section .copies-summary-detail,
   #view-user .copies-section .copies-summary-note { font-size: .62rem; }
+  #view-user .copies-section .copies-summary-card .btn {
+    width: 100%;
+    margin-top: 4px;
+    padding: 9px 8px;
+    font-size: clamp(.72rem, 1vw, .82rem);
+  }
   #view-user .copies-section .pedido-footer {
-    grid-column: 2;
-    grid-row: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    margin: 0;
-    padding: 10px;
-    border-radius: 10px;
+    display: none;
   }
   #view-user .copies-section .pedido-footer .section-note { font-size: .62rem; }
   #view-user .copies-section .pedido-footer .btn { width: 100%; font-size: .68rem; padding: 8px; }

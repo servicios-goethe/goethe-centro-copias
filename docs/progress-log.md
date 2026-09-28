@@ -94,6 +94,14 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 61, `Rediseno copias - resumen unificado`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-28 — Tipografía de copias alineada con materiales
+
+- Se igualó la escala de títulos, etiquetas, campos, botones y textos auxiliares con Solicitud de Materiales.
+- La tipografía mantiene adaptación responsive sin volver a la escala reducida anterior.
+- Commit: `43e198c` (`fix(rediseno): match copy typography to materials`).
+- GAS de desarrollo: versión 62, `Rediseno copias - tipografia alineada`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-08-27 — Hito 1 y corte de prueba en desarrollo
 
 ### Alcance completado

@@ -1,4 +1,9 @@
-function doGet() {
+function doGet(e) {
+  if (e && e.parameter && e.parameter.vista === "instructivo-copias") {
+    return HtmlService.createHtmlOutputFromFile("InstructivoCopias")
+      .setTitle("Instructivo de impresiones · Druckanleitung")
+      .addMetaTag("viewport", "width=device-width, initial-scale=1");
+  }
   return HtmlService.createTemplateFromFile("Index").evaluate()
     .setTitle("Pedidos Gráfica")
     .addMetaTag("viewport", "width=device-width, initial-scale=1")

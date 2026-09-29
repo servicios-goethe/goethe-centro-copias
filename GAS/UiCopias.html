@@ -49,9 +49,9 @@ function actualizarResumenCopiasUI_() {
   const autorizacionNode = document.getElementById("copias-resumen-autorizacion");
   if (totalNode) totalNode.innerText = String(total);
   if (detalleNode) detalleNode.innerText = `${tamano} · ${paginas || 0} pág. × ${cantidad || 0} · ${modalidad || "modalidad"} · Doble faz ${dobleFaz ? dobleFaz.value : "-"} · Color ${color ? color.value : "-"}`;
-  if (autorizacionNode) autorizacionNode.innerText = nivel === "ES"
-    ? "ES ingresa autorizada directamente. · ES wird automatisch freigegeben."
-    : ["KG", "EP", "BO"].includes(nivel)
+  if (autorizacionNode) autorizacionNode.innerText = ["ES", "BO"].includes(nivel)
+    ? `${nivel} ingresa autorizada directamente. · ${nivel} wird automatisch freigegeben.`
+    : ["KG", "EP"].includes(nivel)
       ? `${nivel} requiere autorización antes de imprimir. · ${nivel} muss vorher freigegeben werden.`
       : "Seleccioná un nivel para indicar si requiere autorización. · Niveau auswählen, um die Freigabe zu sehen.";
   sincronizarOpcionesCopiasUI_();

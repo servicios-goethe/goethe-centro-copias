@@ -293,7 +293,7 @@ function registrarSolicitudCopias(form) {
     if (archivoBytes < 1) throw new Error("El archivo esta vacio.");
     if (archivoBytes > CONFIG.COPIAS_MAX_FILE_BYTES) throw new Error("El archivo supera el maximo de 80 MB.");
 
-    const requiereAutorizacion = data.nivel !== "ES";
+    const requiereAutorizacion = !["ES", "BO"].includes(data.nivel);
     const autorizadores = requiereAutorizacion ? obtenerAutorizadoresCopias_(ss, data.nivel, solicitante.email) : [];
     if (requiereAutorizacion && !autorizadores.length) {
       throw new Error(`No hay autorizadores activos configurados para ${data.nivel}. Carga usuarios en la hoja Usuarios_Copias con Nivel ${data.nivel} (o TODOS), Puede_Autorizar = SI y Activo = SI.`);

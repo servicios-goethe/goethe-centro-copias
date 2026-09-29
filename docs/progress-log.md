@@ -5,7 +5,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 ## 2026-09-29 — Nivel BO en solicitudes de copias
 
 - Se agregó `BO · Back Office` al selector bilingüe de nivel.
-- `BO` requiere autorización, igual que `KG` y `EP`; `ES` conserva autorización automática.
+- `BO` ingresa autorizado automáticamente, igual que `ES`; sólo `KG` y `EP` requieren autorización.
 - La administración agrupa las solicitudes BO con color propio y la carpeta Drive se organiza por el nivel `BO`.
 - Se actualizó `docs/business-rules.md`.
 - Commit: `57c239f` (`feat(copias): add back office level`).

@@ -2,6 +2,13 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-09-29 — BO autorizado automáticamente en producción
+
+- Se corrigió la regla de negocio: `BO` pasa directamente a `AUTORIZADO`; sólo `KG` y `EP` requieren autorización.
+- El resumen del formulario refleja la autorización automática para `ES` y `BO`.
+- Commit: `63b11be` (`fix(copias): auto authorize back office`).
+- GAS de producción: versión 11, `Producción - BO autorizado automáticamente`.
+
 ## 2026-09-29 — Nivel BO en solicitudes de copias
 
 - Se agregó `BO · Back Office` al selector bilingüe de nivel.
@@ -10,7 +17,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Se actualizó `docs/business-rules.md`.
 - Commit: `57c239f` (`feat(copias): add back office level`).
 - GAS de desarrollo: versión 66, `Copias - nivel BO Back Office`.
-- Producción no fue modificada con este cambio.
+- La primera implementación se validó en desarrollo; luego la regla corregida se publicó en producción en la versión 11.
 
 ## 2026-09-29 — Diagnóstico de autorización Drive en producción
 

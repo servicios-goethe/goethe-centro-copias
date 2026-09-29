@@ -2,6 +2,13 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-09-29 — Diagnóstico de autorización Drive en producción
+
+- El deployment productivo ejecuta como `USER_DEPLOYING`; la cuenta desplegadora es `servicios@goethe.edu.ar`.
+- La carpeta `Copias` (`1j-9aqOnXGtAi6jRnzfdz2gAzv9LQgA10`) tiene a esa cuenta como propietaria y puede agregar archivos.
+- El error de `DriveApp.getFolderById` corresponde a la autorización OAuth de Drive del proyecto con la cuenta desplegadora, no a permisos de la carpeta.
+- La ejecución remota de `verificarAccesoDriveCopias` no está habilitada como API ejecutable; la autorización debe completarse manualmente desde el editor Apps Script con `servicios@goethe.edu.ar`.
+
 ## 2026-09-29 — Hotfix productivo: restauración de AppConfig
 
 - Tras el lanzamiento se detectó `ReferenceError: CONFIG is not defined` porque el proyecto productivo no contenía `AppConfig.js`.

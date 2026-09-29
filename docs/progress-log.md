@@ -2,6 +2,14 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-09-29 — Migración del rediseño a producción
+
+- Se publicó la rama aprobada `rediseno-pedidos-grafica` en el deployment productivo oficial.
+- Producción pasó de la versión 7 a la versión 8 (`Rediseño aprobado - instructivo interno y corrección de enlace`).
+- Se preservó `AppConfig.js` de producción; el resto del código quedó alineado con la rama aprobada, incluyendo `InstructivoCopias.html`.
+- Deployment productivo: `AKfycbyiYG4YFnklRBiVGgP_4ys0ceVw1ZnZNHRKKOaaZuK2hbkg6haaOjgTztH-wclEct9flA`.
+- Luego del corte corresponde validar materiales, copias PDF, autorizaciones, carga en Drive, correo, administración y el enlace al instructivo con usuarios autenticados.
+
 ## 2026-09-29 — Plan de salida a producción del rediseño
 
 - La rama aprobada es `rediseno-pedidos-grafica`; `main` y el deployment productivo permanecen sin cambios.

@@ -45,7 +45,7 @@ function asegurarHojaCopias_(ss, nombre, headers) {
 
 function normalizarNivelCopias_(value) {
   const nivel = String(value || "").trim().toUpperCase();
-  return ["KG", "EP", "ES"].includes(nivel) ? nivel : "";
+  return ["KG", "EP", "ES", "BO"].includes(nivel) ? nivel : "";
 }
 
 function normalizarSiNoCopias_(value) {
@@ -67,7 +67,7 @@ function validarDatosSolicitudCopias_(data) {
   const solicitanteNombre = String(data.solicitanteNombre || "").trim().slice(0, 120);
 
   if (!solicitanteNombre) throw new Error("Ingresa el nombre del solicitante.");
-  if (!nivel) throw new Error("Selecciona un nivel valido: KG, EP o ES.");
+  if (!nivel) throw new Error("Selecciona un nivel valido: KG, EP, ES o BO.");
   if (!Number.isFinite(paginas) || paginas < 1) throw new Error("La cantidad de paginas debe ser mayor a cero.");
   if (!Number.isFinite(cantidad) || cantidad < 1) throw new Error("La cantidad de copias debe ser mayor a cero.");
   if (!["A4", "A3", "OFICIO"].includes(tamano)) throw new Error("Selecciona un tamano valido.");

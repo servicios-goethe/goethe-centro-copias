@@ -147,7 +147,7 @@ La última igualdad puede dejar de cumplirse después de una cancelación de sal
 
 - Solo una cuenta con email `@goethe.edu.ar` puede crear la solicitud.
 - Cada solicitud registra el nombre declarado del solicitante junto con su email autenticado y fecha/hora; las filas históricas sin nombre muestran el email como respaldo.
-- Niveles admitidos: `KG`, `EP`, `ES`.
+- Niveles admitidos: `KG`, `EP`, `ES`, `BO` (Back Office).
 - Páginas originales y cantidad de copias deben ser enteros mayores que cero.
 - Tamaños admitidos: `A4`, `A3`, `OFICIO`.
 - Modalidades admitidas: `ARMADAS`, `APILADAS`.
@@ -161,7 +161,7 @@ La última igualdad puede dejar de cumplirse después de una cancelación de sal
 ### 6.2 Autorización
 
 - Las solicitudes `ES` se autorizan automáticamente y pasan a `AUTORIZADO`.
-- Las solicitudes `KG` y `EP` comienzan en `SOLICITADO` y requieren al menos un autorizador activo del nivel o de `TODOS`.
+- Las solicitudes `KG`, `EP` y `BO` comienzan en `SOLICITADO` y requieren al menos un autorizador activo del nivel o de `TODOS`.
 - Los autorizadores se cargan en `Usuarios_Copias` (también se admite la hoja alternativa `Autorizados_Copias`) con las columnas `Email`, `Nivel`, `Puede_Autorizar` y `Activo`; para habilitar un usuario deben indicarse `Puede_Autorizar = SI` y `Activo = SI`.
 - El solicitante queda excluido de la lista y no puede decidir su propia solicitud.
 - Un administrador con perfil exacto `admin` o un autorizador activo del nivel puede decidir.

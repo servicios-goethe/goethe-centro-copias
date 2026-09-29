@@ -51,9 +51,9 @@ function actualizarResumenCopiasUI_() {
   if (detalleNode) detalleNode.innerText = `${tamano} · ${paginas || 0} pág. × ${cantidad || 0} · ${modalidad || "modalidad"} · Doble faz ${dobleFaz ? dobleFaz.value : "-"} · Color ${color ? color.value : "-"}`;
   if (autorizacionNode) autorizacionNode.innerText = nivel === "ES"
     ? "ES ingresa autorizada directamente. · ES wird automatisch freigegeben."
-    : nivel === "KG" || nivel === "EP"
+    : ["KG", "EP", "BO"].includes(nivel)
       ? `${nivel} requiere autorización antes de imprimir. · ${nivel} muss vorher freigegeben werden.`
-      : "KG y EP requieren autorización; ES ingresa autorizada. · KG/EP brauchen Freigabe, ES nicht.";
+      : "Seleccioná un nivel para indicar si requiere autorización. · Niveau auswählen, um die Freigabe zu sehen.";
   sincronizarOpcionesCopiasUI_();
 }
 
@@ -233,7 +233,8 @@ function metaNivelCopias_(nivel) {
   const claves = {
     KG: { titulo: "Jardín", clase: "copies-group-kinder" },
     EP: { titulo: "Primaria", clase: "copies-group-primary" },
-    ES: { titulo: "Secundaria", clase: "copies-group-secondary" }
+    ES: { titulo: "Secundaria", clase: "copies-group-secondary" },
+    BO: { titulo: "Back Office", clase: "copies-group-backoffice" }
   };
   return claves[String(nivel || "").toUpperCase()] || { titulo: "Otros", clase: "copies-group-other" };
 }
@@ -297,10 +298,10 @@ function renderizarCopiasOperativas_() {
   });
   const resumen = document.getElementById("admin-copias-resumen");
   if (resumen) resumen.innerText = `${filtradas.length} solicitud(es)`;
-  const ordenNivel = ["KG", "EP", "ES", "OTROS"];
+  const ordenNivel = ["KG", "EP", "ES", "BO", "OTROS"];
   const grupos = {};
   filtradas.forEach(function(item) {
-    const nivel = ["KG", "EP", "ES"].includes(String(item.nivel || "").toUpperCase()) ? String(item.nivel).toUpperCase() : "OTROS";
+    const nivel = ["KG", "EP", "ES", "BO"].includes(String(item.nivel || "").toUpperCase()) ? String(item.nivel).toUpperCase() : "OTROS";
     if (!grupos[nivel]) grupos[nivel] = [];
     grupos[nivel].push(item);
   });

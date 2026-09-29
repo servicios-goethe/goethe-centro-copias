@@ -13,6 +13,14 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Rollback: mover el deployment productivo a la versión anterior; no requiere restaurar hojas ni borrar datos.
 - El paso a producción queda pendiente de confirmar una ventana operativa y completar el checklist manual.
 
+## 2026-09-29 — Enlace al instructivo de impresiones
+
+- El texto descriptivo del encabezado de Solicitud de Copias fue reemplazado por un enlace bilingüe al instructivo de impresiones.
+- El enlace abre en una pestaña nueva y no modifica el flujo de carga ni envío.
+- Commit: `e188a7c` (`feat(rediseno): link copy instruction in section header`).
+- GAS de desarrollo: versión 63, `Rediseno copias - enlace instructivo`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-09-26 — Escudo local en el header
 
 - El header del rediseño usa `docs/Rediseno/escudo.png` embebido como PNG inline en GAS.

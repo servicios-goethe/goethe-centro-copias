@@ -35,6 +35,14 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Se agregó `docs/instructivoImpresiones.html` como copia documental editable y versionada.
 - Su contenido corresponde al instructivo operativo servido por `GAS/InstructivoCopias.html`.
 
+## 2026-09-29 — Corrección de enlace al instructivo interno
+
+- Se corrigió el enlace que resolvía como `userCodeAppPanel?vista=instructivo-copias` y podía mostrar una pantalla en blanco.
+- El enlace ahora se construye con la URL pública del deployment (`ScriptApp.getService().getUrl()`), manteniendo la ruta `?vista=instructivo-copias` que atiende `doGet(e)`.
+- Commit: `c0c588f` (`fix(copias): use public url for internal instruction`).
+- GAS de desarrollo: versión 65, `Corrección URL pública instructivo copias`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-09-26 — Escudo local en el header
 
 - El header del rediseño usa `docs/Rediseno/escudo.png` embebido como PNG inline en GAS.

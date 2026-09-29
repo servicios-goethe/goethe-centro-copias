@@ -2,6 +2,16 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-09-29 — Nivel BO en solicitudes de copias
+
+- Se agregó `BO · Back Office` al selector bilingüe de nivel.
+- `BO` requiere autorización, igual que `KG` y `EP`; `ES` conserva autorización automática.
+- La administración agrupa las solicitudes BO con color propio y la carpeta Drive se organiza por el nivel `BO`.
+- Se actualizó `docs/business-rules.md`.
+- Commit: `57c239f` (`feat(copias): add back office level`).
+- GAS de desarrollo: versión 66, `Copias - nivel BO Back Office`.
+- Producción no fue modificada con este cambio.
+
 ## 2026-09-29 — Diagnóstico de autorización Drive en producción
 
 - El deployment productivo ejecuta como `USER_DEPLOYING`; la cuenta desplegadora es `servicios@goethe.edu.ar`.

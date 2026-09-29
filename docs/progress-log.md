@@ -30,6 +30,11 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 64, `Rediseno copias - instructivo interno editable`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-29 — Fuente documental del instructivo
+
+- Se agregó `docs/instructivoImpresiones.html` como copia documental editable y versionada.
+- Su contenido corresponde al instructivo operativo servido por `GAS/InstructivoCopias.html`.
+
 ## 2026-09-26 — Escudo local en el header
 
 - El header del rediseño usa `docs/Rediseno/escudo.png` embebido como PNG inline en GAS.

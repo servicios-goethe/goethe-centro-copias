@@ -2,6 +2,13 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-09-29 — Hotfix productivo: restauración de AppConfig
+
+- Tras el lanzamiento se detectó `ReferenceError: CONFIG is not defined` porque el proyecto productivo no contenía `AppConfig.js`.
+- Se agregó el `AppConfig.js` versionado con la configuración productiva (`ENVIRONMENT=PRODUCCION`, Spreadsheet y carpeta de copias productivos).
+- El deployment oficial quedó actualizado a la versión 10 (`Hotfix producción - restaurar AppConfig`).
+- La aplicación ya no depende de una configuración global ausente; no se modificaron hojas ni datos.
+
 ## 2026-09-29 — Migración del rediseño a producción
 
 - Se publicó la rama aprobada `rediseno-pedidos-grafica` en el deployment productivo oficial.

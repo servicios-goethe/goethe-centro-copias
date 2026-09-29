@@ -21,6 +21,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 63, `Rediseno copias - enlace instructivo`.
 - Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
 
+## 2026-09-29 — Copia editable del instructivo dentro de GAS
+
+- Se incorporó el contenido del instructivo externo como `GAS/InstructivoCopias.html`, editable desde Apps Script.
+- `doGet(e)` expone la copia mediante `?vista=instructivo-copias`.
+- El enlace de Solicitud de Copias ahora abre la versión interna, sin depender del sitio externo.
+- Commit: `44654db` (`feat(copias): add editable GAS instruction page`).
+- GAS de desarrollo: versión 64, `Rediseno copias - instructivo interno editable`.
+- Producción y `main` no fueron modificadas; el cambio quedó sólo en `rediseno-pedidos-grafica`.
+
 ## 2026-09-26 — Escudo local en el header
 
 - El header del rediseño usa `docs/Rediseno/escudo.png` embebido como PNG inline en GAS.

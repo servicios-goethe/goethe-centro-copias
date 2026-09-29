@@ -2,6 +2,17 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-09-29 — Plan de salida a producción del rediseño
+
+- La rama aprobada es `rediseno-pedidos-grafica`; `main` y el deployment productivo permanecen sin cambios.
+- El reemplazo del código GAS es atómico a nivel de deployment: se suben los archivos, se crea una versión y se mueve el deployment a esa versión.
+- Tiempo técnico estimado del reemplazo: 2–5 minutos. Ventana operativa recomendada: 30–45 minutos, incluyendo congelamiento, pruebas y monitoreo.
+- Antes del corte: respaldo/verificación de hojas, confirmación de autorizadores de copias, carpeta Drive y remitente de correo; aviso a usuarios y cierre de formularios abiertos.
+- Durante el corte: congelar nuevos envíos durante 10–15 minutos, publicar la versión aprobada, recargar una sesión por perfil y ejecutar smoke tests de materiales, copias PDF, autorización, carga Drive, correo y administración.
+- Compatibilidad: el backend nuevo agrega datos de solicitante y validaciones de copias; no se debe dejar una sesión antigua enviando durante el cambio. Si no se puede garantizar la recarga, preparar primero una versión compatible con formularios antiguos.
+- Rollback: mover el deployment productivo a la versión anterior; no requiere restaurar hojas ni borrar datos.
+- El paso a producción queda pendiente de confirmar una ventana operativa y completar el checklist manual.
+
 ## 2026-09-26 — Escudo local en el header
 
 - El header del rediseño usa `docs/Rediseno/escudo.png` embebido como PNG inline en GAS.

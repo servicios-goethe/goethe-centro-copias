@@ -6,7 +6,7 @@
 
 **Diagnóstico:** no conviene borrar filas directamente del Spreadsheet. Las filas de `Pedidos_Retiro` sostienen el historial, las reservas, los movimientos de stock y la auditoría. Un borrado manual puede dejar stock comprometido o movimientos sin correlación.
 
-**Implementación propuesta:** agregar una acción administrativa de **Anular pedido** (baja lógica) que exija confirmación y motivo, marque las líneas como `Cancelado`, ponga en cero únicamente los saldos todavía no retirados y registre usuario, fecha, pedido y motivo en `Log_Auditoria`.
+**Implementación propuesta:** agregar una acción administrativa de **Anular pedido** (baja lógica) que exija confirmación y motivo, marque las líneas como `Cancelado`, ponga en cero únicamente los saldos todavía no retirados y registre usuario, fecha, pedido y motivo en `Log_Auditoria`. Los IDs recibidos para revisión son `RET-1791464629604` y `RET-1786559018968`; no se modificaron.
 
 **Reglas de integridad:**
 
@@ -34,14 +34,16 @@
 
 **Estado actual:** copias administrativas refresca cada 5 minutos; el dashboard de materiales no tiene temporizador periódico.
 
-**Implementación propuesta:**
+**Implementación propuesta (en pausa hasta proteger edición):**
 
 - Crear temporizador de 5 segundos para el dashboard de materiales y para copias administrativas.
 - Ejecutar sólo con la pestaña visible y mientras la solapa operativa esté activa.
 - Agregar guardas de solicitud en curso para no solapar llamadas `google.script.run`.
+- No refrescar mientras haya un formulario, input, textarea, selector o modal en edición; el foco del usuario debe tener prioridad.
+- Si existen cambios sin guardar, mostrar estado “edición en curso” y diferir el refresco hasta guardar, cancelar o quedar inactivo.
 - Actualizar también las listas propias después de una mutación; para usuarios comunes se recomienda refresco de 15 segundos o sólo al módulo visible para evitar consumo innecesario de cuota.
 
-**Criterios de aceptación:** una entrega o autorización realizada desde otra sesión aparece como máximo en 5 segundos; no se duplican solicitudes, no se reinician filtros y el consumo se detiene al ocultar la pestaña.
+**Criterios de aceptación:** una entrega o autorización realizada desde otra sesión aparece como máximo en 5 segundos cuando no hay edición activa; durante una edición no se pierde ningún valor, no se duplican solicitudes, no se reinician filtros y el consumo se detiene al ocultar la pestaña.
 
 ### Orden de ejecución
 

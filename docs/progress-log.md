@@ -4,9 +4,9 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 
 ## 2026-10-09 — Plan de integridad, feedback y refresco operativo
 
-- Se definió no borrar manualmente las dos entregas mal cargadas: se propone baja lógica auditada, con reversión de stock separada si ya hubo retiro.
+- Se definió no borrar manualmente las dos entregas mal cargadas (`RET-1791464629604` y `RET-1786559018968`): se propone baja lógica auditada, con reversión de stock separada si ya hubo retiro. No se modificaron esas filas.
 - Se detectó la decisión pendiente de BO: actualmente entra autorizado automáticamente; se propone mantener ese flujo o parametrizarlo si se requiere autorización manual.
-- Se planificó agregar feedback por entrega completa/parcial y refresco protegido cada 5 segundos para los paneles operativos de materiales y copias.
+- Se planificó agregar feedback por entrega completa/parcial y refresco protegido cada 5 segundos para los paneles operativos de materiales y copias. El refresco queda en pausa hasta proteger inputs, formularios y modales en edición.
 - El plan detallado quedó en `docs/implementation-plan.md`; todavía no se modificó el código ni producción.
 
 ## 2026-09-29 — BO autorizado automáticamente en producción

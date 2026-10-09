@@ -9,6 +9,15 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Se planificó agregar feedback por entrega completa/parcial y refresco protegido cada 5 segundos para los paneles operativos de materiales y copias. El refresco queda en pausa hasta proteger inputs, formularios y modales en edición.
 - El plan detallado quedó en `docs/implementation-plan.md`; todavía no se modificó el código ni producción.
 
+## 2026-10-09 — Anulación controlada de pedidos
+
+- Se agregó la acción administrativa `Anular pedido` para operador y administrador.
+- La acción conserva las filas, exige motivo, libera saldos no retirados y registra `pedido_anulado` en la auditoría.
+- Si una línea ya tiene cantidades retiradas, la operación se rechaza y exige una reversión de stock separada.
+- Commit: `2b85af6` (`feat(pedidos): add audited order cancellation`).
+- GAS de desarrollo: versión 67, `Pedidos - anulación controlada auditada`.
+- Los pedidos `RET-1791464629604` y `RET-1786559018968` no fueron modificados.
+
 ## 2026-09-29 — BO autorizado automáticamente en producción
 
 - Se corrigió la regla de negocio: `BO` pasa directamente a `AUTORIZADO`; sólo `KG` y `EP` requieren autorización.

@@ -22,7 +22,7 @@ function renderizarPedidosAdmin_() {
 }
 
 function actualizarFiltroPedidosAdmin() {
-  filtroPedidosAdmin.termino = String((document.getElementById("filtro-pedidos-admin") || {}).value || "").trim().toLocaleLowerCase("es");
+  filtroPedidosAdmin.termino = normalizarTextoBusqueda_((document.getElementById("filtro-pedidos-admin") || {}).value);
   filtroPedidosAdmin.soloFaltantes = !!((document.getElementById("filtro-pedidos-faltantes") || {}).checked);
   renderizarPedidosAdmin_();
 }
@@ -41,10 +41,11 @@ function filtrarPedidoAdmin_(pedido) {
     pedido.usuario,
     pedido.solicitanteMail,
     pedido.fecha
-  ].join(" ").toLocaleLowerCase("es");
-  const coincidePedido = base.includes(termino);
+  ];
+  const textoPedido = normalizarTextoBusqueda_(base.join(" "));
+  const coincidePedido = textoPedido.includes(termino);
   const coincideItem = pedido.items.some(function(item) {
-    return [item.producto, item.estado].join(" ").toLocaleLowerCase("es").includes(termino);
+    return normalizarTextoBusqueda_([item.producto, item.estado].join(" ")).includes(termino);
   });
   return coincideFaltantes && (coincidePedido || coincideItem);
 }

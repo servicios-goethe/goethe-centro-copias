@@ -4,15 +4,15 @@ function prepararFormularioCompras_() {
 }
 
 function obtenerProductosFiltradosCompra_() {
-  const termino = (document.getElementById("buscador-compra") || { value: "" }).value.trim().toLocaleLowerCase("es");
+  const termino = normalizarTextoBusqueda_((document.getElementById("buscador-compra") || { value: "" }).value);
   const soloConStock = document.getElementById("filtro-compra-stock") ? document.getElementById("filtro-compra-stock").checked : false;
   const soloSeleccionados = document.getElementById("filtro-compra-seleccionados") ? document.getElementById("filtro-compra-seleccionados").checked : false;
 
   return listaProductosGlobal.filter(function(producto) {
     const cantidad = cantidadesCompra[producto.id] || 0;
     const coincideBusqueda = !termino ||
-      obtenerEtiquetaProducto(producto).toLocaleLowerCase("es").includes(termino) ||
-      String(producto.id).toLocaleLowerCase("es").includes(termino);
+      normalizarTextoBusqueda_(obtenerEtiquetaProducto(producto)).includes(termino) ||
+      normalizarTextoBusqueda_(producto.id).includes(termino);
     const coincideStock = !soloConStock || producto.stockFisico > 0;
     const coincideSeleccion = !soloSeleccionados || cantidad > 0;
     return coincideBusqueda && coincideStock && coincideSeleccion;
@@ -177,7 +177,7 @@ function renderizarComprasAdmin_() {
 }
 
 function actualizarFiltroComprasAdmin() {
-  filtroComprasAdmin.termino = String((document.getElementById("filtro-recepcion-admin") || {}).value || "").trim().toLocaleLowerCase("es");
+  filtroComprasAdmin.termino = normalizarTextoBusqueda_((document.getElementById("filtro-recepcion-admin") || {}).value);
   filtroComprasAdmin.soloPendientes = !!((document.getElementById("filtro-recepcion-pendientes") || {}).checked);
   renderizarComprasAdmin_();
 }
@@ -191,10 +191,10 @@ function filtrarCompraAdmin_(lote) {
 
   if (!termino) return coincidePendiente;
 
-  const base = [lote.id, lote.fecha].join(" ").toLocaleLowerCase("es");
+  const base = normalizarTextoBusqueda_([lote.id, lote.fecha].join(" "));
   const coincideLote = base.includes(termino);
   const coincideItem = lote.items.some(function(item) {
-    return [item.producto, item.productoRecibido, item.estado].join(" ").toLocaleLowerCase("es").includes(termino);
+    return normalizarTextoBusqueda_([item.producto, item.productoRecibido, item.estado].join(" ")).includes(termino);
   });
   return coincidePendiente && (coincideLote || coincideItem);
 }

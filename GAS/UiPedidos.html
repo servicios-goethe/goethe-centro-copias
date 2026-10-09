@@ -1,13 +1,13 @@
 <script>
 function obtenerProductosFiltrados() {
-  const termino = (document.getElementById("buscador-productos") || { value: "" }).value.trim().toLocaleLowerCase("es");
+  const termino = normalizarTextoBusqueda_((document.getElementById("buscador-productos") || { value: "" }).value);
   const soloSeleccionados = document.getElementById("filtro-seleccionados") ? document.getElementById("filtro-seleccionados").checked : false;
 
   return listaProductosGlobal.filter(producto => {
     const cantidad = cantidadesPedido[producto.id] || 0;
     const coincideBusqueda = !termino ||
-      obtenerEtiquetaProducto(producto).toLocaleLowerCase("es").includes(termino) ||
-      String(producto.id).toLocaleLowerCase("es").includes(termino);
+      normalizarTextoBusqueda_(obtenerEtiquetaProducto(producto)).includes(termino) ||
+      normalizarTextoBusqueda_(producto.id).includes(termino);
     const coincideSeleccion = !soloSeleccionados || cantidad > 0;
     return coincideBusqueda && coincideSeleccion;
   });

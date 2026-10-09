@@ -1,4 +1,14 @@
 <script>
+// Normaliza únicamente para búsquedas: conserva intactos los nombres mostrados
+// y permite encontrar "lápices" escribiendo "lapices".
+function normalizarTextoBusqueda_(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es")
+    .trim();
+}
+
 let listaProductosGlobal = [];
 let cantidadesPedido = {};
 let cantidadesCompra = {};

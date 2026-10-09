@@ -18,6 +18,12 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 67, `Pedidos - anulación controlada auditada`.
 - Los pedidos `RET-1791464629604` y `RET-1786559018968` no fueron modificados.
 
+## 2026-10-09 — Anulación controlada publicada en producción
+
+- La acción validada permite anular pedidos tanto a administradores como a operadores.
+- Producción: versión 14, `Producción - anulación controlada auditada`.
+- Los dos IDs informados siguen pendientes de confirmación individual; no se ejecutó una anulación automática sobre ellos.
+
 ## 2026-09-29 — BO autorizado automáticamente en producción
 
 - Se corrigió la regla de negocio: `BO` pasa directamente a `AUTORIZADO`; sólo `KG` y `EP` requieren autorización.

@@ -7,6 +7,7 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Se definió no borrar manualmente las dos entregas mal cargadas (`RET-1791464629604` y `RET-1786559018968`): se propone baja lógica auditada, con reversión de stock separada si ya hubo retiro. No se modificaron esas filas.
 - Se detectó la decisión pendiente de BO: actualmente entra autorizado automáticamente; se propone mantener ese flujo o parametrizarlo si se requiere autorización manual.
 - Se planificó agregar feedback por entrega completa/parcial y refresco protegido cada 5 segundos para los paneles operativos de materiales y copias. El refresco queda en pausa hasta proteger inputs, formularios y modales en edición.
+- Como alternativa segura, se implementaron botones manuales de refresco para pedidos y solicitudes de copias; no se activa ningún temporizador automático.
 - El plan detallado quedó en `docs/implementation-plan.md`; todavía no se modificó el código ni producción.
 
 ## 2026-10-09 — Anulación controlada de pedidos

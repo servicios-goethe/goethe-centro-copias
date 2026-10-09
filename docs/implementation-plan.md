@@ -34,16 +34,14 @@
 
 **Estado actual:** copias administrativas refresca cada 5 minutos; el dashboard de materiales no tiene temporizador periódico.
 
-**Implementación propuesta (en pausa hasta proteger edición):**
+**Implementación adoptada:**
 
-- Crear temporizador de 5 segundos para el dashboard de materiales y para copias administrativas.
-- Ejecutar sólo con la pestaña visible y mientras la solapa operativa esté activa.
-- Agregar guardas de solicitud en curso para no solapar llamadas `google.script.run`.
-- No refrescar mientras haya un formulario, input, textarea, selector o modal en edición; el foco del usuario debe tener prioridad.
-- Si existen cambios sin guardar, mostrar estado “edición en curso” y diferir el refresco hasta guardar, cancelar o quedar inactivo.
-- Actualizar también las listas propias después de una mutación; para usuarios comunes se recomienda refresco de 15 segundos o sólo al módulo visible para evitar consumo innecesario de cuota.
+- No se activa refresco automático: reemplazar la grilla mientras se opera podría perder datos no guardados.
+- Agregar botones manuales `Refrescar pedidos` y `Refrescar solicitudes` en los paneles operativos.
+- Mantener guardas de solicitud en curso para no solapar llamadas `google.script.run`.
+- Actualizar las listas propias después de una mutación; el usuario también dispone de `Refrescar solicitudes`.
 
-**Criterios de aceptación:** una entrega o autorización realizada desde otra sesión aparece como máximo en 5 segundos cuando no hay edición activa; durante una edición no se pierde ningún valor, no se duplican solicitudes, no se reinician filtros y el consumo se detiene al ocultar la pestaña.
+**Criterios de aceptación:** una entrega o autorización realizada desde otra sesión aparece al pulsar el botón correspondiente; durante una edición no se pierde ningún valor, no se duplican solicitudes y los filtros permanecen aplicados.
 
 ### Orden de ejecución
 

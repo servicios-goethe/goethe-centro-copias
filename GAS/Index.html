@@ -249,7 +249,7 @@
             <div id="copias-mis-panel" class="copias-subpanel">
               <div class="copies-list-header">
                 <h3>Mis solicitudes · Meine Aufträge</h3>
-                <button class="btn btn-outline btn-small" type="button" onclick="cargarPanelCopias()">Actualizar</button>
+              <button class="btn btn-outline btn-small" type="button" onclick="cargarPanelCopias()">Refrescar solicitudes</button>
               </div>
               <div id="lista-copias-propias" class="copies-list"><div class="empty-state">Cargando solicitudes...</div></div>
             </div>
@@ -302,6 +302,7 @@
                 <input id="filtro-pedidos-faltantes" type="checkbox" onchange="actualizarFiltroPedidosAdmin()">
                 <span>Solo con faltantes · Nur mit Fehlmengen</span>
               </label>
+              <button class="btn btn-outline btn-small" type="button" onclick="cargarDashboardAdmin()">Refrescar pedidos</button>
             </div>
             <div id="lista-pedidos-admin"></div>
           </div>
@@ -440,6 +441,7 @@
                 <option value="RECHAZADO">Rechazadas</option>
                 <option value="FINALIZADO">Finalizadas</option>
               </select>
+              <button class="btn btn-outline btn-small" type="button" onclick="cargarPanelCopias(true)">Refrescar solicitudes</button>
             </div>
             <div id="lista-copias-operativas" class="copies-list"><div class="empty-state">Cargando solicitudes...</div></div>
           </div>

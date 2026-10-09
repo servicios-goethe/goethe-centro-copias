@@ -4,7 +4,6 @@ let copiasOperativasActuales = [];
 let copiasDecisionContexto = null;
 let copiasEnviando = false;
 let solicitantesCopiasBusquedaTimer_ = null;
-let copiasRefreshTimer_ = null;
 let copiasCargaEnCurso_ = false;
 
 function seleccionarOpcionCopiasUI_(selectId, value, button) {
@@ -120,15 +119,7 @@ function seleccionarSolicitanteCopiasUI_(index) {
   container.classList.add("hidden");
 }
 
-function programarActualizacionCopias_() {
-  if (copiasRefreshTimer_ || !rolActual || !rolActual.isAdmin) return;
-  copiasRefreshTimer_ = window.setInterval(function() {
-    if (document.visibilityState === "visible") cargarPanelCopias(true);
-  }, 300000);
-}
-
 function cargarPanelCopias(silencioso) {
-  programarActualizacionCopias_();
   if (copiasCargaEnCurso_) return;
   copiasCargaEnCurso_ = true;
   if (!silencioso) prepararSolicitanteCopiasUI_();

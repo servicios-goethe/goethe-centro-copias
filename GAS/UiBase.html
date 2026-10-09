@@ -549,8 +549,11 @@
   }
   
   function cargarDashboardAdmin() {
+    if (dashboardCargaEnCurso_) return;
+    dashboardCargaEnCurso_ = true;
     google.script.run
       .withSuccessHandler(function(data) {
+        dashboardCargaEnCurso_ = false;
         pedidosAdminActuales = data && data.pedidos ? data.pedidos : [];
         comprasAdminActuales = data && data.compras ? data.compras : [];
         actividadAdminActual = data && data.actividad ? data.actividad : [];
@@ -561,7 +564,10 @@
         renderizarActividadAdminLista_();
         prepararFormularioCompras_();
       })
-      .withFailureHandler(manejarError)
+      .withFailureHandler(function(error) {
+        dashboardCargaEnCurso_ = false;
+        manejarError(error);
+      })
       .getAdminDashboardData();
   }
 

@@ -663,6 +663,66 @@ function cancelarSaldoPedido(idPedido, productoId, motivo) {
   });
 }
 
+/**
+ * Anula un pedido completo sin borrar sus filas. Solo es válido mientras no
+ * haya cantidades retiradas físicamente; los saldos pendientes/listos se
+ * liberan y queda una marca auditable con el motivo.
+ */
+function anularPedido(idPedido, motivo) {
+  return withScriptLock_(() => {
+    const admin = asegurarAdmin_();
+    const ss = getSpreadsheet_();
+    const retirosCtx = obtenerContextoRetiros_(ss);
+    const motivoNormalizado = String(motivo || "").trim().slice(0, 500);
+    if (!motivoNormalizado) throw new Error("Ingresa un motivo para anular el pedido.");
+
+    const lineas = [];
+    for (let i = 1; i < retirosCtx.rows.length; i++) {
+      const retiro = leerFilaRetiro_(retirosCtx.rows[i], retirosCtx.indices);
+      if (retiro.pedidoId !== String(idPedido)) continue;
+      if (retiro.estado === ESTADOS.RETIRO_CANCELADO) continue;
+      if (normalizarCantidad_(retiro.cantidadRetirada) > 0) {
+        throw new Error("No se puede anular el pedido porque ya tiene cantidades retiradas. Requiere una reversión de stock.");
+      }
+      lineas.push({ row: i + 1, retiro: retiro });
+    }
+
+    if (!lineas.length) throw new Error("No se encontraron líneas activas para anular el pedido.");
+
+    lineas.forEach(function(linea) {
+      const retiro = linea.retiro;
+      retiro.cantidadLista = 0;
+      retiro.cantidadPendiente = 0;
+      retiro.estado = ESTADOS.RETIRO_CANCELADO;
+      retiro.observaciones = agregarObservacionPedido_(retiro.observaciones, `Pedido anulado: ${motivoNormalizado}`);
+      escribirFilaRetiro_(retirosCtx.sheet, linea.row, retirosCtx.indices, {
+        ESTADO: retiro.estado,
+        AUTORIZADOR: admin.email,
+        CANTIDAD_LISTA: 0,
+        CANTIDAD_PENDIENTE: 0,
+        OBSERVACIONES: retiro.observaciones
+      });
+    });
+
+    registrarAuditoria_(ss, "pedido_anulado", {
+      loteId: String(idPedido),
+      lineas: lineas.length,
+      motivo: motivoNormalizado,
+      usuario: admin.email
+    });
+    bumpDataVersion_();
+    return {
+      mensaje: `Pedido ${idPedido} anulado correctamente.`,
+      pedido: null,
+      actividad: admin.isOperadorEntrega ? [] : obtenerActividadRecienteDesdeSpreadsheet_(ss, 12),
+      resumen: {
+        pedidos: obtenerPedidosParaGestionDesdeSpreadsheet_(ss).length,
+        compras: admin.isOperadorEntrega ? 0 : obtenerComprasPendientesDesdeSpreadsheet_(ss).length
+      }
+    };
+  });
+}
+
 function procesarCambiosPedido(idPedido, cambios) {
   return withScriptLock_(() => {
     const admin = asegurarAdmin_();

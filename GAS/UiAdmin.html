@@ -92,6 +92,7 @@ function renderizarPedidoAdmin_(pedido) {
           <div class="batch-toolbar-actions">
             <button class="btn btn-outline btn-small" type="button" onclick="cargarDisponiblePedidoAdmin('${escapeHtml_(pedido.id)}')">Cargar disponible</button>
             <button class="btn btn-primary btn-small" onclick="procesarPedidoAdmin('${escapeHtml_(pedido.id)}')">Procesar cambios</button>
+            <button class="btn btn-chip-danger btn-small" type="button" onclick="anularPedidoAdmin('${escapeHtml_(pedido.id)}')">Anular pedido</button>
           </div>
         </div>
         <div class="pedido-lineas-shell">
@@ -156,6 +157,7 @@ function renderizarPedidoEntregaSimple_(pedido) {
           <div class="batch-toolbar-actions">
             <button class="btn btn-outline btn-small" type="button" ${puedeEntregarParcial ? "" : "disabled"} onclick="entregarPedidoParcialAdmin('${escapeHtml_(pedido.id)}')">Registrar entrega parcial</button>
             <button class="btn btn-primary btn-small" type="button" ${puedeEntregar ? "" : "disabled"} onclick="entregarPedidoCompletoAdmin('${escapeHtml_(pedido.id)}')">Registrar entrega</button>
+            <button class="btn btn-chip-danger btn-small" type="button" onclick="anularPedidoAdmin('${escapeHtml_(pedido.id)}')">Anular pedido</button>
           </div>
         </div>
         <div class="pedido-lineas-shell">
@@ -487,6 +489,23 @@ function entregarPedidoParcialAdmin(idPedido) {
     })
     .withFailureHandler(manejarError)
     .entregarPedidoParcialDisponible(idPedido);
+}
+
+function anularPedidoAdmin(idPedido) {
+  mostrarEntradaModal_("La anulación conserva el historial y libera los saldos no retirados. Si ya hubo retiro físico, se rechazará. Indicá el motivo.", function(motivo) {
+    mostrarLoading("Anulando pedido...");
+    google.script.run
+      .withSuccessHandler(function(respuesta) {
+        ocultarLoading();
+        mostrarAviso("success", respuesta.mensaje || "Pedido anulado.");
+        pedidosAdminActuales = pedidosAdminActuales.filter(function(item) { return item.id !== idPedido; });
+        renderizarPedidosAdmin_();
+        actualizarActividadYResumenDesdeOperacion_(respuesta.actividad);
+        actualizarStockGlobal();
+      })
+      .withFailureHandler(manejarError)
+      .anularPedido(idPedido, motivo);
+  }, "Anular pedido", "Motivo");
 }
 
 function deshacerPreparacionPedidoAdmin(idPedido, productoId) {

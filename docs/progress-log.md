@@ -8,6 +8,9 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Se detectó la decisión pendiente de BO: actualmente entra autorizado automáticamente; se propone mantener ese flujo o parametrizarlo si se requiere autorización manual.
 - Se planificó agregar feedback por entrega completa/parcial y refresco protegido cada 5 segundos para los paneles operativos de materiales y copias. El refresco queda en pausa hasta proteger inputs, formularios y modales en edición.
 - Como alternativa segura, se implementaron botones manuales de refresco para pedidos y solicitudes de copias; no se activa ningún temporizador automático.
+- Commit: `384213b` (`feat(ui): add safe manual refresh controls`).
+- GAS de desarrollo: versión 68, `UI - refresco manual seguro`.
+- Producción no fue modificada con este cambio.
 - El plan detallado quedó en `docs/implementation-plan.md`; todavía no se modificó el código ni producción.
 
 ## 2026-10-09 — Anulación controlada de pedidos

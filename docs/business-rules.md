@@ -160,7 +160,6 @@ La última igualdad puede dejar de cumplirse después de una cancelación de sal
 
 ### 6.2 Autorización
 
-- Las solicitudes `ES` se autorizan automáticamente y pasan a `AUTORIZADO`.
 - Las solicitudes `KG` y `EP` comienzan en `SOLICITADO` y requieren al menos un autorizador activo del nivel o de `TODOS`.
 - Las solicitudes `ES` y `BO` se autorizan automáticamente y pasan a `AUTORIZADO`.
 - Los autorizadores se cargan en `Usuarios_Copias` (también se admite la hoja alternativa `Autorizados_Copias`) con las columnas `Email`, `Nivel`, `Puede_Autorizar` y `Activo`; para habilitar un usuario deben indicarse `Puede_Autorizar = SI` y `Activo = SI`.

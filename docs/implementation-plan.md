@@ -1,5 +1,56 @@
 # Plan de implementación del feedback de usuarios
 
+## Plan adicional — 2026-10-09
+
+### A. Corrección controlada de entregas mal cargadas
+
+**Diagnóstico:** no conviene borrar filas directamente del Spreadsheet. Las filas de `Pedidos_Retiro` sostienen el historial, las reservas, los movimientos de stock y la auditoría. Un borrado manual puede dejar stock comprometido o movimientos sin correlación.
+
+**Implementación propuesta:** agregar una acción administrativa de **Anular pedido** (baja lógica) que exija confirmación y motivo, marque las líneas como `Cancelado`, ponga en cero únicamente los saldos todavía no retirados y registre usuario, fecha, pedido y motivo en `Log_Auditoria`.
+
+**Reglas de integridad:**
+
+- Si el pedido no tiene cantidades retiradas, se puede anular completo de forma segura.
+- Si ya hubo retiro, no se anula automáticamente: requiere una operación de reversión de stock separada y auditada.
+- No se elimina ninguna fila física.
+- Para las dos entregas actuales, primero se deben identificar `ID_Pedido`, producto, estado y cantidades; luego aplicar la acción controlada o corregirlas con el procedimiento de reversión.
+
+### B. BO, permisos y feedback de trabajos
+
+**Estado actual:** `BO` ingresa automáticamente como `AUTORIZADO`, mientras `KG` y `EP` requieren autorización. Esto contradice parcialmente el pedido de “poder autorizar Back Office”.
+
+**Decisión funcional pendiente:**
+
+- Opción recomendada: mantener BO automático y permitir que operador/administrador lo procese y finalice.
+- Opción alternativa: agregar una configuración `BO_REQUIERE_AUTORIZACION`; cuando esté activa, BO pasa a `SOLICITADO` y los usuarios autorizados pueden decidirlo.
+
+**Feedback propuesto:**
+
+- Materiales: conservar el aviso `Listo para retirar` y agregar correo al completar una entrega, además de correo específico para entrega parcial con saldo pendiente.
+- Copias: conservar la notificación de finalización; verificar que BO automático llegue a la bandeja de trabajos y pueda finalizarse.
+- En todos los casos, el correo se envía sólo ante una transición real y una falla de correo se devuelve como advertencia sin deshacer la operación.
+
+### C. Refresco automático cada 5 segundos
+
+**Estado actual:** copias administrativas refresca cada 5 minutos; el dashboard de materiales no tiene temporizador periódico.
+
+**Implementación propuesta:**
+
+- Crear temporizador de 5 segundos para el dashboard de materiales y para copias administrativas.
+- Ejecutar sólo con la pestaña visible y mientras la solapa operativa esté activa.
+- Agregar guardas de solicitud en curso para no solapar llamadas `google.script.run`.
+- Actualizar también las listas propias después de una mutación; para usuarios comunes se recomienda refresco de 15 segundos o sólo al módulo visible para evitar consumo innecesario de cuota.
+
+**Criterios de aceptación:** una entrega o autorización realizada desde otra sesión aparece como máximo en 5 segundos; no se duplican solicitudes, no se reinician filtros y el consumo se detiene al ocultar la pestaña.
+
+### Orden de ejecución
+
+1. Identificar y corregir las dos entregas actuales con baja lógica o procedimiento de reversión.
+2. Implementar feedback de entrega completa/parcial.
+3. Implementar refresco protegido de materiales y copias.
+4. Resolver la decisión de autorización BO y, si corresponde, activar la configuración alternativa.
+5. Validar en desarrollo y recién después publicar en producción.
+
 ## Estado de partida
 
 - Rama `main` sincronizada con `origin/main`, con cambios locales previos en once archivos versionados y un ADR nuevo.

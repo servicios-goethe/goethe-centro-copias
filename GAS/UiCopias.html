@@ -233,7 +233,7 @@ function metaNivelCopias_(nivel) {
 function renderizarTarjetaCopias_(item, operativa) {
   const puedeDecidir = operativa && item.estado === "SOLICITADO" && rolActual && (rolActual.isAdmin || rolActual.isAutorizadorCopias);
   const decisiones = puedeDecidir
-    ? `<button class="btn btn-primary btn-small" type="button" onclick="abrirDecisionCopiasPorIdUI_('${escapeHtml_(item.id)}', 'autorizar')">Autorizar</button>
+    ? `<button class="btn btn-primary btn-small" type="button" onclick="autorizarSolicitudCopiasUI_('${escapeHtml_(item.id)}')">Autorizar</button>
        <button class="btn btn-outline btn-small" type="button" onclick="abrirDecisionCopiasPorIdUI_('${escapeHtml_(item.id)}', 'rechazar')">Rechazar</button>`
     : "";
   const finalizar = operativa && item.estado === "AUTORIZADO"
@@ -338,6 +338,21 @@ function abrirDecisionCopiasPorIdUI_(id, accion) {
       document.getElementById("copias-confirmar-decision").classList.add("hidden");
     })
     .getDecisionCopiasDataPorId(id);
+}
+
+function autorizarSolicitudCopiasUI_(id) {
+  mostrarLoading("Autorizando solicitud...");
+  google.script.run
+    .withSuccessHandler(function(result) {
+      ocultarLoading();
+      mostrarAviso("success", result.message || "Solicitud autorizada.");
+      cargarPanelCopias(true);
+    })
+    .withFailureHandler(function(error) {
+      ocultarLoading();
+      manejarError(error);
+    })
+    .decidirSolicitudCopiasPorId(id, "AUTORIZAR", "");
 }
 
 function procesarAccionCopiasDesdeUrl_() {

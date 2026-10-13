@@ -609,5 +609,6 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Las tarjetas envían el número de fila junto con el ID; el servidor lo valida contra el ID y evita leer toda la hoja para cada autorización.
 - La lista de autorizadores por nivel se cachea durante 5 minutos.
 - La auditoría y el cambio de estado se mantienen.
+- GAS de desarrollo: versión 80, `Acelerar autorizacion por fila y cache`.
 - Pendiente medir nuevamente el tiempo en desarrollo.
 

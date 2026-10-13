@@ -124,7 +124,6 @@ function registrarPedidoMasivo(payload) {
   return withScriptLock_(() => {
     const ss = getSpreadsheet_();
     const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-    if (role.isAutorizadorCopias) throw new Error("El perfil autorizarcopias solo puede operar solicitudes de copias.");
     const pedido = Array.isArray(payload) ? { items: payload } : (payload || {});
     const items = consolidarArticulosPorId_(pedido.items);
     const materialNoListado = String(pedido.materialNoListado || "").trim().slice(0, 200);
@@ -297,8 +296,6 @@ function itemPedidoEditablePorOperador_(retiro) {
 
 function obtenerMisPedidosEditables() {
   const ss = getSpreadsheet_();
-  const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-  if (role.isAutorizadorCopias) return [];
   const user = Session.getActiveUser().getEmail();
   const retirosCtx = obtenerContextoRetiros_(ss);
   const productosMap = obtenerMapaProductos_(ss);
@@ -337,8 +334,6 @@ function obtenerMisPedidosEditables() {
 function actualizarItemPedidoPropio(idPedido, productoId, nuevaCantidad) {
   return withScriptLock_(() => {
     const ss = getSpreadsheet_();
-    const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-    if (role.isAutorizadorCopias) throw new Error("El perfil autorizarcopias no puede modificar pedidos de libreria.");
     const user = Session.getActiveUser().getEmail();
     const retirosCtx = obtenerContextoRetiros_(ss);
     const cantidad = normalizarCantidad_(nuevaCantidad);

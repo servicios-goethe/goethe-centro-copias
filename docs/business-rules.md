@@ -165,8 +165,7 @@ La última igualdad puede dejar de cumplirse después de una cancelación de sal
 - Los autorizadores se cargan en `Usuarios_Copias` (también se admite la hoja alternativa `Autorizados_Copias`) con las columnas `Email`, `Nivel`, `Puede_Autorizar` y `Activo`; para habilitar un usuario deben indicarse `Puede_Autorizar = SI` y `Activo = SI`.
 - El solicitante queda excluido de la lista y no puede decidir su propia solicitud.
 - Un administrador con perfil exacto `admin` o un autorizador activo del nivel puede decidir.
-- El perfil `autorizarcopias` en `Usuarios_Admin` limita la interfaz al módulo de copias y a las solicitudes pendientes que ese usuario puede autorizar; permite crear y consultar sus propias solicitudes, pero no habilita materiales, compras, stock ni finalización de trabajos.
-- El servidor rechaza el alta, edición y consulta de pedidos de librería para ese perfil, aunque se invoque una función antigua o una URL directa.
+- El perfil `autorizarcopias` en `Usuarios_Admin` agrega la autorización de copias a las capacidades del usuario común: puede crear y consultar sus propios pedidos de materiales, pero no accede a compras, stock, recepción, entregas ni funciones administrativas.
 - El enlace contiene el token original; la hoja conserva únicamente su hash SHA-256.
 - El token vence a los 14 días.
 - Decisiones admitidas: `AUTORIZAR` y `RECHAZAR`.

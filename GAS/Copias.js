@@ -303,8 +303,8 @@ function registrarSolicitudCopias(form) {
     if (archivoBytes > CONFIG.COPIAS_MAX_FILE_BYTES) throw new Error("El archivo supera el maximo de 80 MB.");
 
     const requiereAutorizacion = !["ES", "BO"].includes(data.nivel);
-    const autorizadores = requiereAutorizacion ? obtenerAutorizadoresCopias_(ss, data.nivel, solicitante.email) : [];
-    if (requiereAutorizacion && !autorizadores.length) {
+    const tieneAutorizadores = requiereAutorizacion ? obtenerAutorizadoresCopias_(ss, data.nivel, solicitante.email).length > 0 : true;
+    if (requiereAutorizacion && !tieneAutorizadores) {
       throw new Error(`No hay autorizadores activos configurados para ${data.nivel}. Carga usuarios en la hoja Usuarios_Copias con Nivel ${data.nivel} (o TODOS), Puede_Autorizar = SI y Activo = SI.`);
     }
 
@@ -353,18 +353,6 @@ function registrarSolicitudCopias(form) {
     registrarLogCopias_(ss, id, "solicitud_creada", { nivel: data.nivel, estado: estado, archivoBytes: archivoBytes, solicitanteNombre: data.solicitanteNombre });
     registrarAuditoria_(ss, "copias_solicitud_creada", { solicitudId: id, nivel: data.nivel, estado: estado, solicitanteNombre: data.solicitanteNombre });
 
-    enviarMailCopiasSeguro_(ss, id, "solicitud_recibida", [solicitante.email], function() {
-      return buildMailCopiasRecibida_(id, data, estado);
-    });
-    if (requiereAutorizacion) {
-      enviarMailCopiasSeguro_(ss, id, "autorizacion_solicitada", autorizadores, function() {
-        return buildMailCopiasAutorizar_(id, solicitante.email, data, token);
-      });
-    } else {
-      enviarMailCopiasSeguro_(ss, id, "solicitud_es_autorizada", [RESPONSABLES.COPIAS], function() {
-        return buildMailCopiasOperador_(id, solicitante.email, data);
-      });
-    }
     bumpDataVersion_();
     return { ok: true, id: id, estado: estado, message: `Solicitud ${id} registrada.` };
   });
@@ -414,7 +402,7 @@ function getDecisionCopiasDataPorId(id) {
   return serializarSolicitudCopias_(solicitud);
 }
 
-function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, notificarOperador) {
+function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo) {
     if (solicitud.estado !== ESTADOS.COPIAS_SOLICITADO) {
       return {
         ok: true,
@@ -444,16 +432,6 @@ function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, 
     registrarLogCopias_(ss, solicitud.id, rechazo ? "solicitud_rechazada" : "solicitud_autorizada", { usuario: role.email, motivo: motivoLimpio });
     registrarAuditoria_(ss, rechazo ? "copias_rechazada" : "copias_autorizada", { solicitudId: solicitud.id, usuario: role.email });
 
-    if (rechazo) {
-      enviarMailCopiasSeguro_(ss, solicitud.id, "rechazo_notificado", [solicitud.solicitante], function() {
-        return buildMailCopiasDecision_(solicitud.id, estado, role.email, motivoLimpio);
-      });
-    }
-    if (!rechazo && notificarOperador !== false) {
-      enviarMailCopiasSeguro_(ss, solicitud.id, "operador_notificado", [RESPONSABLES.COPIAS], function() {
-        return buildMailCopiasOperador_(solicitud.id, solicitud.solicitante, solicitud);
-      });
-    }
     bumpDataVersion_();
     return { ok: true, estado: estado, message: `Solicitud ${estado.toLowerCase()} correctamente.` };
 }
@@ -465,7 +443,7 @@ function decidirSolicitudCopias(token, decision, motivo) {
     const solicitud = buscarSolicitudCopiasPorToken_(ss, token);
     if (!solicitud) throw new Error("El enlace de autorizacion no es valido.");
     validarPermisoDecisionCopias_(ss, role, solicitud);
-    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, true);
+    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo);
   });
 }
 
@@ -476,9 +454,7 @@ function decidirSolicitudCopiasPorId(id, decision, motivo) {
     const solicitud = buscarSolicitudCopiasPorId_(ss, id);
     if (!solicitud) throw new Error("No se encontro la solicitud.");
     validarPermisoDecisionCopias_(ss, role, solicitud);
-    // Desde la bandeja el operador ya ve el cambio; se evita el mail redundante
-    // que hacía que cada autorización esperara dos envíos síncronos.
-    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, false);
+    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo);
   });
 }
 

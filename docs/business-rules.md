@@ -178,7 +178,7 @@ La última igualdad puede dejar de cumplirse después de una cancelación de sal
 - Solo un administrador efectivo puede finalizar.
 - Solo se finaliza una solicitud en estado `AUTORIZADO`.
 - La finalización registra usuario y fecha, pasa a `FINALIZADO` y notifica al solicitante.
-- La autorización no notifica al solicitante; el único aviso positivo al solicitante se envía cuando el trabajo queda listo para retirar. Los rechazos sí notifican el motivo.
+- La creación, autorización y rechazo no envían correos; el único correo del módulo se envía al solicitante cuando el trabajo queda finalizado/listo para retirar.
 - No existe transición implementada desde `RECHAZADO` o `FINALIZADO` hacia otro estado.
 
 ```mermaid

@@ -590,3 +590,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - El solicitante recibe mail positivo únicamente cuando el trabajo queda listo para retirar; los rechazos conservan su notificación con motivo.
 - GAS de desarrollo: versión 77, `Mail de copias solo al retirar`.
 
+## 2026-10-13 — Un único mail al finalizar copias
+
+- Se eliminaron los correos de alta, solicitud de autorización, aprobación, rechazo y aviso al operador.
+- El único envío restante es el mail al solicitante cuando el operador/admin marca el trabajo como `FINALIZADO`.
+- La configuración de autorizadores se sigue validando, aunque ya no se envíen mails de aviso.
+- Pendiente validar en desarrollo antes de promover a producción.
+

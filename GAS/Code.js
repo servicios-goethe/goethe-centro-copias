@@ -41,3 +41,20 @@ function verificarEscrituraDriveCopias() {
   probe.setTrashed(true);
   return result;
 }
+
+/**
+ * Fuerza la solicitud del scope external_request requerido por la carga
+ * resumible de Drive y confirma qué cuenta está usando la autorización.
+ * Ejecutar manualmente una vez desde el editor de Apps Script.
+ */
+function verificarPermisoCargaResumibleDrive() {
+  const response = UrlFetchApp.fetch("https://www.googleapis.com/drive/v3/about?fields=user(emailAddress,displayName)", {
+    headers: { Authorization: `Bearer ${ScriptApp.getOAuthToken()}` },
+    muteHttpExceptions: true
+  });
+  if (response.getResponseCode() !== 200) {
+    throw new Error(`No se pudo validar la API de Drive (${response.getResponseCode()}): ${response.getContentText()}`);
+  }
+  const body = JSON.parse(response.getContentText() || "{}");
+  return { ok: true, cuenta: body.user || null };
+}

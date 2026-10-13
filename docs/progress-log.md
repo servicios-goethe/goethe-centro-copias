@@ -584,3 +584,9 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 76, `Optimizar autorizaciones y refresco`.
 - Pendiente validar tiempos con las 52 solicitudes de `s.kronisch@goethe.edu.ar` antes de promover a producción.
 
+## 2026-10-13 — Mail al solicitante sólo al retirar
+
+- La aprobación de una solicitud de copias dejó de enviar confirmación al solicitante.
+- El solicitante recibe mail positivo únicamente cuando el trabajo queda listo para retirar; los rechazos conservan su notificación con motivo.
+- Pendiente validar en desarrollo antes de promover a producción.
+

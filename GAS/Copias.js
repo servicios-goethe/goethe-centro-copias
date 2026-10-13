@@ -444,9 +444,11 @@ function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, 
     registrarLogCopias_(ss, solicitud.id, rechazo ? "solicitud_rechazada" : "solicitud_autorizada", { usuario: role.email, motivo: motivoLimpio });
     registrarAuditoria_(ss, rechazo ? "copias_rechazada" : "copias_autorizada", { solicitudId: solicitud.id, usuario: role.email });
 
-    enviarMailCopiasSeguro_(ss, solicitud.id, rechazo ? "rechazo_notificado" : "autorizacion_notificada", [solicitud.solicitante], function() {
-      return buildMailCopiasDecision_(solicitud.id, estado, role.email, motivoLimpio);
-    });
+    if (rechazo) {
+      enviarMailCopiasSeguro_(ss, solicitud.id, "rechazo_notificado", [solicitud.solicitante], function() {
+        return buildMailCopiasDecision_(solicitud.id, estado, role.email, motivoLimpio);
+      });
+    }
     if (!rechazo && notificarOperador !== false) {
       enviarMailCopiasSeguro_(ss, solicitud.id, "operador_notificado", [RESPONSABLES.COPIAS], function() {
         return buildMailCopiasOperador_(solicitud.id, solicitud.solicitante, solicitud);

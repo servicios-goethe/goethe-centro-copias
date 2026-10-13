@@ -617,5 +617,5 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - `autorizarcopias` vuelve a mostrar `Solicitud de Materiales` como usuario común.
 - Puede crear, consultar y editar sus propios pedidos de librería; no obtiene funciones administrativas.
 - Mantiene la bandeja restringida de autorizaciones de copias.
-- Pendiente validar en desarrollo.
+- GAS de desarrollo: versión 81, `Materiales para autorizador de copias`.
 

@@ -24,6 +24,13 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 85, `Carga resumible por bloques sin CORS`.
 - Producción no fue modificada.
 
+## 2026-10-13 — Optimización de bloques de carga
+
+- La prueba real de 62 MB completó correctamente, pero tardó casi 5 minutos con bloques de 4 MB.
+- Se aumentó el tamaño a 12 MB para reducir invocaciones Apps Script y conversiones Base64, conservando reintentos y la carga resumible.
+- GAS de desarrollo: versión 86, `Carga resumible optimizada 12 MB`.
+- Producción no fue modificada.
+
 ## 2026-10-09 — Plan de integridad, feedback y refresco operativo
 
 - Se definió no borrar manualmente las dos entregas mal cargadas (`RET-1791464629604` y `RET-1786559018968`): se propone baja lógica auditada, con reversión de stock separada si ya hubo retiro. No se modificaron esas filas.

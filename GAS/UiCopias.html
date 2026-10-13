@@ -258,7 +258,9 @@ function enviarSolicitudCopias(form, event) {
 }
 
 async function subirArchivoCopiasResumible_(sesion, archivo) {
-  const chunkSize = 4 * 1024 * 1024;
+  // 12 MB reduce el overhead de invocaciones GAS sin acercarse al limite
+  // practico de payload una vez aplicado el aumento de Base64 (~33%).
+  const chunkSize = 12 * 1024 * 1024;
   let inicio = 0;
   while (inicio < archivo.size) {
     const fin = Math.min(inicio + chunkSize, archivo.size);

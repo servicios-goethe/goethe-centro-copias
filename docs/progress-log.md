@@ -562,3 +562,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - La restricción no depende de ocultar botones y evita accesos por funciones o URLs antiguas.
 - GAS de desarrollo: versión 74, `Restriccion pedidos para autorizarcopias`.
 
+## 2026-10-13 — Autorización directa desde la bandeja
+
+- El botón `Autorizar` ejecuta directamente la decisión server-side y muestra el resultado, sin dejar la interfaz detenida en `Validando permisos y estado...`.
+- El backend conserva la validación de identidad, nivel, estado y no autoautorización.
+- La ausencia del módulo Materiales para `autorizarcopias` es intencional: ese perfil sólo trabaja con copias.
+- GAS de desarrollo: versión 75, `Autorizacion directa desde bandeja`.
+

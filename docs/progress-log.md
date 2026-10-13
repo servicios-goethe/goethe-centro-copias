@@ -602,5 +602,5 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Se restauró el mail de recepción al solicitante al crear una solicitud.
 - Se mantiene el mail al solicitante cuando el trabajo queda `FINALIZADO`.
 - Autorización, rechazo y avisos al operador no envían mail.
-- Pendiente validar en desarrollo antes de promover a producción.
+- GAS de desarrollo: versión 79, `Dos mails: alta y finalizacion`.
 

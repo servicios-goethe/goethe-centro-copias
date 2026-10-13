@@ -11,6 +11,12 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 82, `feat: resumable Drive uploads for copy requests`.
 - Producción no fue modificada. Antes de promoverlo hay que validar en navegador un PDF de 70 MB o más, corte/reintento y el alcance de seguridad del token OAuth usado por la carga directa.
 
+## 2026-10-13 — Diagnóstico de autorización para carga resumible
+
+- Se confirmó que el error no correspondía a la hoja `Solicitantes`: el flujo alcanzaba la nueva carga y fallaba al invocar `UrlFetchApp.fetch` por falta de autorización del scope `script.external_request`.
+- Se agregó `verificarPermisoCargaResumibleDrive`, que consulta la API de Drive y fuerza la autorización explícita del scope desde el editor de Apps Script.
+- GAS de desarrollo: versión 83. Producción no fue modificada.
+
 ## 2026-10-09 — Plan de integridad, feedback y refresco operativo
 
 - Se definió no borrar manualmente las dos entregas mal cargadas (`RET-1791464629604` y `RET-1786559018968`): se propone baja lógica auditada, con reversión de stock separada si ya hubo retiro. No se modificaron esas filas.

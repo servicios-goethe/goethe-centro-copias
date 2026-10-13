@@ -588,5 +588,5 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 
 - La aprobación de una solicitud de copias dejó de enviar confirmación al solicitante.
 - El solicitante recibe mail positivo únicamente cuando el trabajo queda listo para retirar; los rechazos conservan su notificación con motivo.
-- Pendiente validar en desarrollo antes de promover a producción.
+- GAS de desarrollo: versión 77, `Mail de copias solo al retirar`.
 

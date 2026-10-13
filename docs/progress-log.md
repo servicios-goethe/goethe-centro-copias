@@ -595,5 +595,5 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Se eliminaron los correos de alta, solicitud de autorización, aprobación, rechazo y aviso al operador.
 - El único envío restante es el mail al solicitante cuando el operador/admin marca el trabajo como `FINALIZADO`.
 - La configuración de autorizadores se sigue validando, aunque ya no se envíen mails de aviso.
-- Pendiente validar en desarrollo antes de promover a producción.
+- GAS de desarrollo: versión 78, `Copias: solo mail al finalizar`.
 

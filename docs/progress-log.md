@@ -2,6 +2,15 @@
 
 Este documento registra cada corte verificable del proyecto. Un despliegue en desarrollo no implica aprobación para producción.
 
+## 2026-10-13 — Carga resumible de archivos de copias en desarrollo
+
+- Se agregó un flujo experimental de carga directa resumible a Google Drive para PDFs grandes.
+- El navegador sube el archivo en bloques de 8 MB mediante una sesión `uploadType=resumable`; Apps Script registra la solicitud recién cuando Drive confirma el archivo.
+- Se mantienen las validaciones de PDF, tamaño máximo, carpeta por solicitud y asociación entre archivo e ID generado.
+- La carga anterior mediante `google.script.run` queda reemplazada en la interfaz de desarrollo; el flujo tradicional permanece en el código como compatibilidad de servidor.
+- GAS de desarrollo: versión 82, `feat: resumable Drive uploads for copy requests`.
+- Producción no fue modificada. Antes de promoverlo hay que validar en navegador un PDF de 70 MB o más, corte/reintento y el alcance de seguridad del token OAuth usado por la carga directa.
+
 ## 2026-10-09 — Plan de integridad, feedback y refresco operativo
 
 - Se definió no borrar manualmente las dos entregas mal cargadas (`RET-1791464629604` y `RET-1786559018968`): se propone baja lógica auditada, con reversión de stock separada si ya hubo retiro. No se modificaron esas filas.

@@ -292,6 +292,77 @@ function guardarArchivoCopias_(blob, solicitudId, nivel) {
   return requestFolder.createFile(blob);
 }
 
+/**
+ * Inicia una sesion resumible de Drive para que el navegador suba el PDF
+ * directamente, sin atravesar google.script.run con todo el contenido.
+ * La sesion queda asociada a una carpeta de solicitud; el registro en Sheets
+ * se crea unicamente cuando el cliente confirma que Drive termino la carga.
+ */
+function iniciarCargaCopiasDrive(data) {
+  const ss = getSpreadsheet_();
+  const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
+  if (!role.isGoethe) throw new Error("Solo se admiten solicitudes de cuentas @goethe.edu.ar.");
+  asegurarEstructuraCopias_(ss);
+
+  const payload = data || {};
+  const solicitante = obtenerSolicitanteCopiasDesdeDirectorio_(ss, role, payload);
+  const formData = Object.assign({}, payload, { solicitanteNombre: solicitante.nombre });
+  const datos = validarDatosSolicitudCopias_(formData);
+  const nombre = String(payload.archivoNombre || "").trim();
+  const tamanoBytes = Number(payload.archivoBytes || 0);
+  if (!nombre || extensionArchivoCopias_(nombre) !== "pdf") throw new Error("Formato no admitido. Solo se aceptan archivos PDF.");
+  if (!Number.isFinite(tamanoBytes) || tamanoBytes < 1) throw new Error("El archivo esta vacio.");
+  if (tamanoBytes > CONFIG.COPIAS_MAX_FILE_BYTES) throw new Error("El archivo supera el maximo de 80 MB.");
+
+  const requiereAutorizacion = !["ES", "BO"].includes(datos.nivel);
+  const tieneAutorizadores = requiereAutorizacion ? obtenerAutorizadoresCopias_(ss, datos.nivel, solicitante.email).length > 0 : true;
+  if (requiereAutorizacion && !tieneAutorizadores) {
+    throw new Error(`No hay autorizadores activos configurados para ${datos.nivel}.`);
+  }
+
+  const id = generarIdSolicitudCopias_();
+  const root = DriveApp.getFolderById(CONFIG.COPIAS_DRIVE_FOLDER_ID);
+  const year = Utilities.formatDate(new Date(), CONFIG.TIMEZONE, "yyyy");
+  const yearFolder = obtenerOCrearSubcarpetaCopias_(root, year);
+  const levelFolder = obtenerOCrearSubcarpetaCopias_(yearFolder, datos.nivel);
+  const requestFolder = obtenerOCrearSubcarpetaCopias_(levelFolder, id);
+  const safeName = nombre.replace(/[\\/:*?"<>|]+/g, "-");
+  const metadata = {
+    name: `${id}_${safeName}`,
+    mimeType: "application/pdf",
+    parents: [requestFolder.getId()]
+  };
+  const token = ScriptApp.getOAuthToken();
+  const response = UrlFetchApp.fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true", {
+    method: "post",
+    contentType: "application/json; charset=UTF-8",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "X-Upload-Content-Type": "application/pdf",
+      "X-Upload-Content-Length": String(tamanoBytes)
+    },
+    payload: JSON.stringify(metadata),
+    muteHttpExceptions: true
+  });
+  if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+    throw new Error(`No se pudo iniciar la carga resumible de Drive (${response.getResponseCode()}).`);
+  }
+  const headers = response.getAllHeaders();
+  const uploadUrl = headers.Location || headers.location;
+  if (!uploadUrl) throw new Error("Drive no devolvio la URL de carga resumible.");
+  return {
+    ok: true,
+    id: id,
+    uploadUrl: String(uploadUrl),
+    accessToken: token,
+    archivoNombre: nombre,
+    archivoBytes: tamanoBytes,
+    solicitanteEmail: solicitante.email,
+    solicitanteNombre: solicitante.nombre,
+    nivel: datos.nivel
+  };
+}
+
 function registrarSolicitudCopias(form) {
   return withScriptLock_(function() {
     const ss = getSpreadsheet_();
@@ -301,12 +372,13 @@ function registrarSolicitudCopias(form) {
 
     const solicitante = obtenerSolicitanteCopiasDesdeDirectorio_(ss, role, form || {});
     const data = validarDatosSolicitudCopias_(Object.assign({}, form || {}, { solicitanteNombre: solicitante.nombre }));
+    const driveId = String(form && form.archivoDriveId || "").trim();
     const blob = form && form.archivo;
-    if (!blob || typeof blob.getName !== "function") throw new Error("Selecciona un archivo para copiar.");
-    const archivoNombre = String(blob.getName() || "").trim();
+    if (!driveId && (!blob || typeof blob.getName !== "function")) throw new Error("Selecciona un archivo para copiar.");
+    const archivoNombre = driveId ? String(form.archivoNombre || "").trim() : String(blob.getName() || "").trim();
     const extension = extensionArchivoCopias_(archivoNombre);
     if (!COPIAS_EXTENSIONS.includes(extension)) throw new Error("Formato no admitido. Solo se aceptan archivos PDF.");
-    const archivoBytes = blob.getBytes().length;
+    const archivoBytes = driveId ? Number(form.archivoBytes || 0) : blob.getBytes().length;
     if (archivoBytes < 1) throw new Error("El archivo esta vacio.");
     if (archivoBytes > CONFIG.COPIAS_MAX_FILE_BYTES) throw new Error("El archivo supera el maximo de 80 MB.");
 
@@ -316,14 +388,23 @@ function registrarSolicitudCopias(form) {
       throw new Error(`No hay autorizadores activos configurados para ${data.nivel}. Carga usuarios en la hoja Usuarios_Copias con Nivel ${data.nivel} (o TODOS), Puede_Autorizar = SI y Activo = SI.`);
     }
 
-    const id = generarIdSolicitudCopias_();
+    const id = String(form && form.solicitudId || "").trim() || generarIdSolicitudCopias_();
     const token = requiereAutorizacion ? Utilities.getUuid() + Utilities.getUuid() : "";
     const now = new Date();
     const vence = requiereAutorizacion ? new Date(now.getTime() + CONFIG.COPIAS_TOKEN_DAYS * 86400000) : "";
     const estado = requiereAutorizacion ? ESTADOS.COPIAS_SOLICITADO : ESTADOS.COPIAS_AUTORIZADO;
     let file;
     try {
-      file = guardarArchivoCopias_(blob, id, data.nivel);
+      if (driveId) {
+        file = DriveApp.getFileById(driveId);
+        const padres = file.getParents();
+        const padreValido = padres.hasNext() && padres.next().getName() === id;
+        if (!padreValido || file.getName().indexOf(`${id}_`) !== 0 || file.getMimeType() !== "application/pdf" || file.getSize() !== archivoBytes) {
+          throw new Error("El archivo cargado no coincide con el PDF seleccionado.");
+        }
+      } else {
+        file = guardarArchivoCopias_(blob, id, data.nivel);
+      }
     } catch (error) {
       throw new Error(`No se pudo guardar el archivo en Drive. Verifica que la cuenta desplegadora tenga acceso a la carpeta de copias y haya autorizado Drive. Detalle: ${error.message || error}`);
     }

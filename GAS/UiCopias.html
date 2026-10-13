@@ -201,8 +201,102 @@ function enviarSolicitudCopias(form, event) {
     button.disabled = true;
     button.innerText = "Subiendo archivo...";
   }
-  mostrarLoading("Subiendo archivo y registrando solicitud...");
+  mostrarLoading("Preparando carga resumible...");
+  const datos = {};
+  Array.from(form.elements || []).forEach(function(element) {
+    if (!element.name || element.type === "file" || element.type === "radio" && !element.checked) return;
+    datos[element.name] = element.value;
+  });
+  const archivo = input.files[0];
+  datos.archivoNombre = archivo.name;
+  datos.archivoBytes = archivo.size;
 
+  google.script.run
+    .withSuccessHandler(async function(sesion) {
+      try {
+        const file = await subirArchivoCopiasResumible_(sesion, archivo);
+        mostrarLoading("Registrando solicitud...");
+        google.script.run
+          .withSuccessHandler(function(result) {
+            copiasEnviando = false;
+            ocultarLoading();
+            if (button) {
+              button.disabled = false;
+              button.innerText = "Enviar solicitud";
+            }
+            form.reset();
+            actualizarResumenCopiasUI_();
+            const info = document.getElementById("copias-archivo-info");
+            if (info) info.innerText = "Selecciona un archivo de hasta 80 MB.";
+            mostrarAviso("success", result.message || "Solicitud registrada.");
+            cargarPanelCopias();
+          })
+          .withFailureHandler(function(error) {
+            copiasEnviando = false;
+            if (button) { button.disabled = false; button.innerText = "Enviar solicitud"; }
+            manejarError(error);
+          })
+          .registrarSolicitudCopias(Object.assign({}, datos, {
+            archivoDriveId: file.id,
+            solicitudId: sesion.id,
+            archivoNombre: sesion.archivoNombre,
+            archivoBytes: sesion.archivoBytes
+          }));
+      } catch (error) {
+        copiasEnviando = false;
+        if (button) { button.disabled = false; button.innerText = "Enviar solicitud"; }
+        ocultarLoading();
+        manejarError(error);
+      }
+    })
+    .withFailureHandler(function(error) {
+      copiasEnviando = false;
+      if (button) { button.disabled = false; button.innerText = "Enviar solicitud"; }
+      manejarError(error);
+    })
+    .iniciarCargaCopiasDrive(datos);
+}
+
+async function subirArchivoCopiasResumible_(sesion, archivo) {
+  const chunkSize = 8 * 1024 * 1024;
+  let inicio = 0;
+  while (inicio < archivo.size) {
+    const fin = Math.min(inicio + chunkSize, archivo.size);
+    const chunk = archivo.slice(inicio, fin);
+    let response = null;
+    let ultimoError = null;
+    for (let intento = 0; intento < 3; intento += 1) {
+      try {
+        response = await fetch(sesion.uploadUrl, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${sesion.accessToken}`,
+            "Content-Range": `bytes ${inicio}-${fin - 1}/${archivo.size}`
+          },
+          body: chunk
+        });
+        if (response.ok || response.status === 308) break;
+        if (response.status >= 500) throw new Error(`Drive respondio ${response.status}`);
+        throw new Error(`Drive rechazo la carga (${response.status})`);
+      } catch (error) {
+        ultimoError = error;
+        await new Promise(function(resolve) { window.setTimeout(resolve, 700 * (intento + 1)); });
+      }
+    }
+    if (!response || (!response.ok && response.status !== 308)) throw (ultimoError || new Error("No se pudo completar la carga."));
+    inicio = fin;
+    const porcentaje = Math.round((inicio / archivo.size) * 100);
+    const info = document.getElementById("copias-archivo-info");
+    if (info) info.innerText = `Subiendo ${archivo.name}: ${porcentaje}%`;
+    mostrarLoading(`Subiendo archivo... ${porcentaje}%`);
+    if (response.ok) return response.json();
+  }
+  throw new Error("Drive no confirmo la carga del archivo.");
+}
+
+/* Compatibilidad con el flujo anterior queda deliberadamente eliminada:
+ * las cargas nuevas siempre usan Drive resumible y registran luego la fila. */
+/*
   google.script.run
     .withSuccessHandler(function(result) {
       copiasEnviando = false;
@@ -227,7 +321,7 @@ function enviarSolicitudCopias(form, event) {
       manejarError(error);
     })
     .registrarSolicitudCopias(form);
-}
+*/
 
 function claseEstadoCopias_(estado) {
   if (estado === "AUTORIZADO") return "status-info";

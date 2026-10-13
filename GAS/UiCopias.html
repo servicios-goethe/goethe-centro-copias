@@ -249,8 +249,8 @@ function metaNivelCopias_(nivel) {
 function renderizarTarjetaCopias_(item, operativa) {
   const puedeDecidir = operativa && item.estado === "SOLICITADO" && rolActual && (rolActual.isAdmin || rolActual.isAutorizadorCopias);
   const decisiones = puedeDecidir
-    ? `<button class="btn btn-primary btn-small" type="button" onclick="autorizarSolicitudCopiasUI_('${escapeHtml_(item.id)}')">Autorizar</button>
-       <button class="btn btn-outline btn-small" type="button" onclick="abrirDecisionCopiasPorIdUI_('${escapeHtml_(item.id)}', 'rechazar')">Rechazar</button>`
+    ? `<button class="btn btn-primary btn-small" type="button" onclick="autorizarSolicitudCopiasUI_('${escapeHtml_(item.id)}', ${Number(item.rowNumber) || 0})">Autorizar</button>
+       <button class="btn btn-outline btn-small" type="button" onclick="abrirDecisionCopiasPorIdUI_('${escapeHtml_(item.id)}', 'rechazar', ${Number(item.rowNumber) || 0})">Rechazar</button>`
     : "";
   const finalizar = operativa && item.estado === "AUTORIZADO"
     ? `<button class="btn btn-primary btn-small" type="button" onclick="finalizarSolicitudCopiasUI_('${escapeHtml_(item.id)}')">Marcar finalizado</button>`
@@ -340,7 +340,7 @@ function finalizarSolicitudCopiasUI_(id) {
   }, "Finalizar solicitud");
 }
 
-function abrirDecisionCopiasPorIdUI_(id, accion) {
+function abrirDecisionCopiasPorIdUI_(id, accion, rowNumber) {
   copiasDecisionContexto = { accion: accion, id: id, token: "", solicitud: null, interna: true };
   abrirDecisionCopias_();
   google.script.run
@@ -353,10 +353,10 @@ function abrirDecisionCopiasPorIdUI_(id, accion) {
       document.getElementById("copias-decision-detail").innerHTML = "";
       document.getElementById("copias-confirmar-decision").classList.add("hidden");
     })
-    .getDecisionCopiasDataPorId(id);
+    .getDecisionCopiasDataPorId(id, rowNumber);
 }
 
-function autorizarSolicitudCopiasUI_(id) {
+function autorizarSolicitudCopiasUI_(id, rowNumber) {
   mostrarLoading("Autorizando solicitud...");
   google.script.run
     .withSuccessHandler(function(result) {
@@ -368,7 +368,7 @@ function autorizarSolicitudCopiasUI_(id) {
       ocultarLoading();
       manejarError(error);
     })
-    .decidirSolicitudCopiasPorId(id, "AUTORIZAR", "");
+    .decidirSolicitudCopiasPorId(id, "AUTORIZAR", "", rowNumber);
 }
 
 function procesarAccionCopiasDesdeUrl_() {

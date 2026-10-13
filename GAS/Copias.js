@@ -176,6 +176,7 @@ function leerSolicitudCopias_(row, indices, rowNumber) {
 
 function serializarSolicitudCopias_(solicitud) {
   return {
+    rowNumber: solicitud.rowNumber,
     id: solicitud.id,
     fecha: solicitud.fecha ? Utilities.formatDate(new Date(solicitud.fecha), CONFIG.TIMEZONE, "dd/MM/yyyy HH:mm") : "",
     solicitante: solicitud.solicitante,
@@ -233,6 +234,11 @@ function ordenarSolicitudesCopias_(a, b) {
 }
 
 function obtenerAutorizadoresCopias_(ss, nivel, excluirEmail) {
+  const cacheKey = `copias_autorizadores_${String(nivel || "").toUpperCase()}`;
+  const cached = getCachedJson_(cacheKey);
+  if (Array.isArray(cached)) {
+    return cached.filter(function(email) { return email !== String(excluirEmail || "").toLowerCase(); });
+  }
   asegurarEstructuraCopias_(ss);
   const sheet = asegurarHojaUsuariosCopias_(ss);
   if (sheet.getLastRow() < 2) return [];
@@ -244,7 +250,7 @@ function obtenerAutorizadoresCopias_(ss, nivel, excluirEmail) {
   const idxActivo = headers.indexOf("activo");
   if ([idxEmail, idxNivel, idxAutoriza, idxActivo].some(function(index) { return index < 0; })) return [];
 
-  return rows.slice(1).filter(function(row) {
+  const autorizadores = rows.slice(1).filter(function(row) {
     const email = String(row[idxEmail] || "").trim().toLowerCase();
     const nivelFila = String(row[idxNivel] || "").trim().toUpperCase();
     return email && email !== String(excluirEmail || "").toLowerCase()
@@ -252,6 +258,8 @@ function obtenerAutorizadoresCopias_(ss, nivel, excluirEmail) {
       && normalizarSiNoCopias_(row[idxAutoriza]) === "SI"
       && normalizarSiNoCopias_(row[idxActivo]) === "SI";
   }).map(function(row) { return String(row[idxEmail]).trim().toLowerCase(); });
+  putCachedJson_(cacheKey, autorizadores, 300);
+  return autorizadores.filter(function(email) { return email !== String(excluirEmail || "").toLowerCase(); });
 }
 
 function generarIdSolicitudCopias_() {
@@ -392,14 +400,22 @@ function getDecisionCopiasData(token) {
   return serializarSolicitudCopias_(solicitud);
 }
 
-function buscarSolicitudCopiasPorId_(ss, id) {
-  return listarSolicitudesCopias_(ss).find(function(item) { return item.id === String(id || ""); }) || null;
+function buscarSolicitudCopiasPorId_(ss, id, rowNumber) {
+  const idBuscado = String(id || "");
+  const sheet = getSheetOrThrow_(ss, TABS.COPIAS);
+  const fila = Number(rowNumber);
+  if (Number.isInteger(fila) && fila >= 2 && fila <= sheet.getLastRow()) {
+    const indices = obtenerIndicesCopias_(sheet);
+    const item = leerSolicitudCopias_(sheet.getRange(fila, 1, 1, sheet.getLastColumn()).getValues()[0], indices, fila);
+    if (item.id === idBuscado) return item;
+  }
+  return listarSolicitudesCopias_(ss).find(function(item) { return item.id === idBuscado; }) || null;
 }
 
-function getDecisionCopiasDataPorId(id) {
+function getDecisionCopiasDataPorId(id, rowNumber) {
   const ss = getSpreadsheet_();
   const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-  const solicitud = buscarSolicitudCopiasPorId_(ss, id);
+  const solicitud = buscarSolicitudCopiasPorId_(ss, id, rowNumber);
   if (!solicitud) throw new Error("No se encontro la solicitud.");
   validarPermisoDecisionCopias_(ss, role, solicitud);
   return serializarSolicitudCopias_(solicitud);
@@ -450,11 +466,11 @@ function decidirSolicitudCopias(token, decision, motivo) {
   });
 }
 
-function decidirSolicitudCopiasPorId(id, decision, motivo) {
+function decidirSolicitudCopiasPorId(id, decision, motivo, rowNumber) {
   return withScriptLock_(function() {
     const ss = getSpreadsheet_();
     const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-    const solicitud = buscarSolicitudCopiasPorId_(ss, id);
+    const solicitud = buscarSolicitudCopiasPorId_(ss, id, rowNumber);
     if (!solicitud) throw new Error("No se encontro la solicitud.");
     validarPermisoDecisionCopias_(ss, role, solicitud);
     return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo);

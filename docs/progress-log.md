@@ -521,3 +521,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 69, `Búsqueda de productos sin tildes`.
 - Producción y `main` no fueron modificadas.
 
+## 2026-10-13 — Configuración tolerante de autorizadores de copias
+
+- `Usuarios_Copias.Puede_Autorizar` y `Activo` aceptan ahora `SI`, `Sí`, `S`, `true`, `1`, `JA` o `YES` sin que una tilde impida reconocer el valor.
+- La habilitación sigue requiriendo `Email`, `Nivel` (`KG`, `EP` o `TODOS`), `Puede_Autorizar` afirmativo y `Activo` afirmativo.
+- La corrección no otorga permisos administrativos: para operar desde la bandeja interna, la persona también debe figurar como `admin` en `Usuarios_Admin`; desde el enlace de autorización alcanza `Usuarios_Copias`.
+- Validación local de sintaxis completada. Producción no fue modificada.
+

@@ -49,8 +49,12 @@ function normalizarNivelCopias_(value) {
 }
 
 function normalizarSiNoCopias_(value) {
-  const texto = String(value || "").trim().toLowerCase();
-  return ["si", "s", "true", "1", "ja"].includes(texto) ? "SI" : "NO";
+  const texto = String(value || "")
+    .trim()
+    .toLocaleLowerCase("es")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  return ["si", "s", "true", "1", "ja", "yes"].includes(texto) ? "SI" : "NO";
 }
 
 function extensionArchivoCopias_(nombre) {

@@ -17,6 +17,13 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - Se agregó `verificarPermisoCargaResumibleDrive`, que consulta la API de Drive y fuerza la autorización explícita del scope desde el editor de Apps Script.
 - GAS de desarrollo: versión 83. Producción no fue modificada.
 
+## 2026-10-13 — Carga resumible sin bloqueo CORS
+
+- La prueba de la versión 83 alcanzó el 90 %, pero el `fetch` directo desde el iframe HTML de Apps Script terminó en `Failed to fetch` por CORS/CSP.
+- Se mantuvo la sesión resumible de Drive, pero los bloques de 4 MB ahora pasan por Apps Script, que los reenvía a Drive; el token OAuth ya no se entrega al navegador.
+- GAS de desarrollo: versión 85, `Carga resumible por bloques sin CORS`.
+- Producción no fue modificada.
+
 ## 2026-10-09 — Plan de integridad, feedback y refresco operativo
 
 - Se definió no borrar manualmente las dos entregas mal cargadas (`RET-1791464629604` y `RET-1786559018968`): se propone baja lógica auditada, con reversión de stock separada si ya hubo retiro. No se modificaron esas filas.

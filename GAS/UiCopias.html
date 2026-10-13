@@ -258,40 +258,46 @@ function enviarSolicitudCopias(form, event) {
 }
 
 async function subirArchivoCopiasResumible_(sesion, archivo) {
-  const chunkSize = 8 * 1024 * 1024;
+  const chunkSize = 4 * 1024 * 1024;
   let inicio = 0;
   while (inicio < archivo.size) {
     const fin = Math.min(inicio + chunkSize, archivo.size);
     const chunk = archivo.slice(inicio, fin);
+    const base64 = await new Promise(function(resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function() { resolve(String(reader.result || "").split(",")[1] || ""); };
+      reader.onerror = reject;
+      reader.readAsDataURL(chunk);
+    });
     let response = null;
     let ultimoError = null;
     for (let intento = 0; intento < 3; intento += 1) {
       try {
-        response = await fetch(sesion.uploadUrl, {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${sesion.accessToken}`,
-            "Content-Range": `bytes ${inicio}-${fin - 1}/${archivo.size}`
-          },
-          body: chunk
-        });
-        if (response.ok || response.status === 308) break;
-        if (response.status >= 500) throw new Error(`Drive respondio ${response.status}`);
-        throw new Error(`Drive rechazo la carga (${response.status})`);
+        response = await ejecutarSubidaChunkCopias_(sesion.id, base64, inicio, archivo.size);
+        break;
       } catch (error) {
         ultimoError = error;
         await new Promise(function(resolve) { window.setTimeout(resolve, 700 * (intento + 1)); });
       }
     }
-    if (!response || (!response.ok && response.status !== 308)) throw (ultimoError || new Error("No se pudo completar la carga."));
+    if (!response) throw (ultimoError || new Error("No se pudo completar la carga."));
     inicio = fin;
     const porcentaje = Math.round((inicio / archivo.size) * 100);
     const info = document.getElementById("copias-archivo-info");
     if (info) info.innerText = `Subiendo ${archivo.name}: ${porcentaje}%`;
     mostrarLoading(`Subiendo archivo... ${porcentaje}%`);
-    if (response.ok) return response.json();
+    if (response.complete) return response.file;
   }
   throw new Error("Drive no confirmo la carga del archivo.");
+}
+
+function ejecutarSubidaChunkCopias_(id, base64, inicio, total) {
+  return new Promise(function(resolve, reject) {
+    google.script.run
+      .withSuccessHandler(resolve)
+      .withFailureHandler(function(error) { reject(new Error(normalizarMensaje_(error.message || error))); })
+      .subirChunkCargaCopiasDrive(id, base64, inicio, total);
+  });
 }
 
 /* Compatibilidad con el flujo anterior queda deliberadamente eliminada:

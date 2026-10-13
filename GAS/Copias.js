@@ -350,17 +350,46 @@ function iniciarCargaCopiasDrive(data) {
   const headers = response.getAllHeaders();
   const uploadUrl = headers.Location || headers.location;
   if (!uploadUrl) throw new Error("Drive no devolvio la URL de carga resumible.");
+  PropertiesService.getScriptProperties().setProperty(`COPIAS_UPLOAD_SESSION_${id}`, String(uploadUrl));
   return {
     ok: true,
     id: id,
-    uploadUrl: String(uploadUrl),
-    accessToken: token,
+    chunkedProxy: true,
     archivoNombre: nombre,
     archivoBytes: tamanoBytes,
     solicitanteEmail: solicitante.email,
     solicitanteNombre: solicitante.nombre,
     nivel: datos.nivel
   };
+}
+
+/** Recibe un bloque base64 desde el iframe y lo reenvia a la sesion Drive. */
+function subirChunkCargaCopiasDrive(id, chunkBase64, inicio, total) {
+  const solicitudId = String(id || "").trim();
+  const sessionUrl = PropertiesService.getScriptProperties().getProperty(`COPIAS_UPLOAD_SESSION_${solicitudId}`);
+  if (!sessionUrl) throw new Error("La sesion de carga no existe o vencio. Inicia nuevamente la carga.");
+  const bytes = Utilities.base64Decode(String(chunkBase64 || ""));
+  if (!bytes.length) throw new Error("El bloque de carga esta vacio.");
+  const start = Number(inicio);
+  const size = Number(total);
+  const end = start + bytes.length - 1;
+  if (!Number.isInteger(start) || start < 0 || !Number.isInteger(size) || size < 1 || end >= size) throw new Error("Rango de carga invalido.");
+  const response = UrlFetchApp.fetch(sessionUrl, {
+    method: "put",
+    headers: {
+      Authorization: `Bearer ${ScriptApp.getOAuthToken()}`,
+      "Content-Range": `bytes ${start}-${end}/${size}`
+    },
+    payload: bytes,
+    muteHttpExceptions: true
+  });
+  const code = response.getResponseCode();
+  if (code === 200 || code === 201) {
+    PropertiesService.getScriptProperties().deleteProperty(`COPIAS_UPLOAD_SESSION_${solicitudId}`);
+    return { ok: true, complete: true, file: JSON.parse(response.getContentText() || "{}") };
+  }
+  if (code === 308) return { ok: true, complete: false, next: end + 1 };
+  throw new Error(`Drive rechazo el bloque (${code}): ${response.getContentText()}`);
 }
 
 function registrarSolicitudCopias(form) {

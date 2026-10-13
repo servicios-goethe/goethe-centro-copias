@@ -378,11 +378,17 @@
 
   function obtenerEtiquetaRolRedisenio_(role) {
     if (role && role.isOperadorEntrega) return "Operador · Operator";
+    if (role && role.isAutorizadorCopias) return "Autorizador de copias · Copy approver";
     if (role && role.isAdmin) return "Administrador · Administrator";
     return "Usuario · Benutzer";
   }
 
   function obtenerConfiguracionNavegacionRedisenio_(role, modulo) {
+    if (role && role.isAutorizadorCopias) {
+      return modulo === "copias"
+        ? [{ key: "autorizaciones", es: "Autorizaciones", de: "Freigaben", panels: ["admin-copias"] }]
+        : [];
+    }
     const admin = !!(role && role.isAdmin && !role.isOperadorEntrega);
     const operador = !!(role && role.isOperadorEntrega);
     if (modulo === "copias") {
@@ -408,7 +414,9 @@
     if (!navigation || !tabsNode) return;
     navigation.classList.remove("hidden");
     try {
-      moduloActivo = sessionStorage.getItem("pedidos-grafica-modulo") || "materiales";
+      moduloActivo = role && role.isAutorizadorCopias
+        ? "copias"
+        : sessionStorage.getItem("pedidos-grafica-modulo") || "materiales";
       solapaActivaPorModulo.materiales = sessionStorage.getItem("pedidos-grafica-solapa-materiales") || "nuevo";
       solapaActivaPorModulo.copias = sessionStorage.getItem("pedidos-grafica-solapa-copias") || "nueva";
     } catch (error) {}
@@ -420,6 +428,7 @@
         button.setAttribute("aria-selected", moduloActivo === modulo ? "true" : "false");
       }
     });
+    setVisible_("module-materiales", !(role && role.isAutorizadorCopias));
     let tabs = obtenerConfiguracionNavegacionRedisenio_(role, moduloActivo);
     if (!tabs.some(function(tab) { return tab.key === solapaActivaPorModulo[moduloActivo]; })) solapaActivaPorModulo[moduloActivo] = tabs[0].key;
     const activa = solapaActivaPorModulo[moduloActivo];
@@ -464,6 +473,7 @@
   }
 
   function seleccionarModuloRedisenio_(modulo) {
+    if (rolActual && rolActual.isAutorizadorCopias) modulo = "copias";
     moduloActivo = modulo === "copias" ? "copias" : "materiales";
     try { sessionStorage.setItem("pedidos-grafica-modulo", moduloActivo); } catch (error) {}
     renderNavegacionRedisenio_(rolActual);

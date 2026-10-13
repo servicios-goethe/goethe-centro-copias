@@ -528,3 +528,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - La corrección no otorga permisos administrativos: para operar desde la bandeja interna, la persona también debe figurar como `admin` en `Usuarios_Admin`; desde el enlace de autorización alcanza `Usuarios_Copias`.
 - Validación local de sintaxis completada. Producción no fue modificada.
 
+## 2026-10-13 — Perfil restringido para autorizar copias
+
+- Se agregó el perfil `autorizarcopias` en `Usuarios_Admin`.
+- El perfil sólo expone el módulo de copias y filtra en servidor las solicitudes `SOLICITADO` de niveles autorizados en `Usuarios_Copias`.
+- No se concede acceso a pedidos de materiales, compras, recepción, productos, stock ni finalización de trabajos.
+- Validación local de sintaxis completada. Pendiente desplegar en desarrollo y probar con una cuenta autorizadora.
+

@@ -48,12 +48,14 @@ function obtenerUsuarioActualDesdeSpreadsheet_(ss) {
   const perfil = perfiles[email] || "";
   const isOperadorEntrega = perfil === "operador";
   const isCuentaGeneral = perfil === "general";
+  const isAutorizadorCopias = perfil === "autorizarcopias";
 
   return putCachedJson_(cacheKey, {
     email: email,
     perfil: perfil || "usuario",
     isAdmin: perfil === "admin" || isOperadorEntrega,
     isOperadorEntrega: isOperadorEntrega,
+    isAutorizadorCopias: isAutorizadorCopias,
     isCuentaGeneral: isCuentaGeneral,
     isGoethe: email.endsWith("@goethe.edu.ar")
   }, CONFIG.CACHE_TTL_ROLE);
@@ -77,6 +79,10 @@ function normalizarPerfilAdmin_(valor) {
 
   if (perfil === "admin" || perfil === "administrador" || perfil === "administrator") {
     return "admin";
+  }
+
+  if (perfil === "autorizarcopias" || perfil === "autorizador copias" || perfil === "autorizador de copias") {
+    return "autorizarcopias";
   }
 
   return "";

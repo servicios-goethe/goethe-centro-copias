@@ -215,7 +215,13 @@ function getCopiasPanelData() {
   asegurarEstructuraCopias_(ss);
   const solicitudes = listarSolicitudesCopias_(ss);
   const propias = solicitudes.filter(function(item) { return item.solicitante === role.email; });
-  const operativas = role.isAdmin ? solicitudes : [];
+  const operativas = role.isAdmin
+    ? solicitudes
+    : role.isAutorizadorCopias
+      ? solicitudes.filter(function(item) {
+          return item.estado === ESTADOS.COPIAS_SOLICITADO && usuarioPuedeAutorizarCopias_(ss, role, item);
+        })
+      : [];
   return {
     role: role,
     propias: propias.sort(ordenarSolicitudesCopias_).map(serializarSolicitudCopias_),

@@ -272,7 +272,7 @@ function renderizarCopiasPropias_() {
 function renderizarCopiasOperativas_() {
   const container = document.getElementById("lista-copias-operativas");
   if (!container) return;
-  if (!rolActual || !rolActual.isAdmin) {
+  if (!rolActual || (!rolActual.isAdmin && !rolActual.isAutorizadorCopias)) {
     container.innerHTML = "";
     return;
   }

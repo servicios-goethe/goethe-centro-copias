@@ -556,3 +556,9 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 73, `Autorización interna de copias`.
 - Pendiente validar en desarrollo con una solicitud EP de prueba.
 
+## 2026-10-13 — Bloqueo server-side de pedidos de librería
+
+- `autorizarcopias` queda limitado también en backend: no puede registrar, consultar ni editar pedidos de materiales de librería.
+- La restricción no depende de ocultar botones y evita accesos por funciones o URLs antiguas.
+- Pendiente desplegar esta última corrección en desarrollo.
+

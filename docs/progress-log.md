@@ -548,3 +548,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de desarrollo: versión 72, `Restaurar AppConfig de desarrollo`.
 - Producción, `main` y la configuración productiva versionada no fueron modificadas.
 
+## 2026-10-13 — Acciones internas para autorizar copias
+
+- `autorizarcopias` ahora puede usar `Nueva solicitud` y `Mis solicitudes` además de `Autorizaciones`.
+- Las tarjetas de solicitudes `SOLICITADO` muestran `Autorizar` y `Rechazar`; ambas acciones validan permisos y nivel en servidor, registran auditoría y mantienen las notificaciones existentes.
+- Se agregó decisión interna por ID de solicitud, sin exponer tokens de autorización en la interfaz.
+- Pendiente validar en desarrollo con una solicitud EP de prueba.
+

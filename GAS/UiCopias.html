@@ -231,6 +231,11 @@ function metaNivelCopias_(nivel) {
 }
 
 function renderizarTarjetaCopias_(item, operativa) {
+  const puedeDecidir = operativa && item.estado === "SOLICITADO" && rolActual && (rolActual.isAdmin || rolActual.isAutorizadorCopias);
+  const decisiones = puedeDecidir
+    ? `<button class="btn btn-primary btn-small" type="button" onclick="abrirDecisionCopiasPorIdUI_('${escapeHtml_(item.id)}', 'autorizar')">Autorizar</button>
+       <button class="btn btn-outline btn-small" type="button" onclick="abrirDecisionCopiasPorIdUI_('${escapeHtml_(item.id)}', 'rechazar')">Rechazar</button>`
+    : "";
   const finalizar = operativa && item.estado === "AUTORIZADO"
     ? `<button class="btn btn-primary btn-small" type="button" onclick="finalizarSolicitudCopiasUI_('${escapeHtml_(item.id)}')">Marcar finalizado</button>`
     : "";
@@ -253,6 +258,7 @@ function renderizarTarjetaCopias_(item, operativa) {
       </div>
       <div class="copies-item-actions">
         <a class="btn btn-outline btn-small" href="${escapeHtml_(item.archivoUrl)}" target="_blank" rel="noopener">Abrir archivo</a>
+        ${decisiones}
         ${finalizar}
       </div>
     </div>
@@ -318,6 +324,22 @@ function finalizarSolicitudCopiasUI_(id) {
   }, "Finalizar solicitud");
 }
 
+function abrirDecisionCopiasPorIdUI_(id, accion) {
+  copiasDecisionContexto = { accion: accion, id: id, token: "", solicitud: null, interna: true };
+  abrirDecisionCopias_();
+  google.script.run
+    .withSuccessHandler(function(solicitud) {
+      copiasDecisionContexto.solicitud = solicitud;
+      renderizarDecisionCopias_(solicitud);
+    })
+    .withFailureHandler(function(error) {
+      document.getElementById("copias-decision-copy").innerText = normalizarMensaje_(error.message || error);
+      document.getElementById("copias-decision-detail").innerHTML = "";
+      document.getElementById("copias-confirmar-decision").classList.add("hidden");
+    })
+    .getDecisionCopiasDataPorId(id);
+}
+
 function procesarAccionCopiasDesdeUrl_() {
   const params = new URLSearchParams(window.location.search);
   const accion = String(params.get("copiasAccion") || "").toLowerCase();
@@ -373,7 +395,7 @@ function confirmarDecisionCopias_() {
   }
   const button = document.getElementById("copias-confirmar-decision");
   button.disabled = true;
-  google.script.run
+  const runner = google.script.run
     .withSuccessHandler(function(result) {
       button.disabled = false;
       document.getElementById("copias-decision-copy").innerText = result.message;
@@ -385,8 +407,13 @@ function confirmarDecisionCopias_() {
     .withFailureHandler(function(error) {
       button.disabled = false;
       mostrarAviso("error", error.message || error);
-    })
-    .decidirSolicitudCopias(copiasDecisionContexto.token, esRechazo ? "RECHAZAR" : "AUTORIZAR", motivo);
+    });
+  const argumento = copiasDecisionContexto.interna ? copiasDecisionContexto.id : copiasDecisionContexto.token;
+  if (copiasDecisionContexto.interna) {
+    runner.decidirSolicitudCopiasPorId(argumento, esRechazo ? "RECHAZAR" : "AUTORIZAR", motivo);
+  } else {
+    runner.decidirSolicitudCopias(argumento, esRechazo ? "RECHAZAR" : "AUTORIZAR", motivo);
+  }
 }
 
 function cerrarDecisionCopias_() {

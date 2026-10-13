@@ -395,7 +395,11 @@
   function obtenerConfiguracionNavegacionRedisenio_(role, modulo) {
     if (role && role.isAutorizadorCopias) {
       return modulo === "copias"
-        ? [{ key: "autorizaciones", es: "Autorizaciones", de: "Freigaben", panels: ["admin-copias"] }]
+        ? [
+            { key: "nueva", es: "Nueva solicitud", de: "Neuer Auftrag", panels: ["user-copias"] },
+            { key: "mis", es: "Mis solicitudes", de: "Meine Aufträge", panels: ["user-copias"] },
+            { key: "autorizaciones", es: "Autorizaciones", de: "Freigaben", panels: ["admin-copias"] }
+          ]
         : [];
     }
     const admin = !!(role && role.isAdmin && !role.isOperadorEntrega);

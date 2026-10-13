@@ -383,11 +383,7 @@ function usuarioPuedeAutorizarCopias_(ss, role, solicitud) {
   return obtenerAutorizadoresCopias_(ss, solicitud.nivel, solicitud.solicitante).includes(role.email.toLowerCase());
 }
 
-function getDecisionCopiasData(token) {
-  const ss = getSpreadsheet_();
-  const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-  const solicitud = buscarSolicitudCopiasPorToken_(ss, token);
-  if (!solicitud) throw new Error("El enlace de autorizacion no es valido.");
+function validarPermisoDecisionCopias_(ss, role, solicitud, mensajeInvalido) {
   if (!usuarioPuedeAutorizarCopias_(ss, role, solicitud)) {
     if (role.email === solicitud.solicitante) throw new Error("No podes autorizar tu propia solicitud.");
     throw new Error("No tenes permisos para decidir esta solicitud.");
@@ -395,19 +391,31 @@ function getDecisionCopiasData(token) {
   if (solicitud.estado === ESTADOS.COPIAS_SOLICITADO && solicitud.tokenVence && new Date(solicitud.tokenVence) < new Date()) {
     throw new Error("El enlace de autorizacion vencio.");
   }
+}
+
+function getDecisionCopiasData(token) {
+  const ss = getSpreadsheet_();
+  const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
+  const solicitud = buscarSolicitudCopiasPorToken_(ss, token);
+  if (!solicitud) throw new Error("El enlace de autorizacion no es valido.");
+  validarPermisoDecisionCopias_(ss, role, solicitud);
   return serializarSolicitudCopias_(solicitud);
 }
 
-function decidirSolicitudCopias(token, decision, motivo) {
-  return withScriptLock_(function() {
-    const ss = getSpreadsheet_();
-    const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-    const solicitud = buscarSolicitudCopiasPorToken_(ss, token);
-    if (!solicitud) throw new Error("El enlace de autorizacion no es valido.");
-    if (!usuarioPuedeAutorizarCopias_(ss, role, solicitud)) {
-      if (role.email === solicitud.solicitante) throw new Error("No podes autorizar tu propia solicitud.");
-      throw new Error("No tenes permisos para decidir esta solicitud.");
-    }
+function buscarSolicitudCopiasPorId_(ss, id) {
+  return listarSolicitudesCopias_(ss).find(function(item) { return item.id === String(id || ""); }) || null;
+}
+
+function getDecisionCopiasDataPorId(id) {
+  const ss = getSpreadsheet_();
+  const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
+  const solicitud = buscarSolicitudCopiasPorId_(ss, id);
+  if (!solicitud) throw new Error("No se encontro la solicitud.");
+  validarPermisoDecisionCopias_(ss, role, solicitud);
+  return serializarSolicitudCopias_(solicitud);
+}
+
+function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo) {
     if (solicitud.estado !== ESTADOS.COPIAS_SOLICITADO) {
       return {
         ok: true,
@@ -447,6 +455,27 @@ function decidirSolicitudCopias(token, decision, motivo) {
     }
     bumpDataVersion_();
     return { ok: true, estado: estado, message: `Solicitud ${estado.toLowerCase()} correctamente.` };
+}
+
+function decidirSolicitudCopias(token, decision, motivo) {
+  return withScriptLock_(function() {
+    const ss = getSpreadsheet_();
+    const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
+    const solicitud = buscarSolicitudCopiasPorToken_(ss, token);
+    if (!solicitud) throw new Error("El enlace de autorizacion no es valido.");
+    validarPermisoDecisionCopias_(ss, role, solicitud);
+    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo);
+  });
+}
+
+function decidirSolicitudCopiasPorId(id, decision, motivo) {
+  return withScriptLock_(function() {
+    const ss = getSpreadsheet_();
+    const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
+    const solicitud = buscarSolicitudCopiasPorId_(ss, id);
+    if (!solicitud) throw new Error("No se encontro la solicitud.");
+    validarPermisoDecisionCopias_(ss, role, solicitud);
+    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo);
   });
 }
 

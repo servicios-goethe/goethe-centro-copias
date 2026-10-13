@@ -541,3 +541,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Se ocultan el resumen administrativo heredado, los accesos de materiales y las demás secciones; las advertencias CSP del iframe no eran la causa del blanco.
 - Pendiente validar en desarrollo con `s.kronisch@goethe.edu.ar` antes de promover a producción.
 
+## 2026-10-13 — Restauración de AppConfig en desarrollo
+
+- Se detectó que el proyecto Apps Script de desarrollo remoto no tenía `AppConfig.js`; por eso el deployment 71 fallaba con `CONFIG is not defined`.
+- Se restauró `AppConfig.js` sólo en el proyecto de desarrollo con `ENVIRONMENT = DESARROLLO` y Spreadsheet `1QDlVdMC9GSrUeysk9RHDAyz-YhbYTz8H3s9kHmUgD9k`.
+- GAS de desarrollo: versión 72, `Restaurar AppConfig de desarrollo`.
+- Producción, `main` y la configuración productiva versionada no fueron modificadas.
+

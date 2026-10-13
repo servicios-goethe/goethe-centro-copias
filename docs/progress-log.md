@@ -597,3 +597,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - La configuración de autorizadores se sigue validando, aunque ya no se envíen mails de aviso.
 - GAS de desarrollo: versión 78, `Copias: solo mail al finalizar`.
 
+## 2026-10-13 — Dos mails de copias: alta y finalización
+
+- Se restauró el mail de recepción al solicitante al crear una solicitud.
+- Se mantiene el mail al solicitante cuando el trabajo queda `FINALIZADO`.
+- Autorización, rechazo y avisos al operador no envían mail.
+- Pendiente validar en desarrollo antes de promover a producción.
+

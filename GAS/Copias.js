@@ -353,6 +353,9 @@ function registrarSolicitudCopias(form) {
     registrarLogCopias_(ss, id, "solicitud_creada", { nivel: data.nivel, estado: estado, archivoBytes: archivoBytes, solicitanteNombre: data.solicitanteNombre });
     registrarAuditoria_(ss, "copias_solicitud_creada", { solicitudId: id, nivel: data.nivel, estado: estado, solicitanteNombre: data.solicitanteNombre });
 
+    enviarMailCopiasSeguro_(ss, id, "solicitud_recibida", [solicitante.email], function() {
+      return buildMailCopiasRecibida_(id, data, estado);
+    });
     bumpDataVersion_();
     return { ok: true, id: id, estado: estado, message: `Solicitud ${id} registrada.` };
   });

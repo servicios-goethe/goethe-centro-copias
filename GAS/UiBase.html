@@ -360,9 +360,18 @@
     inicializarSeccionesContraidas_(role);
     aplicarModoOperadorEntrega_(role);
   
-    if (role.isAdmin) {
+    if (role.isAdmin || role.isAutorizadorCopias) {
       document.getElementById("view-admin").classList.remove("hidden");
-      mostrarPlaceholdersAdmin_();
+      if (role.isAdmin) {
+        mostrarPlaceholdersAdmin_();
+      } else {
+        const legacySummary = document.querySelector(".legacy-admin-summary");
+        if (legacySummary) legacySummary.classList.add("hidden");
+        setVisible_("admin-resumen", false);
+        setVisible_("admin-nav-pedidos", false);
+        setVisible_("admin-nav-compras", false);
+        setVisible_("admin-nav-productos", false);
+      }
     } else {
       document.getElementById("admin-resumen").classList.add("hidden");
     }

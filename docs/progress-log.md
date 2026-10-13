@@ -535,3 +535,9 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - No se concede acceso a pedidos de materiales, compras, recepción, productos, stock ni finalización de trabajos.
 - Validación local de sintaxis completada. Pendiente desplegar en desarrollo y probar con una cuenta autorizadora.
 
+## 2026-10-13 — Corrección de visibilidad del perfil autorizarcopias
+
+- El contenedor administrativo de la bandeja de copias ahora se muestra también para `autorizarcopias`.
+- Se ocultan el resumen administrativo heredado, los accesos de materiales y las demás secciones; las advertencias CSP del iframe no eran la causa del blanco.
+- Pendiente validar en desarrollo con `s.kronisch@goethe.edu.ar` antes de promover a producción.
+

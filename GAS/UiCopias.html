@@ -122,6 +122,18 @@ function seleccionarSolicitanteCopiasUI_(index) {
 function cargarPanelCopias(silencioso) {
   if (copiasCargaEnCurso_) return;
   copiasCargaEnCurso_ = true;
+  const refreshButtons = Array.from(document.querySelectorAll(".copies-refresh-btn"));
+  refreshButtons.forEach(function(button) {
+    button.disabled = true;
+    button.dataset.originalLabel = button.innerText;
+    button.innerText = "Actualizando...";
+  });
+  const finalizarRefresco = function(label) {
+    refreshButtons.forEach(function(button) {
+      button.disabled = false;
+      button.innerText = label || button.dataset.originalLabel || "Refrescar solicitudes";
+    });
+  };
   if (!silencioso) prepararSolicitanteCopiasUI_();
   google.script.run
     .withSuccessHandler(function(data) {
@@ -130,9 +142,13 @@ function cargarPanelCopias(silencioso) {
       copiasOperativasActuales = data && data.operativas ? data.operativas : [];
       renderizarCopiasPropias_();
       renderizarCopiasOperativas_();
+      const hora = new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      finalizarRefresco(`Actualizado ${hora}`);
+      window.setTimeout(function() { finalizarRefresco("Refrescar solicitudes"); }, 2500);
     })
     .withFailureHandler(function(error) {
       copiasCargaEnCurso_ = false;
+      finalizarRefresco("Reintentar refresco");
       const propias = document.getElementById("lista-copias-propias");
       const operativas = document.getElementById("lista-copias-operativas");
       if (propias) propias.innerHTML = `<div class="empty-state">${escapeHtml_(normalizarMensaje_(error.message || error))}</div>`;

@@ -576,3 +576,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - GAS de producción: versión 15, `Autorizacion directa copias - produccion`.
 - `main` no fue modificada.
 
+## 2026-10-13 — Optimización de autorizaciones y refresco de copias
+
+- Las autorizaciones desde la bandeja ya no envían el correo redundante al operador; se mantiene el aviso al solicitante y la auditoría.
+- Se evitó una inicialización duplicada de la estructura al cargar el panel de copias.
+- El botón `Refrescar solicitudes` ahora muestra `Actualizando...`, confirma hora de actualización y permite reintentar si falla.
+- Pendiente validar tiempos con las 52 solicitudes de `s.kronisch@goethe.edu.ar` en desarrollo antes de promover a producción.
+

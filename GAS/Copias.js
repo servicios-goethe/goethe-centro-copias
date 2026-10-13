@@ -212,7 +212,6 @@ function listarSolicitudesCopias_(ss) {
 function getCopiasPanelData() {
   const ss = getSpreadsheet_();
   const role = obtenerUsuarioActualDesdeSpreadsheet_(ss);
-  asegurarEstructuraCopias_(ss);
   const solicitudes = listarSolicitudesCopias_(ss);
   const propias = solicitudes.filter(function(item) { return item.solicitante === role.email; });
   const operativas = role.isAdmin
@@ -415,7 +414,7 @@ function getDecisionCopiasDataPorId(id) {
   return serializarSolicitudCopias_(solicitud);
 }
 
-function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo) {
+function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, notificarOperador) {
     if (solicitud.estado !== ESTADOS.COPIAS_SOLICITADO) {
       return {
         ok: true,
@@ -448,7 +447,7 @@ function aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo) 
     enviarMailCopiasSeguro_(ss, solicitud.id, rechazo ? "rechazo_notificado" : "autorizacion_notificada", [solicitud.solicitante], function() {
       return buildMailCopiasDecision_(solicitud.id, estado, role.email, motivoLimpio);
     });
-    if (!rechazo) {
+    if (!rechazo && notificarOperador !== false) {
       enviarMailCopiasSeguro_(ss, solicitud.id, "operador_notificado", [RESPONSABLES.COPIAS], function() {
         return buildMailCopiasOperador_(solicitud.id, solicitud.solicitante, solicitud);
       });
@@ -464,7 +463,7 @@ function decidirSolicitudCopias(token, decision, motivo) {
     const solicitud = buscarSolicitudCopiasPorToken_(ss, token);
     if (!solicitud) throw new Error("El enlace de autorizacion no es valido.");
     validarPermisoDecisionCopias_(ss, role, solicitud);
-    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo);
+    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, true);
   });
 }
 
@@ -475,7 +474,9 @@ function decidirSolicitudCopiasPorId(id, decision, motivo) {
     const solicitud = buscarSolicitudCopiasPorId_(ss, id);
     if (!solicitud) throw new Error("No se encontro la solicitud.");
     validarPermisoDecisionCopias_(ss, role, solicitud);
-    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo);
+    // Desde la bandeja el operador ya ve el cambio; se evita el mail redundante
+    // que hacía que cada autorización esperara dos envíos síncronos.
+    return aplicarDecisionSolicitudCopias_(ss, role, solicitud, decision, motivo, false);
   });
 }
 

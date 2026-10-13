@@ -28,6 +28,12 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 
 - La primera integración del botón Picker provocó un error de sintaxis en el JavaScript renderizado del iframe y dejó la interfaz sin `cargarPanelCopias`.
 - Se retiró temporalmente sólo el código cliente del botón Picker para restaurar la interfaz; el backend y la configuración quedan aislados para una reintroducción segura.
+
+## 2026-10-13 — Reintroducción segura de Drive Picker en desarrollo
+
+- Se agregó `UiCopiasPicker.html` como módulo aislado: consulta la configuración y sólo muestra el botón si Picker está configurado.
+- La carga tradicional resumible queda intacta como alternativa; la selección de Drive registra el PDF sin atravesar el proxy de bloques.
+- Se validó sintaxis local de JavaScript y HTML; pendiente prueba funcional en el despliegue de desarrollo.
 - GAS de desarrollo: versión 88, `Restaurar interfaz desarrollo`.
 - Producción no fue modificada.
 

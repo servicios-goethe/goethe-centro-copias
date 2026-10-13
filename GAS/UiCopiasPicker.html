@@ -1,0 +1,82 @@
+<script>
+function inicializarPickerCopiasUI_() {
+  const boton = document.getElementById("copias-drive-picker-btn");
+  if (!boton || !window.google || !google.script || !google.script.run) return;
+  google.script.run
+    .withSuccessHandler(function() { boton.classList.remove("hidden"); })
+    .withFailureHandler(function() { boton.classList.add("hidden"); })
+    .obtenerPickerCopiasConfig();
+}
+
+function abrirPickerCopiasUI_() {
+  const boton = document.getElementById("copias-drive-picker-btn");
+  if (copiasPickerLoading_) return;
+  copiasPickerLoading_ = true;
+  if (boton) { boton.disabled = true; boton.innerText = "Preparando Drive..."; }
+  google.script.run
+    .withSuccessHandler(function(config) {
+      cargarApiPickerCopias_(function() {
+        copiasPickerLoading_ = false;
+        if (boton) { boton.disabled = false; boton.innerText = "Elegir PDF desde Drive"; }
+        mostrarPickerCopias_(config);
+      });
+    })
+    .withFailureHandler(function(error) {
+      copiasPickerLoading_ = false;
+      if (boton) { boton.disabled = false; boton.innerText = "Elegir PDF desde Drive"; }
+      manejarError(error);
+    })
+    .obtenerPickerCopiasConfig();
+}
+
+function cargarApiPickerCopias_(callback) {
+  if (window.google && google.picker) { callback(); return; }
+  const existente = document.querySelector('script[data-copias-picker-api="1"]');
+  if (existente) { existente.addEventListener("load", function() { esperarPickerCopias_(callback); }); return; }
+  const script = document.createElement("script");
+  script.src = "https://apis.google.com/js/api.js";
+  script.async = true;
+  script.dataset.copiasPickerApi = "1";
+  script.onload = function() { esperarPickerCopias_(callback); };
+  script.onerror = function() { mostrarAviso("error", "No se pudo cargar el selector de Drive."); copiasPickerLoading_ = false; };
+  document.head.appendChild(script);
+}
+
+function esperarPickerCopias_(callback) {
+  if (window.google && google.picker) { callback(); return; }
+  if (!window.gapi || typeof gapi.load !== "function") { mostrarAviso("error", "Drive Picker no está disponible en este navegador."); return; }
+  gapi.load("picker", { callback: callback });
+}
+
+function mostrarPickerCopias_(config) {
+  const vista = new google.picker.DocsView(google.picker.ViewId.DOCS)
+    .setIncludeFolders(false)
+    .setMimeTypes("application/pdf");
+  const picker = new google.picker.PickerBuilder()
+    .setLocale("es")
+    .setDeveloperKey(config.apiKey)
+    .setAppId(config.appId)
+    .setOAuthToken(config.accessToken)
+    .addView(vista)
+    .setCallback(procesarResultadoPickerCopias_)
+    .build();
+  picker.setVisible(true);
+}
+
+function procesarResultadoPickerCopias_(data) {
+  if (!data || data.action !== google.picker.Action.PICKED) return;
+  const documento = data.docs && data.docs[0];
+  if (!documento || !documento.id) return;
+  const nombre = String(documento.name || "");
+  if (nombre.split(".").pop().toLowerCase() !== "pdf") { mostrarAviso("error", "Solo se aceptan archivos PDF."); return; }
+  copiasDriveSelection_ = { id: documento.id, name: nombre, size: Number(documento.sizeBytes || documento.size || 0) };
+  const input = document.getElementById("copias-archivo");
+  const info = document.getElementById("copias-drive-picker-info");
+  if (input) input.required = false;
+  if (info) info.innerText = "PDF seleccionado: " + nombre;
+  const archivoInfo = document.getElementById("copias-archivo-info");
+  if (archivoInfo) archivoInfo.innerText = "Se registrará el PDF seleccionado en Drive al enviar la solicitud.";
+}
+
+window.setTimeout(inicializarPickerCopiasUI_, 0);
+</script>

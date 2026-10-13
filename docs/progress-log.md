@@ -569,3 +569,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - La ausencia del módulo Materiales para `autorizarcopias` es intencional: ese perfil sólo trabaja con copias.
 - GAS de desarrollo: versión 75, `Autorizacion directa desde bandeja`.
 
+## 2026-10-13 — Promoción a producción del perfil autorizarcopias
+
+- Se promovió la versión validada en desarrollo: autorización directa desde la bandeja, creación de solicitudes de copias y bloqueo de pedidos de librería para el perfil restringido.
+- Producción recibió `AppConfig.js` productivo (`ENVIRONMENT = PRODUCCION`, Spreadsheet productivo y carpeta de copias productiva).
+- GAS de producción: versión 15, `Autorizacion directa copias - produccion`.
+- `main` no fue modificada.
+

@@ -5,6 +5,8 @@ let copiasDecisionContexto = null;
 let copiasEnviando = false;
 let solicitantesCopiasBusquedaTimer_ = null;
 let copiasCargaEnCurso_ = false;
+let copiasDriveSelection_ = null;
+let copiasPickerLoading_ = false;
 
 function seleccionarOpcionCopiasUI_(selectId, value, button) {
   const select = document.getElementById(selectId);
@@ -189,11 +191,57 @@ function validarArchivoCopiasCliente_(input) {
   return true;
 }
 
+function abrirPickerCopiasUI_() {
+  if (copiasPickerLoading_) return;
+  copiasPickerLoading_ = true;
+  google.script.run
+    .withSuccessHandler(function(config) {
+      copiasPickerLoading_ = false;
+      const abrir = function() {
+        const uploadView = new google.picker.DocsUploadView().setParent(config.folderId);
+        const docsView = new google.picker.DocsView(google.picker.ViewId.DOCS)
+          .setIncludeFolders(false)
+          .setMimeTypes("application/pdf");
+        const picker = new google.picker.PickerBuilder()
+          .setDeveloperKey(config.apiKey)
+          .setAppId(config.appId)
+          .setOAuthToken(config.accessToken)
+          .setOrigin(window.location.protocol + "//" + window.location.host)
+          .addView(uploadView)
+          .addView(docsView)
+          .setTitle("Seleccionar PDF · PDF auswählen")
+          .setCallback(function(data) {
+            if (data.action !== google.picker.Action.PICKED || !data.docs || !data.docs.length) return;
+            const doc = data.docs[0];
+            copiasDriveSelection_ = { id: doc.id, name: doc.name || "archivo.pdf", size: Number(doc.sizeBytes || 0), mimeType: doc.mimeType || "application/pdf" };
+            const info = document.getElementById("copias-drive-picker-info");
+            if (info) info.innerText = `Seleccionado desde Drive: ${copiasDriveSelection_.name}`;
+            const input = document.getElementById("copias-archivo");
+            if (input) input.required = false;
+          })
+          .build();
+        picker.setVisible(true);
+      };
+      if (window.google && google.picker) return abrir();
+      const script = document.createElement("script");
+      script.src = "https://apis.google.com/js/api.js";
+      script.onload = function() { gapi.load("picker", abrir); };
+      script.onerror = function() { mostrarAviso("error", "No se pudo cargar Google Drive Picker."); };
+      document.head.appendChild(script);
+    })
+    .withFailureHandler(function(error) {
+      copiasPickerLoading_ = false;
+      manejarError(error);
+    })
+    .obtenerPickerCopiasConfig();
+}
+
 function enviarSolicitudCopias(form, event) {
   event.preventDefault();
   if (copiasEnviando) return;
   const input = document.getElementById("copias-archivo");
-  if (!validarArchivoCopiasCliente_(input) || !form.reportValidity()) return;
+  if (!copiasDriveSelection_ && (!validarArchivoCopiasCliente_(input) || !form.reportValidity())) return;
+  if (copiasDriveSelection_ && !form.reportValidity()) return;
 
   copiasEnviando = true;
   const button = document.getElementById("copias-enviar-btn");
@@ -208,6 +256,28 @@ function enviarSolicitudCopias(form, event) {
     datos[element.name] = element.value;
   });
   const archivo = input.files[0];
+  if (copiasDriveSelection_) {
+    datos.archivoDriveId = copiasDriveSelection_.id;
+    datos.archivoPicker = "SI";
+    datos.archivoNombre = copiasDriveSelection_.name;
+    datos.archivoBytes = copiasDriveSelection_.size;
+    mostrarLoading("Registrando archivo de Drive...");
+    google.script.run
+      .withSuccessHandler(function(result) {
+        copiasEnviando = false;
+        ocultarLoading();
+        form.reset();
+        copiasDriveSelection_ = null;
+        const pickerInfo = document.getElementById("copias-drive-picker-info");
+        if (pickerInfo) pickerInfo.innerText = "";
+        if (input) input.required = true;
+        mostrarAviso("success", result.message || "Solicitud registrada.");
+        cargarPanelCopias();
+      })
+      .withFailureHandler(function(error) { copiasEnviando = false; ocultarLoading(); manejarError(error); })
+      .registrarSolicitudCopias(datos);
+    return;
+  }
   datos.archivoNombre = archivo.name;
   datos.archivoBytes = archivo.size;
 

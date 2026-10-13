@@ -426,9 +426,20 @@ function registrarSolicitudCopias(form) {
     try {
       if (driveId) {
         file = DriveApp.getFileById(driveId);
+        if (file.getMimeType() !== "application/pdf" || file.getSize() !== archivoBytes) {
+          throw new Error("El archivo cargado no coincide con el PDF seleccionado.");
+        }
         const padres = file.getParents();
         const padreValido = padres.hasNext() && padres.next().getName() === id;
-        if (!padreValido || file.getName().indexOf(`${id}_`) !== 0 || file.getMimeType() !== "application/pdf" || file.getSize() !== archivoBytes) {
+        if (String(form.archivoPicker || "").toUpperCase() === "SI" && !padreValido) {
+          const root = DriveApp.getFolderById(CONFIG.COPIAS_DRIVE_FOLDER_ID);
+          const year = Utilities.formatDate(now, CONFIG.TIMEZONE, "yyyy");
+          const yearFolder = obtenerOCrearSubcarpetaCopias_(root, year);
+          const levelFolder = obtenerOCrearSubcarpetaCopias_(yearFolder, data.nivel);
+          const requestFolder = obtenerOCrearSubcarpetaCopias_(levelFolder, id);
+          file.setName(`${id}_${archivoNombre.replace(/[\\/:*?"<>|]+/g, "-")}`);
+          file.moveTo(requestFolder);
+        } else if (!padreValido || file.getName().indexOf(`${id}_`) !== 0) {
           throw new Error("El archivo cargado no coincide con el PDF seleccionado.");
         }
       } else {

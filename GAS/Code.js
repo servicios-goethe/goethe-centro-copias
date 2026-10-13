@@ -58,3 +58,27 @@ function verificarPermisoCargaResumibleDrive() {
   const body = JSON.parse(response.getContentText() || "{}");
   return { ok: true, cuenta: body.user || null };
 }
+
+function configurarPickerCopias(apiKey, projectNumber) {
+  const key = String(apiKey || "").trim();
+  const appId = String(projectNumber || "").trim();
+  if (!/^AIza[\w-]+$/.test(key)) throw new Error("La API key de Picker no tiene un formato valido.");
+  if (!/^\d+$/.test(appId)) throw new Error("El project number debe ser numerico.");
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty("COPIAS_PICKER_API_KEY", key);
+  props.setProperty("COPIAS_PICKER_APP_ID", appId);
+  return { ok: true, appId: appId, message: "Configuracion de Drive Picker guardada." };
+}
+
+function obtenerPickerCopiasConfig() {
+  const props = PropertiesService.getScriptProperties();
+  const apiKey = props.getProperty("COPIAS_PICKER_API_KEY") || "";
+  const appId = props.getProperty("COPIAS_PICKER_APP_ID") || "";
+  if (!apiKey || !appId) throw new Error("Drive Picker no esta configurado en este entorno.");
+  return {
+    apiKey: apiKey,
+    appId: appId,
+    accessToken: ScriptApp.getOAuthToken(),
+    folderId: CONFIG.COPIAS_DRIVE_FOLDER_ID
+  };
+}

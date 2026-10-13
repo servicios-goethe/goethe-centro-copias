@@ -24,6 +24,14 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 85, `Carga resumible por bloques sin CORS`.
 - Producción no fue modificada.
 
+## 2026-10-13 — Drive Picker sin costo adicional en desarrollo
+
+- Se agregó el botón de carga/selección mediante Google Drive Picker, con filtro PDF y asociación posterior a la solicitud.
+- El archivo se carga directamente en Drive; Apps Script sólo mueve el archivo a la carpeta de la solicitud y registra los metadatos.
+- La API key y el project number se guardan como propiedades del script, fuera del repositorio.
+- GAS de desarrollo: versión 87, `Drive Picker para PDFs`.
+- Producción no fue modificada.
+
 ## 2026-10-13 — Optimización de bloques de carga
 
 - La prueba real de 62 MB completó correctamente, pero tardó casi 5 minutos con bloques de 4 MB.

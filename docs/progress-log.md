@@ -512,3 +512,12 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Commit: `c85209f` (`feat(rediseno): style deliveries workspace`).
 - GAS de desarrollo: versión 41, `Rediseno Hito 3 - entregas operativas`.
 - Producción, `main` y la rama funcional no fueron modificadas.
+## 2026-10-09 — Búsqueda de productos sin sensibilidad a tildes
+
+- Los buscadores de pedidos, compras, recepción, administración y copias normalizan tildes sólo durante la comparación.
+- `lapices`, `lápices` y `LÁPICES` encuentran el mismo producto; los nombres visibles del catálogo conservan su ortografía correcta en español y alemán.
+- No se modificaron hojas de cálculo ni datos de productos.
+- Commit: `1f62140` (`feat(search): ignore accents in filters`).
+- GAS de desarrollo: versión 69, `Búsqueda de productos sin tildes`.
+- Producción y `main` no fueron modificadas.
+

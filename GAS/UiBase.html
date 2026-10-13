@@ -474,7 +474,6 @@
   }
 
   function seleccionarModuloRedisenio_(modulo) {
-    if (rolActual && rolActual.isAutorizadorCopias) modulo = "copias";
     moduloActivo = modulo === "copias" ? "copias" : "materiales";
     try { sessionStorage.setItem("pedidos-grafica-modulo", moduloActivo); } catch (error) {}
     renderNavegacionRedisenio_(rolActual);

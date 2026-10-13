@@ -24,6 +24,13 @@ Este documento registra cada corte verificable del proyecto. Un despliegue en de
 - GAS de desarrollo: versión 85, `Carga resumible por bloques sin CORS`.
 - Producción no fue modificada.
 
+## 2026-10-13 — Corrección de arranque tras prototipo Picker
+
+- La primera integración del botón Picker provocó un error de sintaxis en el JavaScript renderizado del iframe y dejó la interfaz sin `cargarPanelCopias`.
+- Se retiró temporalmente sólo el código cliente del botón Picker para restaurar la interfaz; el backend y la configuración quedan aislados para una reintroducción segura.
+- GAS de desarrollo: versión 88, `Restaurar interfaz desarrollo`.
+- Producción no fue modificada.
+
 ## 2026-10-13 — Drive Picker sin costo adicional en desarrollo
 
 - Se agregó el botón de carga/selección mediante Google Drive Picker, con filtro PDF y asociación posterior a la solicitud.

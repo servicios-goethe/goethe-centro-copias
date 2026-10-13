@@ -619,3 +619,10 @@ No quedan hitos funcionales pendientes en este plan. Las decisiones de arquitect
 - Mantiene la bandeja restringida de autorizaciones de copias.
 - GAS de desarrollo: versión 81, `Materiales para autorizador de copias`.
 
+## 2026-10-13 — Promoción del perfil mixto a producción
+
+- Se promovió la versión validada en desarrollo: `autorizarcopias` puede usar materiales como usuario común y autorizar copias según nivel, sin funciones administrativas.
+- Producción mantiene la política de dos mails de copias: alta y finalización.
+- GAS de producción: versión 16, `Perfil mixto materiales y autorizacion copias`.
+- `main` no fue modificada.
+

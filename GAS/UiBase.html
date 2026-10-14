@@ -397,7 +397,7 @@
     const operador = !!(role && role.isOperadorEntrega);
     if (modulo === "copias") {
       const tabs = [{ key: "nueva", es: "Nueva solicitud", de: "Neuer Auftrag", panels: ["user-copias"] }, { key: "mis", es: "Mis solicitudes", de: "Meine Aufträge", panels: ["user-copias"] }];
-      if (admin) tabs.push({ key: "autorizaciones", es: "Autorizaciones", de: "Freigaben", panels: ["admin-copias"] });
+      if (admin || (role && role.isAutorizadorCopias)) tabs.push({ key: "autorizaciones", es: "Autorizaciones", de: "Freigaben", panels: ["admin-copias"] });
       if (admin || operador) tabs.push({ key: "trabajos", es: "Trabajos", de: "Druckaufträge", panels: ["admin-copias"] });
       return tabs;
     }

@@ -50,6 +50,30 @@ function esperarPickerCopias_(callback) {
   gapi.load("picker", { callback: callback });
 }
 
+function obtenerOrigenPickerCopias_() {
+  // En producción el web app puede abrirse bajo el dominio institucional
+  // (goethe.edu.ar), mientras que en desarrollo suele abrirse bajo
+  // script.google.com. Picker exige que setOrigin coincida con el origen
+  // superior real, por eso no debe quedar fijo a un único dominio.
+  try {
+    const referencia = String(document.referrer || "").trim();
+    if (referencia) {
+      const origen = new URL(referencia).origin;
+      if (origen && origen !== "null") return origen;
+    }
+  } catch (error) {
+    // Continúa con los orígenes alternativos.
+  }
+  try {
+    if (window.top && window.top.location && window.top.location.origin) {
+      return window.top.location.origin;
+    }
+  } catch (error) {
+    // El acceso al top puede estar restringido por el iframe.
+  }
+  return "https://script.google.com";
+}
+
 function mostrarPickerCopias_(config) {
   copiasPickerScrollY_ = window.scrollY || window.pageYOffset || 0;
   window.scrollTo(0, 0);
@@ -63,9 +87,7 @@ function mostrarPickerCopias_(config) {
     .setDeveloperKey(config.apiKey)
     .setAppId(config.appId)
     .setOAuthToken(config.accessToken)
-    // Apps Script ejecuta este HTML dentro de googleusercontent.com, pero la
-    // pagina superior del web app tiene origen script.google.com.
-    .setOrigin("https://script.google.com")
+    .setOrigin(obtenerOrigenPickerCopias_())
     .setSize(ancho, alto)
     .addView(vista)
     .setCallback(procesarResultadoPickerCopias_)

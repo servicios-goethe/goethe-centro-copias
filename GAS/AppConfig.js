@@ -248,7 +248,8 @@ function enviarMailHtml_(to, subject, htmlBody, name) {
   // rechaza todo el envío aunque el resto de la solicitud esté correcta.
   const opciones = {
     htmlBody: htmlBody,
-    name: name || "Goethe Schule Inventario"
+    name: name || "Centro de Copias – Goethe Schule",
+    replyTo: MAIL_SENDER
   };
   try {
     const aliases = GmailApp.getAliases().map(function(alias) { return String(alias).toLowerCase(); });

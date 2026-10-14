@@ -57,6 +57,7 @@ function mostrarPickerCopias_(config) {
     .setDeveloperKey(config.apiKey)
     .setAppId(config.appId)
     .setOAuthToken(config.accessToken)
+    .setOrigin(window.location.protocol + "//" + window.location.host)
     .addView(vista)
     .setCallback(procesarResultadoPickerCopias_)
     .build();

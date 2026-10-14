@@ -1590,7 +1590,7 @@
   #view-user .copies-section .collapsible-body { padding: 14px; }
   #view-user .copies-section #copias-form {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 142px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
     align-items: start;
     padding: 14px;
@@ -1654,13 +1654,12 @@
     border-radius: 8px;
   }
   #view-user .copies-section .copies-summary-card {
-    grid-column: 2;
-    grid-row: 2;
+    grid-column: 1;
+    grid-row: auto;
     margin: 0;
     padding: 14px 12px;
     border-radius: 12px;
-    position: sticky;
-    top: 12px;
+    position: static;
   }
   #view-user .copies-section .copies-summary-card strong { font-size: 2rem; }
   #view-user .copies-section .copies-summary-label { font-size: .64rem; }
@@ -1690,6 +1689,22 @@
   #view-user .copies-section .copies-summary-detail,
   #view-user .copies-section .copies-summary-note { font-size: .88rem; }
   #view-user .copies-section .copies-summary-card .btn { font-size: .9rem; }
+  #view-user .copies-section .copies-summary-card > span,
+  #view-user .copies-section .copies-summary-card .copies-summary-detail,
+  #view-user .copies-section .copies-summary-card .copies-summary-note,
+  #view-user .copies-section .copies-summary-card .btn {
+    font-size: 1rem;
+  }
+  #view-user .copies-section .copies-summary-card .btn-primary {
+    background: #b08d45;
+    border-color: #b08d45;
+    color: #fff;
+  }
+  #view-user .copies-section .copies-summary-card .btn-primary:hover,
+  #view-user .copies-section .copies-summary-card .btn-primary:focus-visible {
+    background: #7a5f25;
+    border-color: #7a5f25;
+  }
   #view-user .copies-section .pedido-footer {
     display: none;
   }

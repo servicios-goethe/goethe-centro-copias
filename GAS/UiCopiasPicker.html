@@ -57,7 +57,9 @@ function mostrarPickerCopias_(config) {
     .setDeveloperKey(config.apiKey)
     .setAppId(config.appId)
     .setOAuthToken(config.accessToken)
-    .setOrigin(window.location.protocol + "//" + window.location.host)
+    // Apps Script ejecuta este HTML dentro de googleusercontent.com, pero la
+    // pagina superior del web app tiene origen script.google.com.
+    .setOrigin("https://script.google.com")
     .addView(vista)
     .setCallback(procesarResultadoPickerCopias_)
     .build();

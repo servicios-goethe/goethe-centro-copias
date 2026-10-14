@@ -1572,8 +1572,19 @@
   .copies-summary-label { color: #dcc48e; font-size: .8rem; font-weight: 700; }
   .copies-summary-card strong { font-size: 2.7rem; line-height: 1; }
   .copies-summary-card > span:not(.copies-summary-label):not(.copies-summary-detail):not(.copies-summary-note) { font-size: .82rem; }
-  .copies-summary-detail { font-size: .88rem; line-height: 1.45; }
-  .copies-summary-note { padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.08); font-size: .78rem; line-height: 1.4; }
+  .copies-summary-print-box,
+  .copies-summary-note {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #dfe4e0;
+    color: #13261b;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .copies-summary-print-box { display: flex; flex-direction: column; gap: 4px; }
+  .copies-summary-print-box strong { color: #13261b; }
+  .copies-summary-detail { font-size: 1rem; line-height: 1.4; }
+  .copies-summary-note { margin: 0; }
 
   /* Vista compacta del formulario de copias según el rediseño */
   #view-user .copies-section {
@@ -1665,7 +1676,7 @@
   #view-user .copies-section .copies-summary-label { font-size: .64rem; }
   #view-user .copies-section .copies-summary-card > span:not(.copies-summary-label):not(.copies-summary-detail):not(.copies-summary-note),
   #view-user .copies-section .copies-summary-detail,
-  #view-user .copies-section .copies-summary-note { font-size: .62rem; }
+  #view-user .copies-section .copies-summary-note { font-size: 1rem; }
   #view-user .copies-section .copies-summary-card .btn {
     width: 100%;
     margin-top: 4px;
@@ -1690,6 +1701,7 @@
   #view-user .copies-section .copies-summary-note { font-size: .88rem; }
   #view-user .copies-section .copies-summary-card .btn { font-size: .9rem; }
   #view-user .copies-section .copies-summary-card > span,
+  #view-user .copies-section .copies-summary-print-box,
   #view-user .copies-section .copies-summary-card .copies-summary-detail,
   #view-user .copies-section .copies-summary-card .copies-summary-note,
   #view-user .copies-section .copies-summary-card .btn {

@@ -1576,14 +1576,22 @@
   .copies-summary-note {
     padding: 12px 14px;
     border-radius: 12px;
-    background: #dfe4e0;
-    color: #13261b;
-    font-size: 1rem;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    font-size: .88rem;
     line-height: 1.4;
   }
-  .copies-summary-print-box { display: flex; flex-direction: column; gap: 4px; }
-  .copies-summary-print-box strong { color: #13261b; }
-  .copies-summary-detail { font-size: 1rem; line-height: 1.4; }
+  .copies-summary-print-box {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .copies-summary-print-box strong { color: #fff; font-size: .88rem; line-height: 1.4; }
+  .copies-summary-print-box > span { flex: 0 0 auto; }
+  .copies-summary-detail { font-size: .88rem; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; }
   .copies-summary-note { margin: 0; }
 
   /* Vista compacta del formulario de copias según el rediseño */
@@ -1705,8 +1713,9 @@
   #view-user .copies-section .copies-summary-card .copies-summary-detail,
   #view-user .copies-section .copies-summary-card .copies-summary-note,
   #view-user .copies-section .copies-summary-card .btn {
-    font-size: 1rem;
+    font-size: .88rem;
   }
+  #view-user .copies-section .copies-summary-print-box strong { font-size: .88rem; }
   #view-user .copies-section .copies-summary-card .btn-primary {
     background: #b08d45;
     border-color: #b08d45;

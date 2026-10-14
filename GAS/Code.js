@@ -79,6 +79,7 @@ function obtenerPickerCopiasConfig() {
     apiKey: apiKey,
     appId: appId,
     accessToken: ScriptApp.getOAuthToken(),
-    folderId: CONFIG.COPIAS_DRIVE_FOLDER_ID
+    folderId: CONFIG.COPIAS_DRIVE_FOLDER_ID,
+    origin: CONFIG.ENVIRONMENT === "PRODUCCION" ? "https://goethe.edu.ar" : "https://script.google.com"
   };
 }

@@ -50,7 +50,13 @@ function esperarPickerCopias_(callback) {
   gapi.load("picker", { callback: callback });
 }
 
-function obtenerOrigenPickerCopias_() {
+function obtenerOrigenPickerCopias_(config) {
+  try {
+    const configurado = String(config && config.origin || "").trim();
+    if (/^https:\/\/[^/]+$/i.test(configurado)) return configurado;
+  } catch (error) {
+    // Continúa con los orígenes alternativos.
+  }
   // En producción el web app puede abrirse bajo el dominio institucional
   // (goethe.edu.ar), mientras que en desarrollo suele abrirse bajo
   // script.google.com. Picker exige que setOrigin coincida con el origen
@@ -87,7 +93,7 @@ function mostrarPickerCopias_(config) {
     .setDeveloperKey(config.apiKey)
     .setAppId(config.appId)
     .setOAuthToken(config.accessToken)
-    .setOrigin(obtenerOrigenPickerCopias_())
+    .setOrigin(obtenerOrigenPickerCopias_(config))
     .setSize(ancho, alto)
     .addView(vista)
     .setCallback(procesarResultadoPickerCopias_)

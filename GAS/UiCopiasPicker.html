@@ -1,4 +1,6 @@
 <script>
+let copiasPickerScrollY_ = 0;
+
 function inicializarPickerCopiasUI_() {
   const boton = document.getElementById("copias-drive-picker-btn");
   if (!boton || !window.google || !google.script || !google.script.run) return;
@@ -49,9 +51,13 @@ function esperarPickerCopias_(callback) {
 }
 
 function mostrarPickerCopias_(config) {
+  copiasPickerScrollY_ = window.scrollY || window.pageYOffset || 0;
+  window.scrollTo(0, 0);
   const vista = new google.picker.DocsView(google.picker.ViewId.DOCS)
     .setIncludeFolders(false)
     .setMimeTypes("application/pdf");
+  const ancho = Math.min(Math.max((window.innerWidth || 900) - 40, 566), 1051);
+  const alto = Math.min(Math.max((window.innerHeight || 650) - 100, 350), 650);
   const picker = new google.picker.PickerBuilder()
     .setLocale("es")
     .setDeveloperKey(config.apiKey)
@@ -60,6 +66,7 @@ function mostrarPickerCopias_(config) {
     // Apps Script ejecuta este HTML dentro de googleusercontent.com, pero la
     // pagina superior del web app tiene origen script.google.com.
     .setOrigin("https://script.google.com")
+    .setSize(ancho, alto)
     .addView(vista)
     .setCallback(procesarResultadoPickerCopias_)
     .build();
@@ -67,6 +74,8 @@ function mostrarPickerCopias_(config) {
 }
 
 function procesarResultadoPickerCopias_(data) {
+  const posicion = copiasPickerScrollY_;
+  window.setTimeout(function() { window.scrollTo(0, posicion); }, 0);
   if (!data || data.action !== google.picker.Action.PICKED) return;
   const documento = data.docs && data.docs[0];
   if (!documento || !documento.id) return;

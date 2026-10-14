@@ -243,22 +243,14 @@ function enviarMailHtml_(to, subject, htmlBody, name) {
     .replace(/&nbsp;/gi, " ")
     .replace(/\s+\n/g, "\n")
     .trim();
-  // `from` solo puede ser una dirección configurada como alias de la cuenta
-  // que ejecuta el script. Si no lo es (por ejemplo, en desarrollo), Gmail
-  // rechaza todo el envío aunque el resto de la solicitud esté correcta.
+  // MailApp usa el permiso script.send_mail declarado por el proyecto y
+  // envía desde la cuenta ejecutora, sin exigir un alias Gmail.
   const opciones = {
     htmlBody: htmlBody,
     name: name || "Centro de Copias – Goethe Schule",
     replyTo: MAIL_SENDER
   };
-  try {
-    const aliases = GmailApp.getAliases().map(function(alias) { return String(alias).toLowerCase(); });
-    const sender = String(MAIL_SENDER || "").trim().toLowerCase();
-    if (sender && aliases.includes(sender)) opciones.from = sender;
-  } catch (error) {
-    // La ausencia de alias no debe impedir el envío con la cuenta ejecutora.
-  }
-  GmailApp.sendEmail(to, subject, plainBody || subject, opciones);
+  MailApp.sendEmail(to, subject, plainBody || subject, opciones);
 }
 
 function agregarAdvertenciaMail_(mensaje, advertencia) {

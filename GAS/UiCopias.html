@@ -162,6 +162,11 @@ function cargarPanelCopias(silencioso) {
 function validarArchivoCopiasCliente_(input) {
   const info = document.getElementById("copias-archivo-info");
   const file = input && input.files ? input.files[0] : null;
+  if (file && copiasDriveSelection_) {
+    copiasDriveSelection_ = null;
+    const pickerInfo = document.getElementById("copias-drive-picker-info");
+    if (pickerInfo) pickerInfo.innerText = "";
+  }
   if (!file) {
     if (info) info.innerText = "Selecciona un archivo de hasta 80 MB.";
     return true;
@@ -200,11 +205,12 @@ function enviarSolicitudCopias(form, event) {
 
   copiasEnviando = true;
   const button = document.getElementById("copias-enviar-btn");
+  const usaPicker = !!copiasDriveSelection_;
   if (button) {
     button.disabled = true;
-    button.innerText = "Subiendo archivo...";
+    button.innerText = usaPicker ? "Registrando archivo..." : "Subiendo archivo...";
   }
-  mostrarLoading("Preparando carga resumible...");
+  mostrarLoading(usaPicker ? "Registrando archivo de Drive..." : "Preparando carga resumible...");
   const datos = {};
   Array.from(form.elements || []).forEach(function(element) {
     if (!element.name || element.type === "file" || element.type === "radio" && !element.checked) return;
@@ -221,6 +227,10 @@ function enviarSolicitudCopias(form, event) {
       .withSuccessHandler(function(result) {
         copiasEnviando = false;
         ocultarLoading();
+        if (button) {
+          button.disabled = false;
+          button.innerText = "Enviar solicitud";
+        }
         form.reset();
         copiasDriveSelection_ = null;
         const pickerInfo = document.getElementById("copias-drive-picker-info");
@@ -229,7 +239,15 @@ function enviarSolicitudCopias(form, event) {
         mostrarAviso("success", result.message || "Solicitud registrada.");
         cargarPanelCopias();
       })
-      .withFailureHandler(function(error) { copiasEnviando = false; ocultarLoading(); manejarError(error); })
+      .withFailureHandler(function(error) {
+        copiasEnviando = false;
+        ocultarLoading();
+        if (button) {
+          button.disabled = false;
+          button.innerText = "Enviar solicitud";
+        }
+        manejarError(error);
+      })
       .registrarSolicitudCopias(datos);
     return;
   }

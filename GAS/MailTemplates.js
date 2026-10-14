@@ -105,6 +105,30 @@ function buildMailPedidoListo_(pedidoId, items, tienePendiente) {
   });
 }
 
+function buildMailPedidoRegistrado_(pedidoId, items) {
+  return buildMailShell_({
+    title: "Solicitud de materiales recibida",
+    metaRows: [
+      { label: "Pedido", value: pedidoId },
+      { label: "Fecha", value: formatDateMail_(new Date()) }
+    ],
+    bodyHtml: `
+      <p style="margin:0 0 16px;color:#4f6157;line-height:1.6;">
+        Recibimos tu solicitud de materiales correctamente. Te avisaremos cuando esté lista para retirar.
+      </p>
+      <table role="presentation" style="width:100%;border-collapse:collapse;border:1px solid #e7ece9;border-radius:12px;overflow:hidden;">
+        <thead>
+          <tr style="background:#f7f9f8;">
+            <th style="padding:10px 12px;text-align:left;color:#6b7b71;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;">Producto</th>
+            <th style="padding:10px 12px;text-align:right;color:#6b7b71;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;">Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>${buildMailListItems_(items)}</tbody>
+      </table>`,
+    noteHtml: "Este es el mail de recepción. Recibirás otro cuando el pedido esté listo para retirar."
+  });
+}
+
 function buildMailCompraRegistrada_(compraId, solicitante, items) {
   return buildMailShell_({
     title: "Nueva solicitud de compra",

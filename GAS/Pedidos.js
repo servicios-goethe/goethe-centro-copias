@@ -157,6 +157,7 @@ function registrarPedidoMasivo(payload) {
     validarSolicitanteTerminalCopias_(role, pedido.nombreCompletoSolicitante, solicitanteMail);
     const idPedido = "RET-" + new Date().getTime();
     const filasPedido = [];
+    const itemsMail = [];
 
     items.forEach(item => {
       const producto = stockMap[item.id];
@@ -181,6 +182,7 @@ function registrarPedidoMasivo(payload) {
         CANTIDAD_PENDIENTE: item.cantidad,
         OBSERVACIONES: ""
       }));
+      itemsMail.push({ producto: producto.nombre, cantidad: item.cantidad });
     });
     if (materialNoListado) {
       const referencia = materialNoListadoLink ? ` | Referencia: ${materialNoListadoLink}` : "";
@@ -201,6 +203,7 @@ function registrarPedidoMasivo(payload) {
         CANTIDAD_PENDIENTE: 1,
         OBSERVACIONES: `Material no listado${referencia}`
       }));
+      itemsMail.push({ producto: `[No listado] ${materialNoListado}`, cantidad: 1 });
     }
     appendRows_(retirosCtx.sheet, filasPedido);
 
@@ -212,7 +215,10 @@ function registrarPedidoMasivo(payload) {
       materialNoListadoLink: materialNoListadoLink
     });
     bumpDataVersion_();
-    return "Pedido registrado correctamente.";
+    const mailWarning = ejecutarEnvioMailSeguro_(`pedido registrado ${idPedido}`, function() {
+      enviarMailHtml_(solicitanteMail, `Pedido recibido - ${idPedido}`, buildMailPedidoRegistrado_(idPedido, itemsMail));
+    });
+    return agregarAdvertenciaMail_("Pedido registrado correctamente.", mailWarning);
   });
 }
 
